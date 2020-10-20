@@ -1,0 +1,116 @@
+function exportCharacterInfoTile(params)
+    local characterTile = params.target
+    if saveState['characters'] == nil then saveState['characters'] = {} end
+    local characterIndex = (saveState['currentCharacter'] or 0) + 1
+    saveState['currentCharacter'] = characterIndex
+    saveState['characters'][characterIndex] = {['class'] = characterTile.getName()}
+    save()
+end
+
+function exportCharacterSheet(params)
+    local characterSheet = params.target
+    local characterIndex = saveState['currentCharacter']
+    saveState['characters'][characterIndex]['characterSheet'] = JSON.decode(characterSheet.script_state)
+    save()
+end
+
+function exportAbilityDeckInUse(params)
+    local deck = params.target
+    local sourceVersion = params.version
+    local characterIndex = saveState['currentCharacter']
+    saveState['characters'][characterIndex]['useCards'] = readCardsInDeck(deck, sourceVersion, currentCharacter)
+    save()
+end
+
+function exportAbilityDeckUnused(params)
+    local deck = params.target
+    local sourceVersion = params.version
+    local characterIndex = saveState['currentCharacter']
+    saveState['characters'][characterIndex]['unusedCards'] = readCardsInDeck(deck, sourceVersion, currentCharacter)
+    save()
+end
+
+function exportCharacterItems(params)
+    local cards = params.target
+    local sourceVersion = params.version
+    local characterIndex = saveState['currentCharacter']
+    if cards.tag == 'Deck' then
+        saveState['characters'][characterIndex]['items'] = readCardsInDeck(cards, sourceVersion, 'items')
+    elseif cards.tag == 'Card' then
+        saveState['characters'][characterIndex]['items'] = readCard(cards, sourceVersion, 'items')
+    end
+end
+
+function exportAvailableStore(params)
+    local cards = params.target
+    local sourceVersion = params.version
+    if cards.tag == 'Deck' then
+        saveState['storeItems'] = readCardsInDeck(cards, sourceVersion, 'items')
+    elseif cards.tag == 'Card' then
+        saveState['storeItems'] = readCard(cards, sourceVersion, 'items')
+    end
+end
+
+function exportCityEvents(params)
+    local item = params.target
+    local sourceVersion = params.version
+    if sourceVersion <= 2 then
+        saveState['cityEvents'] = JSON.decode(item.script_state)
+    else
+        if item.tag == 'Deck' then
+            saveState['cityEvents'] = readCardsInDeck(item, sourceVersion, 'cityEvents')
+        elseif item.tag == 'Card' then
+            saveState['cityEvents'] = readCard(item, sourceVersion, 'cityEvents')
+        end
+    end
+    save()
+end
+
+function exportMap(params)
+    local mapTile = params.target
+    local sourceVersion = params.version
+    local mapSave = mapTile.script_state
+    if mapSave ~= nil then
+        saveState['map'] = JSON.decode(mapSave).loc
+    else
+        saveState['map'] = {}
+    end
+    for guid, value in pairs(saveState['map']) do
+        local sticker = getObjectFromGUID(guid)
+        if sticker == nil and value == false then -- sticker has been placed and removed, but is still referenced on map save data
+            saveState['map'][guid] = nil
+        else
+            saveState['map'][guid] = not not value -- ignore label colour data
+        end
+    end
+    if sourceVersion <= 2 then
+        -- if check was never placed, old versions have no reference to them on the save state. Find guids and check to see if they exists
+        local checkGuids = mapTile.getVar('tableML')
+        if checkGuids ~= nil then
+            for guid, data in pairs(checkGuids) do
+                if saveState['map'][guid] == nil then
+                    -- double check sticker hasn't been placed
+                    local sticker = getObjectFromGUID(guid)
+                    if sticker ~= nil then
+                        saveState['map'][guid] = false
+                    end
+                end
+            end
+        end
+
+    end
+
+    save()
+end
+
+function exportLootIndex(params)
+    local lootTile = params.target
+    local sourceVersion = params.version
+    local lootInfo = lootTile.script_state
+    if lootInfo ~= nil then
+        saveState['lootIndex'] = JSON.decode(lootInfo).lootedIndex
+    else
+        saveState['lootIndex'] = {}
+    end
+    save()
+end

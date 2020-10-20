@@ -1,0 +1,17 @@
+#include CharacterSetupTile
+
+initiativeTrackerXPos = 34.93
+
+function placeSkills(bag, pos)
+    for i = 1, skillCount do
+        bag.takeObject({ --skills
+            position       = {pos.x-1, pos.y+2, pos.z-33},
+            smooth         = false
+        })
+    end
+
+    bag.takeObject({ --xSkills
+        position       = {pos.x-5, pos.y+1, pos.z-38},
+        smooth         = false
+    })
+end

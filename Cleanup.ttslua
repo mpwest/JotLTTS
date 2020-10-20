@@ -1,0 +1,64 @@
+function unionTables(table1, table2)
+    if table1 == nil then return table2 end
+    if table2 == nil then return table1 end
+    local union = {}
+    for _, element in pairs(table1) do
+        table.insert( union, element )
+    end
+    for _, element in pairs(table2) do
+         table.insert( union, element )
+    end
+    return union
+end
+
+function addToCleanup(newItems)
+    Wait.time(
+        function()
+            local guids = {}
+            for _, item in pairs(newItems) do
+                table.insert(guids, item.getGUID())
+            end
+            forCleanup(guids)
+        end,
+        1
+    )
+end
+
+function addItemToCleanup(newItem)
+    -- Wait added as items coming from infinite bags have same guid when callback fires, and are updated with a unique guid slightly after
+    Wait.time(function() forCleanup({newItem.getGUID()}) end, 1)
+end
+
+function forCleanup(newItems)
+    if saveState['cleanup'] == nil then
+        saveState['cleanup'] = {}
+    end
+
+    if type(newItems) == 'table' then
+        saveState['cleanup'] = unionTables(saveState['cleanup'], newItems)
+    else
+        table.insert(saveState['cleanup'], newItems)
+    end
+    save()
+end
+
+function onDestroy()
+    if saveState['cleanup'] ~= nil then
+        for _, guid in pairs(saveState['cleanup']) do
+            local obj = getObjectFromGUID(guid)
+            if obj ~= nil then
+                obj.destruct()
+            end
+        end
+        for i = 1, 4 do
+            local monsterMat = Global.call('getMonsterMat', i)
+            if monsterMat then
+                monsterMat.call('cleanup')
+            end
+        end
+        local elementTracker = getObjectFromGUID(Global.call('getElementTracker'))
+        if elementTracker then
+            elementTracker.call('cleanup')
+        end
+    end
+end

@@ -1,0 +1,250 @@
+function importCharacters(characterSaveData, sourceVersion)
+    for characterNumber, characterInfo in pairs(characterSaveData) do
+        if characterNumber <= 5 then
+            log('Set up player mat ' .. characterNumber)
+            local mat = setupPlayerMat(characterNumber)
+            Wait.time(function() importCharacter(characterNumber, characterInfo, sourceVersion, false) end, 1)
+        else
+            local waitBlock = math.floor((characterNumber - 1) / 5)
+            Wait.frames(function() importCharacter(characterNumber, characterInfo, sourceVersion, true) end, 300 * waitBlock)
+        end
+    end
+    if #characterSaveData > 5 then
+        broadcastToAll('To allow all assets to load correctly, characters will be loaded in batches.', {1,1,1,1})
+    end
+end
+
+function importCharacter(characterNumber, characterInfo, sourceVersion, condense)
+    logCharacter('Set up', characterInfo['class'], characterNumber)
+    local playerMat = getPlayerMat(characterNumber)
+    local pos = getPositionOrigin(characterNumber, playerMat)
+    local class = characterInfo['class']
+
+    local spin = {0.00, 180.00, 0.00}
+
+    -- validatate tuckbox exists
+    local characterTuckbox = getCharacterTuckbox(class)
+    if characterTuckbox == nil then
+        broadcastToAll('Cannot find tuckbox for ' .. class, {1 ,0.25, 0.25, 1}) -- red?
+        return false
+    end
+
+    logCharacter(nil, class, characterNumber, 'envelope')
+    local bag = characterTuckbox.takeObject({position = positionCalc('charBag', pos, condense), rotation = spin, smooth = false})
+
+    logCharacter('Convert and update', class, characterNumber, 'character sheet')
+    local characterSheetInfo = updateCharacterSheetSave(characterInfo['characterSheet'], sourceVersion)
+    local updateSheet = function(sheet) loadCharacterSheet(sheet, characterSheetInfo) end
+
+    local characterSheet = bag.takeObject({position = positionCalc('charSheet', pos, condense), rotation = spin, smooth = false, callback_function = updateSheet})
+    logCharacter(nil, class, characterNumber, 'info tile')
+    bag.takeObject({position = positionCalc('charBoard', pos, condense), rotation = spin, smooth = false}) --Character board
+
+    logCharacter(nil, class, characterNumber, 'figure, initiative tracker, character markers')
+    local figure = bag.takeObject({position = positionCalc('figure', pos, condense), rotation = spin, smooth = false})
+    bag.takeObject({position = positionCalc('init', pos, condense), rotation = spin, smooth = false})
+    bag.takeObject({position = positionCalc('markers', pos, condense), rotation = spin, smooth = false})
+
+    if hasSummons(class) then
+        logCharacter(nil, class, characterNumber, 'summon')
+        bag.takeObject({position = positionCalc('summons', pos, condense), rotation = spin, smooth = false})
+    end
+
+    logCharacter(nil, class, characterNumber, 'reference, attack modifier deck')
+    bag.takeObject({position = positionCalc('reference', pos, condense), rotation = spin, smooth = false})
+    local baseModifierDeck = bag.takeObject({position = positionCalc('baseMod', pos, condense), rotation = {0.00, 180.00, 180.00}, smooth = false})
+
+    local useCards = characterInfo['useCards']
+    local unusedCards = characterInfo['unusedCards']
+    logCharacter('Calculate', class, characterNumber, 'perks')
+    local perkChanges = calculatePerkChanges(characterSheetInfo, class)
+    local xpTracker = nil
+    local coinPurse = nil
+
+    if checkJotlClass(class) then
+        logCharacter(nil, class, characterNumber, 'A abilities')
+        placeACards(bag, pos, not not useCards, condense)
+        logCharacter(nil, class, characterNumber, 'coin purse, xp tracker')
+        coinPurse = placeCoinPurse(bag, pos, condense)
+        xpTracker = placeXPTracker(bag, pos, condense)
+        logCharacter(nil, class, characterNumber, 'B abilities')
+        bag.takeObject({position = positionCalc('abAbilities', pos, condense)}) -- B abilitiies
+        logCharacter(nil, class, characterNumber, 'level X-4 abilities')
+        removeAndSortAbilities(bag, useCards, unusedCards, pos, 'abilitySet1', condense) -- Level 1-4 abilities
+        logCharacter(nil, class, characterNumber, 'Attack modifier addons')
+        removeAndAddPerks(bag, baseModifierDeck, perkChanges, pos, condense)
+        logCharacter(nil, class, characterNumber, 'level 5+ abilities')
+        removeAndSortAbilities(bag, useCards, unusedCards, pos, 'abilitySet2', condense) -- Level 5+ abilities
+    else
+        logCharacter(nil, class, characterNumber, 'level 1 abilities')
+        moveLooseCards(bag, class, pos, useCards, condense)
+        logCharacter(nil, class, characterNumber, 'X abilities')
+        removeAndSortAbilities(bag, useCards, unusedCards, pos, 'abilitySet1', condense) -- X abilities
+        logCharacter(nil, class, characterNumber, 'coin purse, xp tracker')
+        coinPurse = placeCoinPurse(bag, pos, condense)
+        xpTracker = placeXPTracker(bag, pos, condense)
+        logCharacter(nil, class, characterNumber, 'level 2+ abilities')
+        removeAndSortAbilities(bag, useCards, unusedCards, pos, 'abilitySet2', condense) -- Level 2+ cards
+        logCharacter(nil, class, characterNumber, 'Attack modifier addons')
+        removeAndAddPerks(bag, baseModifierDeck, perkChanges, pos, condense)
+    end
+
+    if characterInfo['items'] ~= nil then
+        logCharacter('Find', class, characterNumber, 'character items')
+        getCharacterItems(characterInfo['items'], pos, condense)
+    end
+
+    Wait.condition(
+        function() waitSendGUIDs(xpTracker, coinPurse, characterSheet, figure, playerMat) end,
+        function() return not characterSheet.spawning and not figure.spawning end
+    )
+end
+
+function waitSendGUIDs(xpTracker, coinPurse, sheet, figure, playerMat)
+    Wait.condition(
+        function() sendGUIDs(xpTracker, coinPurse, sheet, figure, playerMat) end,
+        function() return not sheet.spawning and not figure.spawning and not coinPurse.spawning end
+    )
+end
+
+function sendGUIDs(xpTracker, coinPurse, sheet, figure, playerMat)
+    log('Send GUIDs')
+    local sheetGUID = sheet.getGUID()
+    local figureGUID = figure.getGUID()
+    xpTracker.call('setCharacterInfo', {sheetGUID = sheetGUID, figureGUID = figureGUID})
+    if playerMat ~= nil then
+        playerMat.call('setCharacterInfo', {sheetGUID = sheetGUID, figureGUID = figureGUID})
+    end
+    figure.call('setCharacterSheet', sheetGUID)
+    coinPurse.call('setCharacterSheet', sheetGUID)
+end
+
+
+-- functions to help with JotL/GH class differences
+
+function placeCoinPurse(bag, pos, condense)
+    return bag.takeObject({position = positionCalc('coinPurse', pos, condense)}) -- coin purse
+end
+
+function placeXPTracker(bag, pos, condense)
+    return bag.takeObject({position = positionCalc('xpTracker', pos, condense)}) -- xp Tracker
+end
+
+function placeACards(bag, basePosition, discardCards, condense)
+    local cardPosition = positionCalc('hand', basePosition, condense)
+    if discardCards then
+        cardPosition = positionCalc('abAbilities', basePosition, condense)
+    end
+    for i = 1, 6 do
+        bag.takeObject({position = cardPosition})
+    end
+end
+
+function moveLooseCards(bag, class, basePosition, useCards, condense)
+    local handPosition = positionCalc('hand', basePosition, condense)
+    local availablePosition = positionCalc('available', basePosition, condense)
+    local callback = function(card) checkCardAndMove(card, useCards, handPosition) end
+
+    for i = 1, ghHandSize[class] do
+        local card = bag.takeObject({position = availablePosition, callback_function = callback})
+        availablePosition.y = availablePosition.y + 0.2
+        card.setLock(true) -- prevent cards from falling into deck until move check complete
+    end
+end
+
+function checkCardAndMove(card, useCards, handPosition)
+    if useCards ~= nil then
+        for _, cardName in pairs(useCards) do
+            if card.getName() == cardName then
+                card.setPosition(handPosition)
+                card.setLock(false)
+                return
+            end
+        end
+    end
+    card.setLock(false)
+end
+
+function removeAndSortAbilities(bag, useCards, unusedCards, pos, cardSet, condense)
+    local initialPosition = positionCalc(cardSet, pos, condense)
+    bag.takeObject({position = initialPosition, callback_function = function(deck) updateAbilities(deck, useCards, unusedCards, pos, condense) end})
+end
+
+function removeAndAddPerks(bag, baseModifierDeck, perkUpdates, basePosition, condense)
+    local callback = function(perkDeck)
+        Wait.condition(
+            function() updateModifierDeck(baseModifierDeck, perkDeck, perkUpdates) end,
+            function() return not baseModifierDeck.spawning end
+        )
+    end
+    bag.takeObject({position = positionCalc('perkMod', basePosition, condense), callback_function = callback})
+end
+
+function updateModifierDeck(baseModifierDeck, perkModifierDeck, modifierDeckChanges)
+    local perkDeckPosition = perkModifierDeck.getPosition()
+    perkDeckPosition.y = 2
+
+    local perkRemaining = #perkModifierDeck.getObjects()
+
+    for _, change in ipairs(modifierDeckChanges) do
+        if change['action'] == 'remove' then
+            removeCard(baseModifierDeck, change['cardName'], {perkDeckPosition.x, 1.5, perkDeckPosition.z - 2.5})
+        elseif change['action'] == 'add' then
+            if perkRemaining == 1 then
+                Wait.frames(function() moveLastCard(perkDeckPosition, change['cardName'], baseModifierDeck.getPosition(), {180, 0, 0}) end, 30)
+            else
+                addCard(baseModifierDeck, perkModifierDeck, change['cardName'])
+            end
+            perkRemaining = perkRemaining - 1
+        end
+    end
+end
+
+function updateAbilities(deck, useCards, unusedCards, basePosition, condense)
+    if useCards == nil then
+        return
+    end
+
+    local handPosition = positionCalc('hand', basePosition, condense)
+    local availablePosition = positionCalc('available', basePosition, condense)
+    local remaining = #(deck.getObjects())
+    for _, card in pairs(deck.getObjects()) do
+        local lastCard = (remaining == 1)
+        if not checkAndMoveCard(deck, card, useCards, handPosition, lastCard) then
+            checkAndMoveCard(deck, card, unusedCards, availablePosition, lastCard)
+        end
+        remaining = remaining - 1
+    end
+end
+
+function getCharacterItems(itemList, basePosition, condense)
+    local movePosition = positionCalc('item', basePosition, condense)
+
+    local availableItems = getObjectFromGUID(getItemDeck('available'))
+    local unavailableItems = getObjectFromGUID(getItemDeck('unavailable'))
+
+    local availableRemaining = #availableItems.getObjects()
+    local unavailableRemaining = #unavailableItems.getObjects()
+
+    local availableItemPosition = availableItems.getPosition()
+    local unavailableItemPosition = unavailableItems.getPosition()
+    local cardRotation = {0,180,0}
+    for _, itemName in pairs(itemList) do
+        if availableRemaining == 1 then
+            Wait.frames(function() moveLastCard(availableItemPosition, itemName, movePosition, cardRotation) end, 30)
+        else
+            if not removeCard(availableItems, itemName, movePosition, cardRotation) then
+                if unavailableRemaining == 1 then
+                    Wait.frames(function() moveLastCard(unavailableItemPosition, itemName, movePosition, cardRotation) end, 30)
+                else
+                    if removeCard(unavailableItems, itemName, movePosition, cardRotation) then
+                        unavailableRemaining = unavailableRemaining - 1
+                    end
+
+                end
+            else
+                availableRemaining = availableRemaining - 1
+            end
+        end
+    end
+end

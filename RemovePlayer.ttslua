@@ -1,0 +1,30 @@
+function onLoad(save_state)
+    self.createButton({
+        click_function = 'setupPlayerMat',
+        function_owner = self,
+        position = {0, 0.2, 0},
+        scale = {1, 1, 1},
+        width = 5000,
+        height = 1000,
+        color = {1, 1, 1, 0},
+        tooltip = 'Remove Player ' .. playerNumber .. ' Mat'
+    })
+    self.interactable = false
+    self.tooltip = false
+end
+
+function setupPlayerMat()
+    local playerMatComponents = Global.call('getPlayerMatInfo', playerNumber)
+    for _, componentInfo in pairs(playerMatComponents) do
+        local object = getObjectFromGUID(componentInfo.guid)
+        if object ~= nil then
+            object.setPosition(componentInfo.hiddenPosition)
+            object.setRotation({0, 180, 180})
+            object.setLock(true)
+        end
+    end
+    for _, state in pairs(self.getStates()) do
+        self.setState(state.id)
+    end
+    --self.setState(2)
+end

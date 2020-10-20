@@ -1,0 +1,14 @@
+function playLevel5Card(params)
+    local characterSheet = getObjectFromGUID(params.characterSheet)
+    if characterSheet and characterSheet.getVar('getCharacterLevel') then
+        local level = characterSheet.call('getCharacterLevel')
+        if level >= 5 then
+            local bag = getObjectFromGUID(Global.call('getLvl5Bag', 'hatchet'))
+            if bag then
+                local dropPosition = self.getPosition()
+                dropPosition.y = dropPosition.y + 1
+                bag.takeObject({position = dropPosition})
+            end
+        end
+    end
+end

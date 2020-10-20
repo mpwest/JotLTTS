@@ -1,0 +1,163 @@
+saveState = {}
+
+function onLoad(save_state)
+  if save_state ~= "" then
+    saveState = JSON.decode(save_state)
+  end
+  if preInit ~= nil then
+      preInit()
+  end
+
+  createLabels()
+  createPlusMinusButtons()
+  if postInit ~= nil then
+      postInit()
+  end
+end
+
+function createLabels()
+    createLabel(primaryCounterName)
+    createLabel(secondaryCounterName)
+end
+
+function createLabel(counterName)
+    local color = getFontColor(counterName)
+    local buttonParameter = {
+        click_function = counterName,
+        function_owner = self,
+        position       = labelPosition[counterName],
+        rotation       = labelRotation[counterName],
+        width          = 0,
+        height         = 0,
+        font_size      = size[counterName],
+        font_color     = color
+    }
+    local counterValue = saveState[counterName]
+    if counterValue == nil or counterValue == "" then counterValue = min[counterName] end
+
+    saveState[counterName] = counterValue
+    buttonParameter.label = checkHide(counterValue, counterName)
+    self.createButton(buttonParameter)
+    save_state = JSON.encode(saveState)
+end
+
+function createPlusMinusButtons()
+    local buttonColor = getButtonColor()
+    local fontColor = getFontColor()
+
+    local plusButton = getPlusLabel()
+    local minusButton = getMinusLabel()
+
+    local buttonParameter  = {
+        click_function = "decrement",
+        function_owner = self,
+        label = minusButton,
+        position = minusPosition,
+        rotation = buttonRotation,
+        width = buttonWidth or 200,
+        height = buttonHeight or 200,
+        font_size = fontSize or 250,
+        font_color = fontColor,
+        color = buttonColor
+    }
+
+    self.createButton(buttonParameter)
+    buttonParameter.position = plusPosition
+    buttonParameter.label = plusButton
+    buttonParameter.click_function = "increment"
+    self.createButton(buttonParameter)
+end
+
+function decrement(obj, playerColor, altClick)
+    if altClick then
+        changeCounter(-1, secondaryCounterName)
+    else
+        changeCounter(-1, primaryCounterName)
+    end
+end
+function increment(obj, playerColor, altClick)
+    if altClick then
+        changeCounter(1, secondaryCounterName)
+    else
+        changeCounter(1, primaryCounterName)
+    end
+end
+
+function changeCounter(delta, counterName)
+    local counterValue = saveState[counterName]
+
+    counterValue = counterValue + delta
+    if counterValue < min[counterName] then counterValue = min[counterName] end
+    if counterValue > max[counterName] then counterValue = max[counterName] end
+    saveState[counterName] = counterValue
+
+    local counter = getCounter(counterName)
+    if counter ~= nil then
+        counter.label = checkHide(counterValue, counterName)
+        self.editButton(counter)
+    end
+
+    self.script_state = JSON.encode(saveState)
+end
+
+function setCounter(newValue, counterName)
+    if counterName == nil then
+        counterName = primaryCounterName
+    end
+
+    saveState[counterName] = newValue
+    local counter = getCounter(counterName)
+    if counter ~= nil then
+        counter.label = checkHide(newValue, counterName)
+        self.editButton(counter)
+    end
+
+    self.script_state = JSON.encode(saveState)
+end
+
+function getCounter(counterName)
+    for _, button in pairs(self.getButtons() or {}) do
+        if button.click_function == counterName then
+          return button
+        end
+    end
+end
+
+function getButtonColor()
+    if buttonColor ~= nil then
+        return buttonColor
+    else
+        return {180/255, 180/255, 180/255, 0}
+    end
+end
+
+function getFontColor(counterName)
+    if labelColor[counterName] ~= nil then
+        return labelColor[counterName]
+    else
+        return {1/255, 1/255, 1/255, 180}
+    end
+end
+
+function getPlusLabel()
+    if plusButtonLabel ~= nil then
+        return plusButtonLabel
+    else
+        return ''
+    end
+end
+
+function getMinusLabel()
+    if minusButtonLabel ~= nil then
+        return minusButtonLabel
+    else
+        return ''
+    end
+end
+
+function checkHide(counterValue, counterName)
+    if hideZero[counterName] and counterValue == 0 then
+        return ''
+    end
+    return counterValue
+end

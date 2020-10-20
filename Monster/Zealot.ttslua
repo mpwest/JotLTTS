@@ -1,0 +1,7 @@
+#include ../MonsterStandee
+
+eliteHealth = {[0]=7, [1]=8, [2]=11, [3]=13, [4]=17, [5]=18, [6]=22, [7]=26}
+normalHealth = {[0]=4, [1]=6, [2]=7, [3]=8, [4]=10, [5]=12, [6]=14, [7]=16}
+
+baseName = 'Zealot'
+monsterType = 'zealot'

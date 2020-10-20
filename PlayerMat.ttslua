@@ -1,0 +1,119 @@
+#include AttackModifiers
+
+Casts = {
+    left = {0.6, 0, -0.369},
+    right = {0.2, 0, -0.369},
+    draw = {-0.725, 0.5, -0.172},
+    discard = {-0.725, 0.5, -0.569}
+}
+
+ playerCasts = {
+     active = {{0.7, 0.5, 0.633},{0.24, 0.5, 0.633},{-0.22, 0.5, 0.633},{-0.68, 0.5, 0.633}},
+     discard = {0.7, 0.5, 1.663},
+     lose = {-0.7, 0.5, 1.663},
+  }
+
+curseType = 'playerCurse'
+curseName = 'Curse'
+
+saveState = {}
+
+function onLoad(save_state)
+    if(save_state) ~= '' then
+        saveState = JSON.decode(save_state)
+    end
+
+    if saveState['xpTrackerGUID'] ~= nil then
+        xpTracker = saveState['xpTrackerGUID']
+    end
+
+    createButtons()
+    getTempDecks()
+end
+
+function getTempDecks()
+    tempModifierDeck['Bless'] = getObjectFromGUID(Global.call('getTempModifierDeck', 'bless'))
+    tempModifierDeck['Curse'] = getObjectFromGUID(Global.call('getTempModifierDeck', 'playerCurse'))
+end
+
+function announceDraw(card, name)
+     broadcastToAll(name .. ' Drew ' .. card.getName(), color['white'])
+ end
+
+function createButtons()
+    createButt('activeLeft', -0.875, -0.48, 'Player', 'Active Card')
+    createButt('discardLeft', -0.875, -0.369, 'Player', 'Discard Card')
+    createButt('loseLeft', -0.875, -0.255, 'Player', 'Lost Card')
+    createButt('activeRight', 0.28, -0.48, 'Player', 'Active Card')
+    createButt('discardRight', 0.28, -0.369, 'Player', 'Discard Card')
+    createButt('loseRight', 0.28, -0.255, 'Player', 'Lost Card')
+
+    createButt('draw', 0.6, 0.088, 'Player', 'Draw a Modifier Card')
+    createButt('cleanupAndShuffle', 0.848, 0.088, 'Player', 'Shuffle the Modifier Deck')
+
+    createButt('curse', 0.848, 0.201, 'Player', 'Add curse card')
+    createButt('bless', 0.6, 0.201, 'Player', 'Add bless card')
+end
+
+function activeLeft() placeCard('active', 'left') end
+function discardLeft() placeCard('discard', 'left') end
+function loseLeft() placeCard('lose', 'left') end
+function activeRight() placeCard('active', 'right') end
+function discardRight() placeCard('discard', 'right') end
+function loseRight() placeCard('lose', 'right') end
+
+function placeCard(destination, source)
+    local hitlist = getCards(Casts[source])
+
+    for _, obj in pairs(hitlist) do
+        local item = obj.hit_object
+        if item.tag == 'Card' then
+            if destination == 'active' then
+               local activeSlot = getEmptyActiveSlot(playerCasts[destination])
+               if activeSlot then
+                  item.setPosition(self.positionToWorld(activeSlot))
+                  if item.getVar('playLevel5Card') then
+                      item.call('playLevel5Card', {characterSheet = saveState['characterSheet'], figure = saveState['figure']})
+                  end
+               end
+            else
+               item.setPosition(self.positionToWorld(playerCasts[destination]))
+            end
+            return
+        end
+    end
+end
+
+function getCards(origin)
+    return Physics.cast({
+       origin = self.positionToWorld(origin),
+       direction = {0, 1, 0},
+       type = 3,
+       size = {1,1,1},
+       max_distance = 0,
+       debug = false
+    })
+end
+
+function getEmptyActiveSlot(checkSlots)
+   local found = false
+   for _, slot in pairs(checkSlots) do
+      found = false
+      local hitlist = getCards(slot)
+
+      --check each item found in active slot
+      for _, obj in pairs(hitlist) do
+         if obj.hit_object.tag == 'Card' then found = true end
+      end
+      if found == false then return slot end
+   end
+
+   return false
+end
+
+-- set character data for level 5 card functionality
+function setCharacterInfo(params)
+    saveState['figure'] = params.figureGUID
+    saveState['characterSheet'] = params.sheetGUID
+    self.script_state = JSON.encode(saveState)
+end

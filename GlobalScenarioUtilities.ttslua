@@ -1,0 +1,105 @@
+overlayBags = {
+    ['gold'] = 'efce98',
+    ['bear_trap'] = 'dd6d22',
+    ['poison_trap'] = '195c15',
+    ['treasure'] = 'cdec52',
+    ['activate'] = 'a82277',
+    ['rubble'] = 'e198c4'
+}
+
+itemDecks = {['available'] = '326c84', ['unavailable'] = '3c4bd0'}
+
+scenarioLevelTrackerGUID = 'e7124c'
+playerCountTrackerGUID = '222c42'
+treasureIndexGUID = 'f7bf69'
+rewardTileBagGUID = 'ad6e66'
+initiativeTrackerGUID = '1239cf'
+mapStickerBagGUID = 'd6ebae'
+mapTileGUID = 'a002d8'
+elementsBagGUID = 'aae07f'
+elementTrackerGUID = '0193f3'
+
+scenarioRewards = {
+    [0] = {goldMultiplier = 2, bonusXP = 4},
+    [1] = {goldMultiplier = 2, bonusXP = 6},
+    [2] = {goldMultiplier = 3, bonusXP = 8},
+    [3] = {goldMultiplier = 3, bonusXP = 10},
+    [4] = {goldMultiplier = 4, bonusXP = 12},
+    [5] = {goldMultiplier = 4, bonusXP = 14},
+    [6] = {goldMultiplier = 5, bonusXP = 16},
+    [7] = {goldMultiplier = 6, bonusXP = 18},
+}
+
+tempModifierDeck = {
+    ['bless'] = 'a42b3e',
+    ['playerCurse'] = '1d366e',
+    ['monsterCurse'] = '4c71f2'
+}
+
+function getScenarioLevel()
+    local scenarioLevelTracker = getObjectFromGUID(scenarioLevelTrackerGUID)
+    return scenarioLevelTracker.call('getLevel')
+end
+
+function getPlayerCount()
+    local playerCountTracker = getObjectFromGUID(playerCountTrackerGUID)
+    return playerCountTracker.call('getScenarioSetupPlayerCount')
+end
+
+function getScenarioRewardInfo()
+    local level = getScenarioLevel()
+    local playerCountTracker = getObjectFromGUID(playerCountTrackerGUID)
+    local rewardParams = playerCountTracker.call('getRewardParameters')
+
+    if rewardParams.solo then
+        level = level - 1
+    end
+
+    if rewardParams.playerCount == 5 then
+        level = level - 2
+    end
+
+    local rewardInfo = scenarioRewards[math.max(level, 0)]
+    rewardInfo.playerCount = rewardParams.playerCount
+    return rewardInfo
+end
+
+function getInitiativeTracker()
+    return initiativeTrackerGUID
+end
+
+function getOverlayBag(name)
+    return overlayBags[name]
+end
+
+function getTreasureIndexGUID()
+    return treasureIndexGUID
+end
+
+function getRewardTileBagGUID()
+    return rewardTileBagGUID
+end
+
+function getItemDeck(name)
+    return itemDecks[name]
+end
+
+function getTempModifierDeck(type)
+    return tempModifierDeck[type]
+end
+
+function getMapStickerBagGUID()
+    return mapStickerBagGUID
+end
+
+function getMapTileGUID()
+    return mapTileGUID
+end
+
+function getElementsBag()
+    return elementsBagGUID
+end
+
+function getElementTracker()
+    return elementTrackerGUID
+end

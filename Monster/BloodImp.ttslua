@@ -1,0 +1,7 @@
+#include ../MonsterStandee
+
+eliteHealth = {[0]=4, [1]=6, [2]=7, [3]=10, [4]=11, [5]=13, [6]=17, [7]=21}
+normalHealth = {[0]=3, [1]=4, [2]=5, [3]=5, [4]=7, [5]=8, [6]=9, [7]=12}
+
+baseName = 'Blood Imp'
+monsterType = 'blood_imp'

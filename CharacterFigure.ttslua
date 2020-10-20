@@ -1,0 +1,45 @@
+#include DoubleCounter
+#include Figure
+
+level = 0
+
+-- counter data
+primaryCounterName = 'Health'
+secondaryCounterName = 'BonusCounter'
+min = {[primaryCounterName] = 0, [secondaryCounterName] = 0}
+max = {[primaryCounterName] = 26, [secondaryCounterName] = 1000}
+labelColor = {[primaryCounterName] = {0,0,0,4.5}, [secondaryCounterName] = {0.15, 0.15, 0.15, 4.5}}
+hideZero = {[primaryCounterName] = false, [secondaryCounterName] = true}
+buttonColor = {1,1,1,0}
+minusButtonLabel = '-'
+plusButtonLabel = '+'
+
+function initializeHealth()
+    local characterSheet = getObjectFromGUID(saveState['characterSheet'])
+    if characterSheet ~= nil then
+        local level = characterSheet.call('getCharacterLevel')
+        setCounter(calculateHealth(level))
+    end
+end
+
+function setCharacterSheet(characterSheetGUID)
+    saveState['characterSheet'] = characterSheetGUID
+    initializeHealth()
+    self.script_state = JSON.encode(saveState)
+end
+
+function lostSheet()
+    local characterSheet = getObjectFromGUID(saveState['characterSheet'])
+    if characterSheet == nil then return true
+    else return false end
+end
+
+function onCollisionEnter(collision_info)
+    if collision_info['collision_object'].getName() == 'Player Mat' then
+        initializeHealth()
+    elseif collision_info['collision_object'].getName() == className .. ' Character Sheet' and lostSheet() then
+        saveState['characterSheet'] = collision_info['collision_object'].getGUID()
+        initializeHealth()
+        self.script_state = JSON.encode(saveState)
+    end
+end

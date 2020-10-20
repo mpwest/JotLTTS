@@ -1,0 +1,175 @@
+color = {['white'] = {1, 1, 1} }
+tempModifierDeck = {}
+
+function createButt(name, x, z, type, tooltip)
+    local buttonParameter = {
+        click_function = name,
+        function_owner = self,
+        position = {x, 0.2, z},
+        scale = {0.1, 0.1, 0.1},
+        width = 5000,
+        height = 3000,
+        color = {1, 1, 1, 0},
+        tooltip = tooltip
+    }
+    if type == 'Monster' or type == 'MTemp' then
+        buttonParameter.width = 3600
+        buttonParameter.height = 1200
+    elseif type == 'Player' or type == 'PTemp' then
+        buttonParameter.width = 800
+        buttonParameter.height = 400
+    end
+
+   if type == 'MTemp' or type == 'PTemp' then
+       buttonParameter.color = {1,1,1,1}
+   end
+
+   self.createButton(buttonParameter)
+end
+
+function draw(obj, playerColor)
+    drawCard(false, Player[playerColor].steam_name)
+end
+
+function drawCard(preventRetry, name)
+    local objects = getCards(Casts['draw'])
+    for _, obj in pairs(objects) do
+        item = obj.hit_object
+        if item.tag == 'Deck' then
+           local nextCard = item.takeObject({position = self.positionToWorld(Casts['discard']), rotation = {0, 180, 0}})
+           announceDraw(nextCard, name)
+           return
+        elseif item.tag == 'Card' then
+           item.setPosition(self.positionToWorld(Casts['discard']))
+           item.flip()
+           announceDraw(item, name)
+           return
+       end
+    end
+
+    if preventRetry == nil or preventRetry == false then
+        -- if function has not returned, clean up deck, shuffle and then retry once
+        Wait.time(function() cleanupAndShuffle() end, 0.5)
+        Wait.time(function() drawCard(true) end, 4)
+    end
+end
+
+function cleanupAndShuffle()
+    removeBlessCurse()
+    Wait.time(function() shuffle() end, 0.2)
+
+end
+
+function shuffle()
+    local objects = getCards(Casts['discard'])
+    for _, obj in pairs(objects) do
+        local item = obj.hit_object
+        if (item.tag == 'Deck' or item.tag == 'Card') then
+            local drawObjects = getCards(Casts['draw'])
+            for _, drawObj in pairs(drawObjects) do
+                local possibleDeck = drawObj.hit_object
+                if possibleDeck.tag == 'Deck' then
+                    possibleDeck.putObject(item)
+                    Wait.time(function() possibleDeck.shuffle() end, 0.5, 5)
+                    return
+               end
+            end
+            -- no draw deck found, move whole discard deck
+            item.setPosition(self.positionToWorld(Casts['draw']))
+            Wait.condition(
+                function()
+                    item.flip()
+                    Wait.time(
+                        function() item.shuffle() end,
+                    0.5, 5)
+                end,
+                function() return not item.isSmoothMoving() end
+            )
+            return
+         end
+    end
+end
+
+function getCards(origin)
+    return Physics.cast({
+       origin = self.positionToWorld(origin),
+       direction = {0, 1, 0},
+       type = 3,
+       size = {1,1,1},
+       max_distance = 0,
+       debug = false
+    })
+end
+
+function removeBlessCurse()
+    local hitlist = getCards(Casts['discard'])
+    for _, obj in pairs(hitlist) do
+        local item = obj.hit_object
+        if item.tag == 'Deck' then
+            local removed = 0
+            local cardsInDeck = #item.getObjects()
+            for _, card in pairs(item.getObjects()) do
+               if tempModifierDeck[card.name] then
+                   -- ensure we're not trying to take the last card from a deck that no longer exists as a deck
+                    if removed == cardsInDeck - 1 then
+                        Wait.time(function() moveSingleCard(getObjectFromGUID(card.guid), tempModifierDeck[card.name]) end, 0.1)
+                    else
+                        tempModifierDeck[card.name].putObject(item.takeObject({guid = card.guid}))
+                        removed = removed + 1
+                   end
+               end
+            end
+        elseif item.tag == 'Card' then
+            if tempModifierDeck[item.getName()] then
+                moveSingleCard(item, tempModifierDeck[item.getName()])
+            end
+        end
+    end
+end
+
+function moveSingleCard(card, deck)
+    deck.putObject(card)
+end
+
+function shuffleWithoutReplacement()
+    local objects = getCards(Casts['draw'])
+    for _, obj in pairs(objects) do
+        local item = obj.hit_object
+        if item.tag == 'Deck' then
+            Wait.time(function() item.shuffle() end, 0.5, 5)
+        end
+    end
+end
+
+function addCard(deck, name)
+    if #deck.getObjects() > 0 then
+        deck.takeObject({
+            position  = self.positionToWorld(Casts['draw']),
+            rotation  = {0, 180, 180},
+            smooth    = true,
+        })
+        Wait.time(function() shuffleWithoutReplacement() end, 2)
+    else
+        broadcastToAll('No ' .. name .. ' cards available', white)
+    end
+end
+
+function bless()
+    local blessDeck = getObjectFromGUID(Global.call('getTempModifierDeck', 'bless'))
+    if #blessDeck.getObjects() == 0 then
+        removeBlessCurse()
+        Wait.time(function() addCard(blessDeck, 'Bless') end, 2)
+    else
+        addCard(blessDeck, 'Bless')
+    end
+end
+
+function curse()
+    local curseDeck = getObjectFromGUID(Global.call('getTempModifierDeck', curseType))
+    if #curseDeck.getObjects() == 0 then
+        removeBlessCurse()
+        Wait.time(function() addCard(curseDeck, 'Monster Curse') end, 2)
+    else
+        addCard(curseDeck, curseName)
+    end
+end

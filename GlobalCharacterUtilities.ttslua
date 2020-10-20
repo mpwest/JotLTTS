@@ -1,0 +1,67 @@
+playerHandPosition = {
+    ['Red'] = {x = -20.87, y = 2.86, z = -64.18},
+    ['White'] = {x = -4.15, y = 2.86, z = -64.18},
+    ['Blue'] = {x = 12.46, y = 2.86, z = -64.18},
+    ['Green'] = {x = 29.00, y = 2.86, z = -64.18},
+    ['Purple'] = {x = 46.69, y = 2.86, z = -64.18},
+    ['Black'] = {x = 0, y = 2.86, z = -64.18}
+}
+
+level5FigureBags = {
+    ['hatchet'] = '3aa934',
+    ['demolitionist'] = '7577f7',
+    ['voidwarden'] = '72f164',
+    ['red_guard'] = '3ba6fb'
+}
+
+characterTuckboxes = {
+    ['Brute'] = '7dfec2',
+    ['Cragheart'] = '547e40',
+    ['Demolitionist'] = 'f3a54d',
+    ['Hatchet'] = '2dd407',
+    ['Mindthief'] = 'cf0cf3',
+    ['Red Guard'] = '4869c0',
+    ['Scoundrel'] = 'a1f046',
+    ['Spellweaver'] = '932784',
+    ['Tinkerer'] = '1f6056',
+    ['Voidwarden'] = '38ef50'
+}
+
+playerMatData = {
+    [1] = {
+        ['primaryPlayerMat'] = {guid = '25b30f', usePosition = {-20.06, 1.83, -31.94}, hiddenPosition = {-20.06, -4, -31.94}},
+        ['secondaryPlayerMat'] = {guid = 'd20979', usePosition = {-19.99, 0.20, -51.13}, hiddenPosition = {-19.99, -4, -51.13}}
+    },
+    [2] = {
+        ['primaryPlayerMat'] = {guid = 'c2b7c6', usePosition = {-3.89, 1.83, -31.94}, hiddenPosition = {-3.89, -4, -31.94}},
+        ['secondaryPlayerMat'] = {guid = 'b6b2ea', usePosition = {-3.81, 0.20, -51.13}, hiddenPosition = {-3.81, -4, -51.13}}
+    },
+    [3] = {
+        ['primaryPlayerMat'] = {guid = 'edf392', usePosition = {12.28, 1.83, -31.94}, hiddenPosition = {12.28, -4, -31.94}},
+        ['secondaryPlayerMat'] = {guid = 'c08381', usePosition = {12.35, 0.20, -51.13}, hiddenPosition = {12.35, -4, -51.13}}
+    },
+    [4] = {
+        ['primaryPlayerMat'] = {guid = '8520f0', usePosition = {28.45, 1.83, -31.94}, hiddenPosition = {28.45, -4, -31.94}},
+        ['secondaryPlayerMat'] = {guid = '9d5008', usePosition = {28.51, 0.20, -51.13}, hiddenPosition = {28.51, -4, -51.13}}
+    },
+    [5] = {
+        ['primaryPlayerMat'] = {guid = '1e15db', usePosition = {46.63, 0.20, -31.94}, hiddenPosition = {46.63, -4, -31.94}},
+        ['secondaryPlayerMat'] = {guid = '184d87', usePosition = {46.54, 0.20, -51.13}, hiddenPosition = {46.54, -4, -51.13}}
+    }
+}
+
+function getHandPosition(playerColor)
+    return playerHandPosition[playerColor]
+end
+
+function getLvl5Bag(class)
+    return level5FigureBags[class]
+end
+
+function getCharacterTuckboxGUID(className)
+    return characterTuckboxes[className]
+end
+
+function getPlayerMatInfo(playerNumber)
+    return playerMatData[playerNumber]
+end

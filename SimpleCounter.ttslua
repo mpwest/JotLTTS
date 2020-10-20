@@ -1,0 +1,127 @@
+saveState = {}
+
+function onLoad(save_state)
+  if save_state ~= "" then
+    saveState = JSON.decode(save_state)
+  end
+
+  createLabel()
+  createPlusMinusButtons()
+  initialize()
+end
+
+function createLabel()
+    local color = getFontColor()
+    local buttonParameter = {
+        click_function = counterName,
+        function_owner = self,
+        label          = saveState[counterName],
+        position       = labelPosition,
+        width          = 0,
+        height         = 0,
+        font_size      = 250,
+        font_color     = color
+    }
+    if buttonParameter.label == nil or buttonParameter.label == "" then buttonParameter.label = min end
+
+    saveState[counterName] = buttonParameter.label
+    save_state = JSON.encode(saveState)
+    self.createButton(buttonParameter)
+end
+
+function createPlusMinusButtons()
+    local buttonColor = getButtonColor()
+    local fontColor = getFontColor()
+
+    local plusButton = getPlusLabel()
+    local minusButton = getMinusLabel()
+
+    local buttonParameter  = {
+        click_function = "decrement",
+        function_owner = self,
+        label = minusButton,
+        position = minusPosition,
+        width = plusMinusSize or 200,
+        height = plusMinusSize or 200,
+        font_size = 250,
+        font_color = fontColor,
+        color = buttonColor
+    }
+
+    self.createButton(buttonParameter)
+    buttonParameter.position = plusPosition
+    buttonParameter.label = plusButton
+    buttonParameter.click_function = "increment"
+    self.createButton(buttonParameter)
+end
+
+function decrement() changeCounter(-1) end
+function increment() changeCounter(1) end
+
+function changeCounter(delta)
+    local counterValue = saveState[counterName]
+
+    counterValue = counterValue + delta
+    if counterValue < min then counterValue = min end
+    if counterValue > max then counterValue = max end
+    saveState[counterName] = counterValue
+
+    local counter = getCounter()
+    if counter ~= nil then
+        counter.label = counterValue
+        self.editButton(counter)
+    end
+
+    self.script_state = JSON.encode(saveState)
+end
+
+function setCounter(newValue)
+    saveState[counterName] = newValue
+    local counter = getCounter()
+    if counter ~= nil then
+        counter.label = newValue
+        self.editButton(counter)
+    end
+
+    self.script_state = JSON.encode(saveState)
+end
+
+function getCounter()
+    for _, button in pairs(self.getButtons()) do
+        if button.click_function == counterName then
+          return button
+        end
+    end
+end
+
+function getButtonColor()
+    if buttonColor ~= nil then
+        return buttonColor
+    else
+        return {180/255, 180/255, 180/255, 0}
+    end
+end
+
+function getFontColor()
+    if labelColor ~= nil then
+        return labelColor
+    else
+        return {1/255, 1/255, 1/255, 180}
+    end
+end
+
+function getPlusLabel()
+    if plusButtonLabel ~= nil then
+        return plusButtonLabel
+    else
+        return ''
+    end
+end
+
+function getMinusLabel()
+    if minusButtonLabel ~= nil then
+        return minusButtonLabel
+    else
+        return ''
+    end
+end

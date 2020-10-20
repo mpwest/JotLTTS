@@ -1,0 +1,23 @@
+#include CommonEnvelope
+
+monsterType = 'boss'
+
+bossFriendlyName = {['blood_horror'] = 'Blood Horror', ['blood_tumor'] = 'Blood Tumor', ['first_of_the_order'] = 'First of the Order'}
+
+function getStandeeGUID(name)
+    local contents = self.getObjects()
+    for _, item in pairs(contents) do
+        if item.name == bossFriendlyName[name] and item.gm_notes == 'Standee' then
+            return item.guid
+        end
+    end
+end
+
+function getStatCardGUID(name)
+    local contents = self.getObjects()
+    for _, item in pairs(contents) do
+        if item.name == bossFriendlyName[name] and item.gm_notes == 'Stat card' then
+            return item.guid
+        end
+    end
+end

@@ -1,0 +1,236 @@
+monsterMatNumber = 0
+scenario = nil
+
+function onCollisionEnter(info)
+
+    if info['collision_object'].getName() == 'Monster Mat'  then
+        -- Position
+        local  monsterMat = info['collision_object']
+        local pos = monsterMat.getPosition()
+        local scenarioLevel = Global.call('getScenarioLevel')
+        monsterMatNumber = monsterMat.call('getMatNumber')
+
+        -- Move aside
+        local newBagPos = {x = pos.x + 22, y = pos.y, z = pos.z}
+        self.setPosition(newBagPos)
+
+        registerMonster()
+        placeInitiativeTracker(monsterMatNumber)
+        placeAbilityCards(pos, newBagPos, 'unknown')
+        if monsterType ~= 'boss' then
+            placeStatCard(scenarioLevel, pos)
+            addSleeve(monsterMat)
+            emptyStandees(nil)
+        end
+    end
+end
+
+function setupScenario(params)
+    monsterMatNumber = params.monsterMatNumber
+    local level = params.level
+    local cardType = params.cardType
+    local monsterType = params.monsterType
+    local bossName = params.bossName
+    scenario = params.scenario
+
+    local monsterMat = Global.call('getMonsterMat', monsterMatNumber )
+    local pos = monsterMat.getPosition();
+    local asidePosition = {x = pos.x + 22, y = pos.y, z = pos.z}
+
+    registerMonster()
+    local initiativeTracker = placeInitiativeTracker(monsterMatNumber)
+    local abilityCards = placeAbilityCards(pos, asidePosition, cardType)
+    local statCard = placeStatCard(level, pos, bossName)
+    local sleeve = addSleeve(monsterMat)
+    scenario.call('continueMonsterSetup', monsterType)
+    Wait.time(function() reportGUIDsForCleanup(abilityCards, initiativeTracker, statCard, sleeve) end, 1)
+end
+
+function placeInitiativeTracker(matNumber)
+    local trackerPosition = getInitiativeTrackerPosition()
+    return self.takeObject({ --Initiative
+        position       = trackerPosition,
+        rotation       = {0.00, 180.00, 0.00},
+        smooth         = false
+    })
+end
+
+function placeAbilityCards(pos, asidePos, cardType)
+
+    besidePosition1 = {asidePos.x + 4, asidePos.y, asidePos.z }
+    besidePosition2 = {asidePos.x + 4, asidePos.y, asidePos.z + 4}
+    besidePosition3 = {asidePos.x + 4, asidePos.y, asidePos.z - 4}
+    inUsePosition = {pos.x - 2.2, pos.y + 0.2, pos.z + 4.78}
+    inUseFlippedPosition = {pos.x + 2.2, pos.y + 0.1, pos.z + 4.6}
+
+    local abilityDecks = {}
+
+    local cardPosition = besidePosition1
+    if hasScenarioOneCard then
+        if cardType == 'single' then
+            cardPosition = inUseFlippedPosition
+        end
+        local destructSingle = (cardType ~= 'single' and cardType ~= 'unknown')
+
+        local single = self.takeObject({ -- Single scenario 1 ability card
+            position       = cardPosition,
+            rotation       = {180.00, 0.00, 0.00},
+            smooth         = false,
+            callback_function = function(deck) selfdestruct(deck, destructSingle) end
+        })
+        table.insert(abilityDecks, single)
+    end
+
+    cardPosition = besidePosition2
+    if hasBasicCards then
+        if cardType == 'basic' then
+            cardPosition = inUsePosition
+        end
+        local destructBasic = (cardType ~= 'basic' and cardType ~= 'unknown')
+        local basic = self.takeObject({ -- Basic cards
+            position       = cardPosition,
+            rotation       = {180.00, 0.00, 0.00},
+            smooth         = false,
+            callback_function = function(deck) selfdestruct(deck, destructBasic) end
+        })
+        table.insert(abilityDecks, basic)
+    end
+
+    cardPosition = besidePosition3
+    if cardType == 'standard' or cardType == 'unknown' then
+        cardPosition = inUsePosition
+    end
+    local destructStandard = (cardType ~= 'standard' and cardType ~= 'unknown')
+    local standard = self.takeObject({ -- Ability cards
+        position       = cardPosition,
+        rotation       = {180.00, 0.00, 0.00},
+        smooth         = false,
+        callback_function = function(deck) selfdestruct(deck, destructStandard) end
+    })
+    table.insert(abilityDecks, standard)
+    return abilityDecks
+end
+
+function selfdestruct(deck, destruct)
+    if destruct then
+        deck.destruct()
+    end
+end
+
+function placeStatCard(scenarioLevel, pos, bossName)
+    local statCardRotation = 180.00 - (scenarioLevel*90)
+    while statCardRotation >= 360.00 do
+        statCardRotation = statCardRotation - 360.00
+    end
+    while statCardRotation < 0 do
+        statCardRotation = statCardRotation + 360.00
+    end
+    local statCardFlip = 0.00
+    if scenarioLevel >= 4 then
+        statCardFlip = 180.00
+    end
+
+    local statCardGUID = getStatCardGUID(bossName)
+
+    return self.takeObject({ --Stat card
+        position       = {pos.x, pos.y+0.2, pos.z-1.65},
+        rotation       = {statCardFlip, statCardRotation, 0.00},
+        smooth         = false,
+        guid           = statCardGUID,
+        callback_function = function(card) setLockOn(card) end
+    })
+end
+
+function addSleeve(monsterMat)
+    local flipSleeve = false
+    if figureCount > 6 then
+        flipSleeve = true
+    end
+    local sleeve = monsterMat.call('placeSleeve', flipSleeve)
+    sleeve.setLock(true)
+    return sleeve
+end
+
+function placeStandee(dropPosition, standeeGUID)
+    return self.takeObject({
+        position       = dropPosition,
+        rotation       = {0.00, 180.00, 0.00},
+        smooth         = false,
+        guid           = standeeGUID
+    })
+end
+
+function setLockOn(component)
+    component.setLock(true)
+end
+
+function emptyStandees(standeeGUID)
+    local standees = {}
+    if standeeGUID ~= nil then
+        local dropPosition = Global.call('getStandeeBowlPosition', { monsterMatNumber = monsterMatNumber, iterationNumber = 1 })
+        if checkStandeePresent(standeeGUID) then
+            local figure = placeStandee(dropPosition, standeeGUID)
+            table.insert(standees, figure)
+        end
+    else
+        for i = 1, #self.getObjects() do
+            local dropPosition = Global.call('getStandeeBowlPosition', { monsterMatNumber = monsterMatNumber, iterationNumber = i })
+            local figure = placeStandee(dropPosition, nil)
+            table.insert(standees, figure)
+        end
+    end
+    Wait.time(function() recordStandees(standees) end, 1)
+    self.destruct()
+end
+
+function checkStandeePresent(standeeGUID)
+    local contents = self.getObjects()
+    for _, item in pairs(contents) do
+        if item.guid == standeeGUID then
+            return true
+        end
+    end
+    return false
+end
+
+function getInitiativeTrackerPosition()
+    local initiativeTracker = getObjectFromGUID(Global.call('getInitiativeTracker'))
+    if initiativeTracker ~= nil then
+        local trackerPosition = initiativeTracker.call('getNextEmptyPosition')
+        -- cannot pass reference obtained from another object
+        if trackerPosition ~= nil then
+            return vector(trackerPosition.x, trackerPosition.y, trackerPosition.z)
+        end
+    end
+    return vector(34.03, 2.18, -5.80)
+end
+
+function registerMonster()
+    local deathGUID = Global.call('getMonsterDeathGUID')
+    local death = getObjectFromGUID(deathGUID)
+    death.call('registerMonster', { monsterType = monsterType, monsterMatNumber = monsterMatNumber})
+end
+
+function recordStandees(standees)
+    local GUIDs = {}
+    for _, standee in pairs(standees) do
+        table.insert(GUIDs, standee.getGUID())
+    end
+
+    local deathGUID = Global.call('getMonsterDeathGUID')
+    local death = getObjectFromGUID(deathGUID)
+    death.call('setAvailable', { monsterType = monsterType, GUIDs = GUIDs})
+
+    scenario.call('forCleanup', GUIDs)
+end
+
+function reportGUIDsForCleanup(abilityCards, initiativeTracker, statCard, sleeve)
+    local GUIDs = {}
+    for _, deck in pairs(abilityCards) do
+        table.insert(GUIDs, deck.getGUID())
+    end
+    table.insert(GUIDs, initiativeTracker.getGUID())
+    table.insert(GUIDs, statCard.getGUID())
+    table.insert(GUIDs, sleeve.getGUID())
+    scenario.call('forCleanup', GUIDs)
+end

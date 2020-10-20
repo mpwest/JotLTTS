@@ -1,0 +1,58 @@
+completeMessage = 'Done exporting data. Please right click the save token and select Save Object, then load the new version and import object from Objects menu at the top of the screen.'
+
+commonRequestDataV1Base = {
+    ['CharacterInfoTile'] = { message = 'Please drop the save token on a character info tile to be imported. If there are no more, please drop the token on the NEXT tile',
+        continue = 'CharacterSheet', next = 'AvailableStore', quantity = 0},
+    ['CharacterSheet'] = { message = 'Please drop the save token on the associated character sheet.', continue = 'AbilityDeckInUse', quantity = 1},
+    ['AbilityDeckInUse'] = { message = 'Please drop the save token on that character\'s in use ability deck. Skip this step if you are still using any A or B cards with the NEXT tile. Unused available cards will follow.',
+        continue = 'AbilityDeckUnused', next = 'CharacterItems', quantity = 1},
+    ['AbilityDeckUnused'] = { message = 'Please drop the save token on that character\'s unused but unlocked ability deck. This should not include A and B cards. ' ..
+        'Drop the token on the NEXT tile if level 1 cards are not yet available', continue = 'CharacterItems', quantity = 1},
+    ['CharacterItems'] = { message = 'Please drop the save token on that character\'s items, merged into one deck. Drop the token on the NEXT tile if no items are owned.', continueOrNext = 'CharacterInfoTile', quantity = 1},
+    ['AvailableStore'] = { message = 'Please drop the save token on the available items deck. Or NEXT if you\'ve managed to buy out the store.', continueOrNext = 'CityEvents', quantity = 1},
+    ['CityEvents'] = { message = 'Cannot differentiate cards in current version. Please use the included sheet to mark off any completed events, without looking at incomplete events. ' ..
+        'Then drop the save token on the completed sheet.', continue = 'Map', quantity = 1},
+    ['Map'] = {message = 'Please drop the save token on the map of Gloomhaven.', continue = 'LootIndex', quantity = 1},
+    ['LootIndex'] = {message = 'Please check off all looted chests on the included Treasure Index tile and drop the save token on it.', continue = 'Done', quantity = 1},
+}
+
+requestData = {
+    [1] = commonRequestDataV1Base,
+    [2] = commonRequestDataV1Base
+}
+
+validTypeData = {
+    -- version dependent rules
+    [1] = {
+        ['CharacterInfoTile'] = {type = {'Tile'}, name = {'Hatchet', 'Demolitionist', 'Voidwarden', 'Red Guard'}},
+        ['CharacterSheet'] = {type = {'Tile'}, name = {'Character Sheet'}},
+        ['AbilityDeckInUse'] = {type = {'Deck'}, min = 6, max = 11}, -- contentProperty = nil
+        ['AbilityDeckUnused'] = {type = {'Deck'}, max = 11}, -- swapped out cards from 3 X cards + 8 level up. A and B no longer valid options
+        ['CharacterItems'] = {type = {'Deck', 'Card'}, max = 52 }, -- no particular properties to rely on. Bad item will require players to find items manually.
+        ['AvailableStore'] = {type = {'Deck', 'Card'}, max = 52 }, -- no particular properties
+        ['CityEvents'] = {type = {'Tile'}, name = {'Completed City Events'}},
+        ['Map'] = { type = {'Tile'}, name = {'Map of Gloomhaven'}},
+        ['LootIndex'] = { type = {'Tile'}, name = {'Treasure Index'}}
+    },
+    [2] = {
+        ['CharacterInfoTile'] = {type = {'Tile'}, name = {'Hatchet', 'Demolitionist', 'Voidwarden', 'Red Guard', 'Brute', 'Cragheart', 'Mindthief', 'Scoundrel', 'Spellweaver', 'Tinkerer'}},
+        ['CharacterSheet'] = {type = {'Tile'}, name = {'Character Sheet'}},
+        ['AbilityDeckInUse'] = {type = {'Deck'}, min = 6, max = 12},
+        ['AbilityDeckUnused'] = {type = {'Deck'}, max = 11},
+        ['CharacterItems'] = {type = {'Deck', 'Card'}, max = 52},
+        ['AvailableStore'] = {type = {'Deck', 'Card'}, max = 52},
+        ['CityEvents'] = {type = {'Tile'}, name = {'Completed City Events'}},
+        ['Map'] = {type = {'Tile'}, name = {'Map of Gloomhaven'}},
+        ['LootIndex'] = {type = {'Tile'}, name = {'Treasure Index'}}
+    }
+}
+
+nameMapping = {
+    [1] = {
+        ['Hatchet'] = {[''] = 'One-Two Punch (66)'},
+        --['items'] = {}
+    },
+    [2] = {
+        ['Hatchet'] = {[''] = 'One-Two Punch (66)'}
+    }
+}

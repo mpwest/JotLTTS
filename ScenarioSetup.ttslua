@@ -1,0 +1,99 @@
+#include ScenarioButtonLogic
+#include ScenarioMonsterLogic
+#include RewardLogic
+#include Cleanup
+
+overlayRotation = {['bear_trap'] = 90, ['gold'] = 180, ['activate'] = 180}
+
+saveState = {}
+
+function onLoad(save_state)
+    if save_state ~= '' then
+      saveState = JSON.decode(save_state)
+    end
+
+    save()
+    initializeSetupButtons()
+end
+
+function initializeScenario()
+    local level = Global.call('getScenarioLevel')
+    local playerCount = Global.call('getPlayerCount')
+    broadcastToAll('Setting up scenario at level '.. level .. ' for ' .. playerCount .. ' players', {1,1,1})
+
+    saveState['playerCount'] = playerCount
+    saveState['scenarioLevel'] = level
+
+    cleanupButton(1)
+    self.setLock(true)
+    getMonsterEnvelopes()
+    placeOverlays(1, self.getPosition())
+
+    save()
+end
+
+function setupRoom(roomNumber)
+    cleanupButton(roomNumber)
+    local pagePosition = self.getPosition()
+    setupEnemies(roomNumber, pagePosition)
+    placeOverlays(roomNumber, pagePosition)
+end
+
+function placeOverlays(roomNumber, pagePosition)
+    if overlayPositionsByRoom ~= nil then
+        local positions = overlayPositionsByRoom[roomNumber]
+        if positions ~= nil then
+            local overlayGUIDs = {}
+            for overlayType, positionList in pairs(positions) do
+                local yRotation = getOverlayRotation(overlayType)
+                local bag_GUID = Global.call('getOverlayBag', overlayType)
+                local bag = getObjectFromGUID(bag_GUID)
+                for i, position in pairs(positionList) do
+                    local overlayPosition = vector(pagePosition.x + position.x, pagePosition.y + (position.y or 0.5), pagePosition.z + position.z )
+                    bag.takeObject({
+                        position = overlayPosition,
+                        rotation = { 0.00, yRotation, 0.00},
+                        smooth = false,
+                        callback_function = function(overlay) addItemToCleanup(overlay) end
+                    })
+                end
+            end
+        end
+    end
+end
+
+function generateWinRewards(buttonNumber)
+    cleanupButton(buttonNumber)
+    local pagePosition = self.getPosition()
+    local rewardInfo = Global.call('getScenarioRewardInfo')
+    local totalXp = (winXp or 0) + calculateScenarioXP(rewardInfo)
+    local rewardBag = getRewardBag()
+    for i = 1, rewardInfo.playerCount do
+        local dropLocation = vector(pagePosition.x + rewardLocation.x, 2.5 + (i *0.5), pagePosition.z + rewardLocation.z)
+        gainXPOrGold(rewardBag, totalXp, winGold or 0, dropLocation)
+    end
+
+    if winItem ~= nil then
+        local dropLocation = vector(pagePosition.x + rewardLocation.x, 6, pagePosition.z + rewardLocation.z)
+        getItem(winItem, dropLocation)
+    end
+
+    if shopItems ~= nil then
+        addToShop(shopItems)
+    end
+end
+
+function calculateScenarioXP(rewardInfo)
+    if noBonusXp == true then
+        return 0
+    end
+    return rewardInfo.bonusXP
+end
+
+function getOverlayRotation(overlayType)
+    return overlayRotation[overlayType] or 0
+end
+
+function save()
+    self.script_state = JSON.encode(saveState)
+end

@@ -1,0 +1,9 @@
+#include CommonEnvelope
+
+function getStandeeGUID(name)
+    return nil
+end
+
+function getStatCardGUID(name)
+    return nil
+end

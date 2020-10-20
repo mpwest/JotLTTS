@@ -1,0 +1,32 @@
+saveState = {}
+
+function onLoad(save_state)
+    if save_state ~= '' then
+        saveState = JSON.decode(save_state)
+    end
+end
+
+function onCollisionEnter(collision_info)
+    if collision_info['collision_object'].getVar('jotl_Class') == 'figure' and saveState['figureGuid'] == nil then
+        self.unregisterCollisions()
+        collision_info['collision_object'].call('registerCondition', self)
+        saveState['figureGuid'] = collision_info['collision_object'].getGUID()
+        self.script_state = JSON.encode(saveState)
+    end
+end
+
+function onPickUp()
+    local figure = getObjectFromGUID(saveState['figureGuid'])
+    if figure ~= nil then
+        saveState['figureGuid'] = nil
+        self.script_state = JSON.encode(saveState)
+        figure.call('removeCondition', self.getGUID())
+        self.registerCollisions()
+    end
+end
+
+function updateFigure(guid) -- used when replacing figure
+    saveState['figureGuid'] = guid
+    self.script_state = JSON.encode(saveState)
+    self.unregisterCollisions()
+end

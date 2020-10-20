@@ -1,0 +1,22 @@
+function filterObjectEnter(enter_object)
+    if enter_object.tag == 'Card' and enter_object.getName() == allowedCard then
+        return true
+    end
+    if enter_object.tag == 'Deck' then
+        filterDeck(enter_object)
+    end
+    return false
+end
+
+function filterDeck(deck)
+    local remaining = #deck.getObjects()
+    for index, card in pairs(deck.getObjects()) do
+        if card.name == allowedCard then
+            if remaining > 1 then
+                -- last item will go in automatically, if allowed
+                self.putObject(deck.takeObject({guid = card.guid}))
+            end
+            remaining = remaining - 1
+        end
+    end
+end

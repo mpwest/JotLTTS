@@ -1,0 +1,126 @@
+Casts = {
+  AbilityDraw = {0.3, 0.5, -0.635},
+  AbilityDiscard = {-0.3, 0.5, -0.635},
+}
+
+function onLoad(save_state)
+  createButt("draw", -0.3, -0.89, "Default", "Draw a Skill Card")
+  createButt("shuffle", 0.3, -0.89, "Default", "Shuffle the Skill Deck")
+  createButt('placeSleeveClick', 0, 0.955, "Default", "Place Sleeve")
+end
+
+function createButt(name, x, z, type, tooltip)
+  self.createButton({
+     click_function = name,
+     function_owner = self,
+     label = "",
+     position = {x, 0.1, z},
+     scale = {0.1, 0.1, 0.1},
+     width = 1100,
+     height = 450,
+     color = {1, 1, 1, 0},
+     tooltip = tooltip
+  })
+end
+
+function placeSleeveClick(obj, playerColor, altClick)
+    placeSleeve(altClick)
+end
+
+function draw()
+    drawCard(false)
+end
+
+function drawCard(preventRetry)
+    local objects = getCards(Casts['AbilityDraw'])
+    for _, obj in pairs(objects) do
+        item = obj.hit_object
+        if item.tag == 'Deck' then
+           local nextCard = item.takeObject({position = self.positionToWorld(Casts['AbilityDiscard']), rotation = {0, 180, 0}})
+           announceDraw(nextCard)
+           return
+        elseif item.tag == 'Card' then
+           item.setPosition(self.positionToWorld(Casts['AbilityDiscard']))
+           item.flip()
+           announceDraw(item)
+           return
+       end
+    end
+
+    if preventRetry == nil or preventRetry == false then
+        -- if function has not returned, clean up deck, shuffle and then retry once
+        Wait.time(function() shuffle() end, 0.5)
+        Wait.time(function() drawCard(true) end, 4)
+    end
+end
+
+function shuffle()
+    local objects = getCards(Casts['AbilityDiscard'])
+    for _, obj in pairs(objects) do
+        local item = obj.hit_object
+        if (item.tag == 'Deck' or item.tag == 'Card') then
+            local drawObjects = getCards(Casts['AbilityDraw'])
+            for _, drawObj in pairs(drawObjects) do
+                local possibleDeck = drawObj.hit_object
+                if possibleDeck.tag == 'Deck' then
+                    possibleDeck.putObject(item)
+                    Wait.time(function() possibleDeck.shuffle() end, 0.5, 5)
+                    return
+               end
+            end
+            -- no draw deck found, move whole discard deck
+            item.setPosition(self.positionToWorld(Casts['AbilityDraw']))
+            Wait.condition(
+                function()
+                    item.flip()
+                    Wait.time(
+                        function() item.shuffle() end,
+                    0.5, 5)
+                end,
+                function() return not item.isSmoothMoving() end
+            )
+            return
+         end
+    end
+end
+
+function announceDraw(card)
+    broadcastToAll(card.getName(), {31/255, 135/255, 255/255})
+end
+
+function getCards(origin)
+    return Physics.cast({
+       origin = self.positionToWorld(origin),
+       direction = {0, 1, 0},
+       type = 3,
+       size = {1,1,1},
+       max_distance = 0,
+       debug = false
+    })
+end
+
+function placeSleeve(flipSleeve)
+    zRotation = 0.00
+    if flipSleeve then
+        zRotation = 180.00
+    end
+    sleeve = getObjectFromGUID(Global.call('getMonsterSleeveBag')).takeObject({
+       position = sleevePosition,
+       rotation = {0.00, 0.00, zRotation}
+    })
+    return sleeve
+end
+
+function cleanup()
+    local objects = getCards(Casts["AbilityDiscard"])
+    for _, obj in pairs(objects) do
+        local item = obj.hit_object
+        if (item.tag == 'Deck' or item.tag == 'Card') then
+            item.destruct()
+        end
+    end
+end
+
+function getMatNumber()
+    return matNumber
+end

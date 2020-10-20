@@ -1,0 +1,46 @@
+#include CharacterFigure
+
+function preInit()
+    modelRotation = modelRotation or 0
+    local baseButtonDistance = buttonDistance or 2 -- coalesce
+    local buttonSpread = buttonSpread or 1
+    buttonRotation = {0, modelRotation or 0, 0}
+    buttonY = buttonY or 0.5
+
+    local rotationRads = math.rad(360 - modelRotation)
+
+    labelPosition = {
+        [primaryCounterName] = {
+            math.sin(rotationRads) * (0.9 * baseButtonDistance),
+            buttonY,
+            math.cos(rotationRads) * (baseButtonDistance - 0.2)
+        },
+        [secondaryCounterName] = {
+            math.sin(rotationRads) * (baseButtonDistance + 1.1),
+            buttonY,
+            math.cos(rotationRads) * (baseButtonDistance + 1.1)
+        }
+    }
+    minusPosition = {
+        (-1 * math.cos(rotationRads) * buttonSpread) + (math.sin(rotationRads) * baseButtonDistance),
+        buttonY,
+        (math.sin(rotationRads) * buttonSpread) + (math.cos(rotationRads) * baseButtonDistance)
+    }
+    plusPosition = {
+        (math.cos(rotationRads) * buttonSpread) + (math.sin(rotationRads) * baseButtonDistance),
+        buttonY,
+        (-1 * math.sin(rotationRads) * buttonSpread) + (math.cos(rotationRads) * baseButtonDistance)
+    }
+
+    size = {
+        [primaryCounterName] = baseCounterSize or 1000,
+        [secondaryCounterName] = 0.9 * (baseCounterSize or 1000)
+    }
+    labelRotation = {[primaryCounterName] = buttonRotation, [secondaryCounterName] = buttonRotation}
+
+    buttonWidth = buttonWidth or 800
+    buttonHeight = buttonHeight or 800
+    fontSize = fontSize or 1000
+
+    baseConditionDistance = baseConditionDistance or 1.35
+end

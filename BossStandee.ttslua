@@ -1,0 +1,50 @@
+#include SimpleCounter
+#include Figure
+
+min = 0
+max = 300
+counterName = 'Health'
+labelPosition = {0, 0.1, 0.45}
+minusPosition = {-0.4, 0.1, 0.42}
+plusPosition = {0.4, 0.1, 0.42}
+labelColor = {0,0,0,4.5}
+buttonColor = {1,1,1, 0.2 }
+minusButtonLabel = '-'
+plusButtonLabel = '+'
+
+function initialize()
+	if saveState['max'] == nil or saveState['max'] == 0 then
+        local level = Global.call('getScenarioLevel')
+        local playerCount = Global.call('getPlayerCount')
+
+        max = calculateHealth(level, playerCount)
+        setCounter(max)
+
+        saveState['max'] = max
+    else
+        max = saveState['max']
+    end
+end
+
+function calculateHealth(level, playerCount)
+    return healthByLevel[level] * playerCount
+end
+
+function onCollisionEnter(collision_info)
+    local objectName = collision_info['collision_object'].getName()
+    if objectName == Global.call('getDeathName') then
+        self.destruct()
+    end
+end
+
+function initializeHealth(params)
+    setCounter(params.health)
+    max = params.health
+
+    saveState['level'] = params.level
+    save_state = JSON.encode(saveState)
+end
+
+-- essentially implementing a common interface for enemy types
+function setType(type)
+end

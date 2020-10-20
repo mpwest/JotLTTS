@@ -1,0 +1,56 @@
+function getItem(itemName, dropLocation)
+    local unavailableItems = getObjectFromGUID(Global.call('getItemDeck', 'unavailable'))
+    if unavailableItems ~= nil then
+        if not findItemInDeck(unavailableItems, itemName, dropLocation, {0, 180, 0}) then
+            local availableItems = getObjectFromGUID(Global.call('getItemDeck', 'available'))
+            if availableItems ~= nil then
+                findItemInDeck(availableItems, itemName, dropLocation, {0, 180, 0})
+            end
+        end
+    end
+end
+
+function findItemInDeck(itemDeck, itemName, dropLocation, dropRotation)
+    local itemContents = itemDeck.getObjects()
+    for i, item in pairs(itemContents) do
+        if item.name == itemName then
+            itemDeck.takeObject({
+                position          = dropLocation,
+                rotation          = dropRotation,
+                guid              = item.guid,
+            })
+            return true
+        end
+    end
+    return false
+end
+
+function getRewardBag()
+    local rewardTileBagGUID = Global.call('getRewardTileBagGUID')
+    return getObjectFromGUID(rewardTileBagGUID)
+end
+
+function gainXPOrGold(bag, xp, gold, dropLocation)
+    bag.takeObject({
+        position = dropLocation,
+        rotation = {0, 180, 0},
+        callback_function = function(tile) addXPOrGold(tile, xp, gold) end
+    })
+end
+
+function addXPOrGold(tile, xp, gold)
+    tile.call('addRewards', {xp = xp, gold = gold})
+end
+
+function addToShop(shopItems)
+    local unavailableItems = getObjectFromGUID(Global.call('getItemDeck', 'unavailable'))
+    local availableItems = getObjectFromGUID(Global.call('getItemDeck', 'available'))
+    local availableItemsPosition = availableItems.getPosition()
+    local dropLocation = vector(availableItemsPosition.x + 5, 2, availableItemsPosition.z)
+
+    if unavailableItems ~= nil then
+        for _, itemName in ipairs(shopItems) do
+            findItemInDeck(unavailableItems, itemName, dropLocation, {0,90,0})
+        end
+    end
+end

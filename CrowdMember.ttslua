@@ -1,0 +1,60 @@
+#include SimpleCounter
+
+min = 0
+max = 6
+counterName = 'SupportProgress'
+labelPosition = {0, 0.1, 0.45}
+minusPosition = {-0.4, 0.1, 0.42}
+plusPosition = {0.4, 0.1, 0.42}
+labelColor = {0,0,0,4.5}
+buttonColor = {1,1,1, 0.2 }
+minusButtonLabel = '-'
+plusButtonLabel = '+'
+
+proHatchetName = 'Cheering for Hatchet'
+antiHatchetName = 'Cheering for monsters'
+
+function onCollisionEnter(collision_info)
+    local objectName = collision_info['collision_object'].getName()
+    local rotationZ = self.getRotation().z
+    if objectName == 'Scenario 23' and rotationZ > 135 and rotationZ < 225 then
+        switchSupport()
+        self.flip()
+    end
+end
+
+function switchSupport()
+    if saveState['proHatchet'] then
+        self.setColorTint({ 128/255, 128/255, 128/255, 255/255  })
+        self.setName(antiHatchetName)
+        saveState['proHatchet'] = false
+
+        saveState[counterName] = max
+        createLabel()
+        createPlusMinusButtons()
+    else
+        self.setColorTint({ 33/255, 77/255, 122/255, 255/255 })
+        self.setName(proHatchetName)
+        saveState['proHatchet'] = true
+
+        self.clearButtons()
+    end
+    save_state = JSON.encode(saveState)
+end
+
+function initialize()
+    saveState['proHatchet'] = self.getName() == proHatchetName
+    playerCount = Global.call('getPlayerCount')
+    max = 2 * (playerCount - 1)
+
+    if saveState['proHatchet'] then
+        self.clearButtons()
+    else
+        -- implies that this is newly spawned
+        if saveState['hasInfluence'] == nil then
+            setCounter(max)
+        end
+    end
+    saveState['hasInfluence'] = true
+    save_state = JSON.encode(nil)
+end

@@ -1,0 +1,5 @@
+#include CharacterStandee
+
+function calculateHealth(level)
+    return math.ceil((level * 1.5) + 6)
+end

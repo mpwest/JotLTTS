@@ -1,0 +1,117 @@
+function initializeSetupButtons()
+    if saveState['buttons'] == nil then
+        saveState['buttons'] = {}
+        createSetupButton(1)
+    else
+        for i, buttonState in pairs(saveState['buttons']) do
+            if buttonState == 'active' then
+                createSetupButton(i)
+            end
+        end
+    end
+    save()
+end
+
+function createSetupButton(buttonNumber)
+    local action = buttonData[buttonNumber].action
+    local buttonWidth = getButtonWidth(action, buttonNumber)
+    local buttonHeight = getButtonHeight(action, buttonNumber)
+
+    if action == 'setupRoom' then
+        action = action .. buttonNumber
+        _G[action] = function() setupRoom(buttonNumber) end
+    end
+
+    if action == 'generateWinRewards' then
+        action = action .. buttonNumber
+        _G[action] = function() generateWinRewards(buttonNumber) end
+    end
+
+    local buttonRotation = { 0, 0, 0}
+    if buttonData[buttonNumber].position[2] < 0 then
+        buttonRotation = { 180, 0, 0}
+    end
+
+    local buttonParameter = {
+      click_function = action,
+      function_owner = self,
+      label          = "",
+      position       = buttonData[buttonNumber].position,
+      rotation       = buttonRotation,
+      scale = {0.1, 0.1, 0.1},
+      width = buttonWidth,
+      height = buttonHeight,
+      color = {180/255, 180/255, 180/255, 0},
+      tooltip = buttonData[buttonNumber].hint
+    }
+
+    self.createButton(buttonParameter)
+
+    if buttonData[buttonNumber].label ~= '' and buttonData[buttonNumber].label ~= nil then
+        local labelParameter = {
+            click_function = 'roomLabel' .. buttonNumber,
+            function_owner = self,
+            label          = buttonData[buttonNumber].label,
+            position       = buttonData[buttonNumber].labelPosition,
+            rotation       = buttonRotation,
+            width          = 0,
+            height         = 0,
+            font_size      = 35,
+            font_color     = {1,1,1,1}
+        }
+        self.createButton(labelParameter)
+    end
+
+    saveState['buttons'][buttonNumber] = 'active'
+    save()
+end
+
+function cleanupButton(buttonNumber)
+    -- display message
+    if buttonData[buttonNumber].message ~= '' and buttonData[buttonNumber].message ~= nil then
+        broadcastToAll(buttonData[buttonNumber].message, {1,1,1})
+    end
+
+    local action = buttonData[buttonNumber].action
+    local oldButtons = self.getButtons()
+    for i, button in pairs(oldButtons) do
+        if button.click_function == action or button.click_function == action .. buttonNumber or button.click_function == 'roomLabel' .. buttonNumber then
+            self.removeButton(oldButtons[i].index)
+        end
+    end
+
+    saveState['buttons'][buttonNumber] = 'clicked'
+    save()
+
+    local newButtons = buttonData[buttonNumber].nextButtons
+    for _, newButton in pairs(newButtons) do
+        createSetupButton(newButton)
+    end
+end
+
+function placeActivationToken(roomNumber)
+    if roomNumber ~= 1 then
+        local tokenOffset = setupButtonPosition[roomNumber].position
+        local pagePosition = self.getPosition()
+        local activationTokenPosition = {pagePosition.x + tokenOffset, pagePosition.y + 2, pagePosition.z + tokenOffset.z}
+        local activationToken_bag = getObjectFromGUID(Global.call('getOverlayBag', 'activate'))
+        activationToken_bag.takeObject({
+            position = activationTokenPosition,
+            smooth = false
+        })
+    end
+end
+
+function getButtonWidth(action, buttonNumber)
+    if buttonData[buttonNumber].overrideButtonWidth ~= nil then
+        return buttonData[buttonNumber].overrideButtonWidth
+    end
+    return 800
+end
+
+function getButtonHeight(action, buttonNumber)
+    if buttonData[buttonNumber].overrideButtonHeight ~= nil then
+        return buttonData[buttonNumber].overrideButtonHeight
+    end
+    return 500
+end

@@ -1,0 +1,107 @@
+jotl_Class = 'figure'
+
+--[[conditionPositioningOld = {
+    ['Disarm'] = {position = vector(1.3, 0.3, 0), rotation = vector(90, 300, 0)},
+    ['Stun'] = {position = vector(1.45, 0.4, -0.5), rotation = vector(90, 325, 0)},
+    ['Immobilize'] = {position = vector(1.12, 0.3, -0.44), rotation = vector(90, 325, 0)},
+    ['Wound'] = {position = vector(0.13, 0.3, -1.35), rotation = vector(90, 0, 0)},
+    ['Poison'] = {position = vector(0.44, 0.4, -1.06), rotation = vector(90, 350, 0)},
+    ['Muddle'] = {position = vector(-0.87, 0.3, -1.24), rotation = vector(90, 35, 0)},
+    ['Strengthen'] = {position = vector(-0.87, 0.4, -0.85), rotation = vector(90, 35, 0)},
+    ['Invisible'] = {position = vector(-1.3, 0.3, 0), rotation = vector(90, 55, 0)},
+}]]
+
+conditionPositioning = {
+    ['Disarm'] = {angle = 0, adjustmentDistance = 0.15, rotation = vector(90, 300, 0)},
+    ['Stun'] = {angle = 341, adjustmentDistance = 0.38, rotation = vector(90, 325, 0)},
+    ['Immobilize'] = {angle = 339, adjustmentDistance = 0.05, rotation = vector(90, 325, 0)},
+    ['Wound'] = {angle = 275, adjustmentDistance = 0.2, rotation = vector(90, 0, 0)},
+    ['Poison'] = {angle = 292, adjustmentDistance = 0, rotation = vector(90, 350, 0)},
+    ['Muddle'] = {angle = 235, adjustmentDistance = 0.35, rotation = vector(90, 35, 0)},
+    ['Strengthen'] = {angle = 225, adjustmentDistance = 0.05, rotation = vector(90, 35, 0)},
+    ['Invisible'] = {angle = 180, adjustmentDistance = 0.15, rotation = vector(90, 55, 0)},
+}
+
+function registerCondition(conditionToken)
+    if Global.getVar('checkAllowConditionAttach') ~= nil then
+        if not Global.call('checkAllowConditionAttach') then
+            return
+        end
+    end
+    ensureConditionTableExists()
+
+    local guid = conditionToken.getGUID()
+    if saveState['conditions'][guid] ~= nil then
+        return
+    end
+
+    local conditionName = conditionToken.getName()
+    if hasCondition(conditionName) then
+        return
+    end
+
+    move(conditionToken, conditionName)
+
+    saveState['conditions'][guid] = conditionName
+    self.script_state = JSON.encode(saveState)
+end
+
+function hasCondition(conditionName)
+    -- If shield has tokens, return false for shield
+    for guid, name in pairs(saveState['conditions']) do
+        if name == conditionName then
+            return true
+        end
+    end
+    return false
+end
+
+function calculatePosition(conditionName)
+    local offset = vector(
+        math.cos(math.rad(conditionPositioning[conditionName].angle)) * (baseConditionDistance + conditionPositioning[conditionName].adjustmentDistance),
+        0.4,
+        math.sin(math.rad(conditionPositioning[conditionName].angle)) * (baseConditionDistance + conditionPositioning[conditionName].adjustmentDistance)
+    )
+    return self.getPosition() + offset
+end
+
+function calculateRotation(conditionName)
+    return conditionPositioning[conditionName].rotation
+end
+
+function removeCondition(guid)
+    saveState['conditions'][guid] = nil
+    self.script_state = JSON.encode(saveState)
+end
+
+function onPickUp()
+    moveConditions = true
+    updateConditionPositions()
+end
+
+function onDrop()
+    Wait.frames(function() moveConditions = false end, 3)
+end
+
+function updateConditionPositions()
+    if moveConditions and saveState['conditions'] ~= nil then
+        for guid, name in pairs(saveState['conditions']) do
+            local token = getObjectFromGUID(guid)
+            if token ~= nil then
+                move(token, name)
+            end
+        end
+        Wait.frames(updateConditionPositions, 1)
+    end
+end
+
+function move(conditionToken, conditionName)
+    conditionToken.setPosition(calculatePosition(conditionName))
+    conditionToken.setRotation(calculateRotation(conditionName))
+end
+
+function ensureConditionTableExists()
+    if saveState['conditions'] == nil then
+        saveState['conditions'] = {}
+    end
+end

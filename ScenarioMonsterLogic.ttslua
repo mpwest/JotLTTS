@@ -1,0 +1,122 @@
+function getMonsterEnvelopes()
+    saveState['monsterEnvelope'] = {}
+    for monsterNumber, monsterType in ipairs(enemyTypes) do
+        local enemyEnvelope = Global.call('getMonsterEnvelope', monsterType)
+        enemyEnvelope.takeObject({
+            position          = {38 + (5 * monsterNumber), 2.1, 27.5},
+            rotation          = {0.00, 180.00, 0.00},
+            callback_function = function(bag) setupEnvelopeContents(bag, monsterNumber, monsterType) end
+        })
+    end
+    save()
+end
+
+function setupEnvelopeContents(enemyEnvelope, monsterNumber, monsterType)
+    local level = saveState['scenarioLevel']
+    saveState['monsterEnvelope'][monsterType] = enemyEnvelope.getGUID()
+    enemyEnvelope.call('setupScenario', {level = level, monsterMatNumber = monsterNumber, cardType = cardType, scenario = self, monsterType = monsterType, bossName = bossName})
+    save()
+end
+
+-- callback once each envelope is ready, sets up enemies present at start of scenario (figurePositions[1])
+function continueMonsterSetup(monsterType)
+    local enemyEnvelopeGUID = saveState['monsterEnvelope'][monsterType]
+    local enemyEnvelope = getObjectFromGUID(enemyEnvelopeGUID)
+    local playerCount = saveState['playerCount']
+
+    local bossStandeeGUID = nil
+    if monsterType == 'boss' then
+        bossStandeeGUID = enemyEnvelope.call('getStandeeGUID', bossName)
+    else
+        enemyEnvelope.shuffle()
+    end
+
+    if figurePositions[1] ~= nil and figurePositions[1][monsterType] ~= nil then
+        local pagePosition = self.getPosition()
+        local enemyPositions = figurePositions[1][monsterType]
+        local figures = {}
+        for i, figureSetupInfo in ipairs(enemyPositions) do
+            local figurePosition = calculatePosition(pagePosition, figureSetupInfo.positionOffset)
+            local overrideHealth  = calculateHealth(figureSetupInfo.health, figureSetupInfo.healthCalc)
+            local overrideMaxHealth  = calculateHealth(figureSetupInfo.maxHealth, figureSetupInfo.maxHealthCalc)
+
+            -- skip when no enemy present for player count
+            if monsterType == 'boss' or figureSetupInfo.type[playerCount] == 'normal' then
+                table.insert(figures, placeStandeeFromEnvelope(enemyEnvelope, figurePosition, false, overrideHealth, overrideMaxHealth, bossStandeeGUID))
+            elseif figureSetupInfo.type[playerCount] == 'elite' then
+                table.insert(figures, placeStandeeFromEnvelope(enemyEnvelope, figurePosition, true, overrideHealth, overrideMaxHealth, bossStandeeGUID))
+            end
+        end
+        addToCleanup(figures)
+    end
+    enemyEnvelope.call('emptyStandees', bossStandeeGUID)
+end
+
+function placeStandeeFromEnvelope(enemyEnvelope, position, elite, overrideHealth, overrideMaxHealth, bossStandeeGUID)
+    local callback = function(figure) updateMonster(figure, elite, overrideHealth, overrideMaxHealth)  end
+    return enemyEnvelope.takeObject({
+        position          = position,
+        rotation          = {0.00, 180.00, 0.00},
+        guid              = bossStandeeGUID,
+        callback_function = callback
+    })
+end
+
+-- subsequent rooms/spawn batches
+function setupEnemies(roomNumber, pagePosition)
+    local playerCount = saveState['playerCount']
+
+    local deathGUID = Global.call('getMonsterDeathGUID')
+    local death = getObjectFromGUID(deathGUID)
+    if figurePositions[roomNumber] ~= nil then
+        for monsterType, enemyPositions in pairs(figurePositions[roomNumber]) do
+            for i, figureSetupInfo in pairs(enemyPositions) do
+                if monsterType == 'boss' or figureSetupInfo.type[playerCount] == 'normal' or figureSetupInfo.type[playerCount] == 'elite' then
+
+                    local figureGUID = death.call('getAvailableMonster', monsterType)
+                    if figureGUID ~= nil then
+                        local figure = getObjectFromGUID(figureGUID)
+                        local figurePosition = calculatePosition(pagePosition, figureSetupInfo.positionOffset)
+                        local overrideHealth  = calculateHealth(figureSetupInfo.health, figureSetupInfo.healthCalc)
+                        local overrideMaxHealth  = calculateHealth(figureSetupInfo.maxHealth, figureSetupInfo.maxHealthCalc)
+
+                        local elite = false
+                        if monsterType ~= 'boss' and figureSetupInfo.type[playerCount] == 'elite' then
+                            elite = true
+                        end
+
+                        updateMonster(figure, elite, overrideHealth, overrideMaxHealth)
+                        figure.setPosition(figurePosition)
+                        figure.setRotation({0, 180, 0})
+                    end
+                end
+            end
+        end
+    end
+end
+
+function calculatePosition(pagePosition, positionOffset)
+    local positionX = pagePosition.x + positionOffset.x
+    local positionZ = pagePosition.z + positionOffset.z
+    return vector(positionX, 3, positionZ)
+end
+
+function calculateHealth(healthValue, healthFunction)
+    if healthFunction ~= nil then
+        return self.call(healthFunction)
+    else
+        return healthValue
+    end
+end
+
+function updateMonster(figure, elite, health, maxHealth)
+    -- setType will do nothing on bosses
+    figure.call('setType', elite)
+    if maxHealth ~= nil then
+        figure.call('initializeHealth', {level = saveState['scenarioLevel'], health = maxHealth})
+    end
+
+    if health ~= nil then
+        figure.call('setCounter', health)
+    end
+end

@@ -1,0 +1,295 @@
+toggleSymbol = "\u{2717}"
+hideButtonBack = true
+jotl_Class = "characterSheet"
+
+buttonThickness = 0.1
+
+xpForLevel = {[1] = 0, [2] = 45, [3] = 95, [4] = 150, [5] = 210, [6] = 275, [7] = 345, [8] = 420, [9] = 500}
+
+leftColumnCenterAlign = -0.27
+leftColumnLeftAlign = -0.34
+nameZ = -0.727
+xpZ = -0.34
+goldZ = -0.05
+itemsZ = 0.53
+
+levelButtonXPosition = {
+    ['level1'] = -0.505, ['level2'] = -0.44, ['level3'] = -0.375, ['level4'] = -0.308, ['level5'] = -0.243,
+    ['level6'] = -0.178, ['level7'] = -0.112, ['level8'] = -0.046, ['level9'] = 0.02
+}
+levelZ = -0.65
+
+perkCol1 = 0.165
+perkCol2 = 0.215
+perkCol3 = 0.267
+-- perkButtonPosition defined per character
+
+checkLeftStart = 0.214
+checkColumnSpacing = 0.0455
+checkGroupGap = 0.2
+checkRowSpacing = 0.06
+-- checkZ defined per character
+
+styleInfo = {
+    ['counter'] = {
+    	width = 0, height = 0, font = 800,
+    	offsetX = 0.08, offsetZ = -0.08, associatedWidth = 300, associatedHeight = 300
+    },
+    ['toggleA'] = {
+    	width = 300, height = 300, font = 400
+    },
+    ['toggleB'] = {
+    	width = 200, height = 200, font = 250
+    },
+    ['txt'] = {
+    	width = 3200, height = 300, font = 250, alignment = 3
+    },
+    ['editBox'] = {
+    	width = 3800, height = 3600, font = 250, alignment = 2
+    }
+}
+
+saveState = {}
+
+function onLoad(save_state)
+    if save_state ~= '' and save_state ~= nil then
+        saveState = JSON.decode(save_state)
+    end
+    buttonIndex = {}
+    index = 1
+    initCustomButtons()
+    save() -- required for import
+end
+
+function initCustomButtons()
+	createTextField('Name', 'txt', leftColumnCenterAlign, nameZ)
+	setupButton('xp', 'counter', leftColumnCenterAlign, xpZ)
+	setupButton('gold', 'counter', leftColumnCenterAlign, goldZ)
+	createTextField('Empty', 'editBox', leftColumnLeftAlign, itemsZ);
+
+    for levelNumber, xPosition in pairs(levelButtonXPosition) do
+        setupButton(levelNumber, "toggleA", xPosition, levelZ)
+    end
+
+    for perkNumber, positionData in pairs(perkButtonPosition) do
+        setupButton(perkNumber, "toggleB", positionData.x, positionData.z)
+    end
+
+    for checkNumber = 1, 18 do
+        local indexInGroup = (checkNumber - 1) % 3
+        local row = math.floor((checkNumber - 1) / 9)
+        local groupIndex = math.floor((checkNumber - 1) / 3) - (row * 3)
+
+        local checkPositionX = checkLeftStart + (indexInGroup * checkColumnSpacing) + (groupIndex * checkGroupGap)
+        local checkPositionZ = checkZ + (row * checkRowSpacing)
+        setupButton('notes' .. checkNumber, "toggleB", checkPositionX, checkPositionZ)
+    end
+end
+
+-- text and button creation
+function createTextField(name, type, x, z)
+    self.createInput({
+        height = styleInfo[type].height,
+        width = styleInfo[type].width,
+        font_size = styleInfo[type].font,
+        alignment = styleInfo[type].alignment,
+        input_function = "editTextField",
+        function_owner = self,
+        label = name,
+        value = saveState[name] or nil,
+        scale = {0.1, 0.1, 0.1},
+        position = {x, buttonThickness, z},
+        color = getColor(),
+        font_color = getFontColor()
+    })
+end
+
+function editTextField(object, color, text, editing)
+	if not editing then
+		saveText()
+	end
+end
+
+function setupButton(name, type, x, z)
+    local buttonLabel = saveState[name] or "0"
+    local onClick = "doNothing"
+
+    if type == "counter" then
+        createPlusMinus(name, type, x, z)
+	elseif type == "toggleA" or type == "toggleB" then
+		_G["toggleClick_" .. name] = function() clickedToggle(name) end
+		onClick = "toggleClick_" .. name
+		if saveState[name] then
+            buttonLabel = toggleSymbol
+        else
+            buttonLabel = ""
+        end
+    end
+
+    local button_parameters = {
+        scale = {0.1, 0.1, 0.1},
+        position = {x, buttonThickness, z},
+    	function_owner = self,
+        click_function = onClick,
+        height = styleInfo[type].height,
+        width = styleInfo[type].width,
+        font_size = styleInfo[type].font,
+        label = buttonLabel,
+        color = getColor(),
+        font_color = getFontColor()
+    }
+
+  createAndIndexButton(button_parameters, name)
+end
+
+function createPlusMinus(name, type, x, z)
+    _G["add_" .. name] = function (obj, color, alt_click) add(name, 1, alt_click) end
+    _G["sub_" .. name] = function (obj, color, alt_click) add(name, - 1, alt_click) end
+
+    local button_parameters = {
+        height = styleInfo[type].associatedHeight,
+        width = styleInfo[type].associatedWidth,
+        font_size = styleInfo[type].font * 0.7,
+        function_owner = self,
+        scale = {0.1, 0.1, 0.1},
+        color = getColor(),
+        font_color = getFontColor()
+    }
+
+    button_parameters.click_function = "add_" .. name
+    button_parameters.label = "+"
+    button_parameters.position = {x + styleInfo[type].offsetX, buttonThickness, z + styleInfo[type].offsetZ}
+    createAndIndexButton(button_parameters, "p_" .. name)
+
+    button_parameters.click_function = "sub_" .. name
+    button_parameters.label = "-"
+    button_parameters.position = {x - styleInfo[type].offsetX, buttonThickness, z + styleInfo[type].offsetZ}
+    createAndIndexButton(button_parameters, "m_" .. name)
+end
+
+function createAndIndexButton(button_parameters, name)
+    self.createButton(button_parameters)
+    -- I hate this, but need to reference buttons by a name that doesn't get stored
+    buttonIndex[name] = index
+    index = index + 1
+end
+
+-- click functionality
+function doNothing() end
+
+function clickedToggle(buttonName)
+    local newLabel = ""
+    local button = getButtonByName(buttonName)
+    if button.label == "" then
+        newLabel = toggleSymbol
+    end
+    if buttonName:find("level") then
+        updatedLevel(buttonName)
+    end
+
+    self.editButton({index = button.index, label = newLabel})
+    saveState[buttonName] = not saveState[buttonName]
+    save()
+end
+
+function add(name, amount, alt_click)
+    if alt_click then amount = amount * 10 end
+    local button = getButtonByName(name)
+
+    local oldValue = tonumber(button.label)
+    local newValue = oldValue + amount
+    self.editButton({index = button.index, label = newValue})
+
+	if name == "xp" then
+        checkLevelChange(oldValue, newValue)
+	end
+
+	saveState[name] = newValue
+    save()
+end
+
+function updatedLevel(buttonName)
+    -- add minimum xp for level
+    local level = tonumber(buttonName:sub(6))
+    if (saveState["xp"] or 0) < xpForLevel[level] then
+        local button = getButtonByName("xp")
+        saveState["xp"] = xpForLevel[level]
+        self.editButton({index = button.index, label = saveState["xp"]})
+    end
+    -- check all lower levels
+    for i=1, level do
+        local button = getButtonByName("level" .. i)
+        self.editButton({index = button.index, label = toggleSymbol})
+        saveState["level" .. i] = true
+    end
+    -- uncheck all higher levelButtonXPosition
+    for i=9, level, -1 do
+        local button = getButtonByName("level" .. i)
+        self.editButton({index = button.index, label = ""})
+        saveState["level" .. i] = false
+    end
+
+    save()
+end
+
+function checkLevelChange(oldValue, newValue)
+    for level = 1, 9 do
+        local required = xpForLevel[level]
+        if (oldValue < required and newValue >= required) or (oldValue >= required and newValue < required) then
+            clickedToggle("level" .. level)
+        end
+    end
+end
+
+--save functionality
+function saveText()
+    local inputs = self.getInputs()
+	for _, v in pairs(inputs) do
+		saveState[v.label] = v.value
+	end
+    save()
+end
+
+function save()
+    self.script_state = JSON.encode_pretty(saveState)
+end
+
+-- helper functions
+function getColor()
+    if hideButtonBack then
+        return {1, 1, 1, 0}
+    end
+    return nil
+end
+
+function getFontColor()
+    if hideButtonBack then
+        return {0, 0, 0, 100}
+    end
+    return nil
+end
+
+function getButtonByName(buttonName)
+    local buttons = self.getButtons()
+    return buttons[buttonIndex[buttonName]]
+end
+
+-- external functions
+function addGold(params)
+	gold = params.gold
+	add('gold', gold, false)
+end
+
+function addXP(params)
+	xp = params.xp
+	add('xp', xp, false)
+end
+
+function getCharacterLevel()
+    for i=9, 1, -1 do
+        if saveState["level" .. i] then
+            return i
+        end
+    end
+    return 1
+end

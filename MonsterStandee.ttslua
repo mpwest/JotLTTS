@@ -1,0 +1,87 @@
+#include SimpleCounter
+#include Figure
+
+min = 0
+max = 99
+level = 0
+counterName = 'Health'
+labelPosition = {0, 0.1, 0.45}
+minusPosition = {-0.4, 0.1, 0.42}
+plusPosition = {0.4, 0.1, 0.42}
+labelColor = {0,0,0,4.5}
+buttonColor = {1,1,1, 0.2 }
+minusButtonLabel = '-'
+plusButtonLabel = '+'
+
+function initializeHealth(params)
+    setCounter(params.health)
+    max = params.health
+
+    saveState['level'] = params.level
+    save_state = JSON.encode(saveState)
+end
+
+function onCollisionEnter(collision_info)
+    local objectName = collision_info['collision_object'].getName()
+    if objectName == 'Switch to elite' then
+        setType(true)
+    elseif objectName ==  'Switch to normal' then
+        setType(false)
+    elseif objectName == Global.call('getDeathName') then
+        local death = collision_info['collision_object']
+        setCounter(max)
+        death.call('resetMonster', { guid = self.getGUID(), monsterType = monsterType })
+    end
+end
+
+function setType(elite)
+    originalType = saveState['type']
+
+    if elite and originalType == 'normal' then
+        self.setColorTint({ 231/255, 229/255, 44/255, 255/255 })
+        self.setName('Elite ' .. baseName .. ' (' .. standeeNumber .. ')')
+        saveState['type'] = 'elite'
+
+    elseif not elite and originalType == 'elite' then
+        self.setColorTint({ 255/255, 255/255, 255/255, 255/255  })
+        self.setName(baseName .. ' (' .. standeeNumber .. ')')
+        saveState['type'] = 'normal'
+    end
+
+    calculateHealth(elite)
+end
+
+function calculateHealth(elite)
+    local missingHealth = 0
+    local newMax = normalHealth[level]
+    if elite then newMax = eliteHealth[level] end
+
+    if saveState[counterName] ~= nil and saveState['max'] ~= nil then
+        missingHealth = saveState['max'] - saveState[counterName]
+    end
+
+    local newHealth = newMax - missingHealth
+    if newHealth < 0 then newHealth = 0 end
+    if newHealth > newMax then newHealth = newMax end
+    max = newMax
+    saveState['max'] = max
+    setCounter(newHealth)
+end
+
+function initialize()
+    level = Global.call('getScenarioLevel')
+    saveState['level'] = level
+    if saveState['type'] == nil then
+        saveState['type'] = 'normal'
+        max = normalHealth[level]
+    end
+    if saveState['type'] == 'elite' then
+        setType(true)
+    else
+        setType(false)
+    end
+end
+
+function getStandeeNumber()
+    return standeeNumber
+end

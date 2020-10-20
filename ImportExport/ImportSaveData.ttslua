@@ -1,0 +1,101 @@
+#include DataImportInfo
+#include ImportCharacter
+#include ImportUtilities
+
+debug = false -- No breakpoints or debugging utilities for tts, unfortunately
+allowImport = true
+version = 3
+
+function getVersion()
+    return version
+end
+
+-- Any older source versions must be handled, destination versions can update fully with any future release
+function importPriorVersion(saveInfoJSON)
+    if not allowImport then
+        broadcastToAll('There is currently an import operation being run. Please wait to spawn additional import tokens.', {1,1,1,1})
+        return true
+    end
+    allowImport = false
+
+    local saveInfo = JSON.decode(saveInfoJSON)
+    if saveInfo['characters'] ~= nil  then
+        log('Import characters')
+        importCharacters(saveInfo['characters'], saveInfo['sourceVersion'])
+    end
+
+    if saveInfo['storeItems'] ~= nil  then
+        log('Import store')
+        addToStore(saveInfo['storeItems'])
+    end
+
+    if saveInfo['cityEvents'] ~= nil  then
+        log('Import city events')
+        moveCompletedEvents(saveInfo['cityEvents'])
+    end
+
+    if saveInfo['map'] ~= nil then
+        log('Import map')
+        updateMap(saveInfo['map'])
+    end
+
+    if saveInfo['lootIndex'] ~= nil then
+        log('Import loot index')
+        updateLoot(saveInfo['lootIndex'])
+    end
+    Wait.frames(function() broadcastToAll('Try setting up scenarios 1 and 2 for a tutorial on the new setup process.', {1,1,1,1}) end, 300)
+    Wait.frames(function() allowImport = true end, 60 * (#saveInfo['characters'] + 5))
+    return true
+end
+
+function addToStore(itemList)
+    local available =  getObjectFromGUID(getItemDeck('available'))
+    local unavailable = getObjectFromGUID(getItemDeck('unavailable'))
+    local itemsRemaining = #unavailable.getObjects()
+    local unavailablePosition = unavailable.getPosition()
+
+    for _, item in pairs(itemList) do
+        if itemsRemaining == 1 then
+            Wait.frames(function() moveLastCard(unavailablePosition, item, available.getPosition()) end, 30)
+        else
+            addCard(available, unavailable, item)
+        end
+        itemsRemaining = itemsRemaining - 1
+    end
+end
+
+function moveCompletedEvents(cityEvents)
+    local eventDeck = getObjectFromGUID(eventDeckGUID)
+    local deckPosition = eventDeck.getPosition()
+    if eventDeck ~= nil then
+        local eventsRemaining = #eventDeck.getObjects()
+        for eventNumber, complete in pairs(cityEvents) do
+            if complete then
+                if eventsRemaining == 1 then -- removed last card
+                    Wait.frames(function() moveLastCard(deckPosition, eventNumber, completedEventLocation) end, 30)
+                else
+                    removeCard(eventDeck, eventNumber, completedEventLocation)
+                end
+                eventsRemaining = eventsRemaining - 1
+            end
+        end
+    end
+end
+
+function updateMap(mapInfo)
+    local map = getObjectFromGUID(getMapTileGUID())
+    local importedAll = true
+    for guid, checked in pairs(mapInfo) do
+        importedAll = map.call('addStickerFromImport', {guid = guid, checked = checked}) and importedAll -- will become false if adding a sticker fails
+    end
+    if not importedAll then
+        broadcastToAll('Some map stickers may not have imported correctly, based on unexpected GUIDs', {1,1,1,1})
+    end
+end
+
+function updateLoot(lootInfo)
+    local treasureIndex = getObjectFromGUID(getTreasureIndexGUID())
+    if treasureIndex ~= nil then
+        treasureIndex.call('onLoad', JSON.encode({lootedIndex = lootInfo}))
+    end
+end

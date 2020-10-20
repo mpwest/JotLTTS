@@ -1,0 +1,60 @@
+#include SimpleCounter
+
+max = 99
+min = 0
+counterName = "XP"
+labelPosition = {-0.18, 0.1, 0.08}
+minusPosition = {0.65, 0.05, 0.68}
+plusPosition = {0.65, 0.05, -0.68}
+plusMinusSize = 400
+
+function initialize()
+    if saveState['characterSheetGUID'] ~= nil then
+        createXPAddButton()
+    end
+end
+
+function createXPAddButton()
+    self.createButton({
+        click_function = 'addXP',
+        function_owner = self,
+        position       = labelPosition,
+        color          = {180/255, 180/255, 180/255, 0},
+        width          = 400,
+        height         = 400,
+        tooltip        = 'Add to character sheet and reset'
+    })
+end
+
+function onCollisionEnter(collision_info)
+    if collision_info['collision_object'].getName() == 'Player Mat' and saveState['characterSheetGUID'] ~= nil then
+        collision_info['collision_object'].call('setCharacterInfo', {sheetGUID = saveState['characterSheetGUID'], figureGUID = saveState['figureGUID']})
+    end
+end
+
+function setCharacterInfo(params)
+    saveState['characterSheetGUID'] = params.sheetGUID
+    saveState['characterSheetGUID'] = params.sheetGUID
+    saveState['figureGUID'] = params.figureGUID
+    createXPAddButton()
+    self.script_state = JSON.encode(saveState)
+end
+
+function addXP()
+    local characterSheet = getObjectFromGUID(saveState['characterSheetGUID'])
+    if characterSheet ~= nil then
+        local xp = 0
+        local counter = getCounter()
+
+        if counter ~= nil then
+            xp = counter.label
+            counter.label = 0
+            self.editButton(counter)
+            saveState[counterName] = 0
+        end
+        characterSheet.call('addXP', {xp = xp})
+    else
+        saveState['characterSheetGUID'] = nil
+        self.script_state = JSON.encode(saveState)
+    end
+end

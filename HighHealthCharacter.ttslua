@@ -1,0 +1,5 @@
+#include CharacterStandee
+
+function calculateHealth(level)
+    return (level * 2) + 8
+end

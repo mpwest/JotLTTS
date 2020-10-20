@@ -1,0 +1,100 @@
+function onCollisionEnter(info)
+
+    if info['collision_object'].getName() == 'Player Mat'  then
+        local pos = info['collision_object'].getPosition()
+        local bag = getObjectFromGUID(characterEnvelope_GUID).takeObject({ --Character Envelope
+            position       = {pos.x-5, pos.y+1, pos.z-41},
+            rotation       = {0.00, 180.00, 0.00},
+            smooth         = false
+        })
+
+        local sheet = bag.takeObject({ --Character Sheet
+            position       = {pos.x+2, pos.y+1, pos.z-42},
+            rotation       = {0.00, 180.00, 0.00},
+            smooth         = false
+        })
+
+        bag.takeObject({ --Character board
+            position       = {pos.x, pos.y+1, pos.z-15.1},
+            rotation       = {0.00, 180.00, 0.00},
+            smooth         = false
+        })
+
+        local figure = bag.takeObject({ --Figurine
+            position       = {pos.x+2.3, pos.y+1, pos.z+6},
+            rotation       = {0.00, 180.00, 0.00},
+            smooth         = false
+        })
+
+        local trackerPos = getInitiativeTrackerPosition()
+        bag.takeObject({ --Initiative Tracker
+            position       = trackerPos,
+            rotation       = {0.00, 180.00, 0.00},
+            smooth         = false
+        })
+
+        bag.takeObject({ --Character markers
+            position       = {pos.x+2.1, pos.y+1, pos.z+0.3},
+            rotation       = {0.00, 180.00, 0.00},
+        })
+
+        if hasSummons then
+            bag.takeObject({ --Summons
+                position       = {pos.x+2.1, pos.y+1, pos.z-1.3},
+                rotation       = {0.00, 180.00, 0.00},
+                smooth         = false
+            })
+        end
+
+        bag.takeObject({ --Reference Card
+            position       = {pos.x, pos.y+1, pos.z-33},
+            rotation       = {0.00, 180.00, 0.00},
+            smooth         = false
+        })
+
+        bag.takeObject({ --Modifier deck
+            position       = {pos.x+5.36, pos.y+1, pos.z+1.3},
+            rotation       = {0.00, 180.00, 180.00},
+            smooth         = false
+        })
+
+        placeSkills(bag, pos)
+
+        local coinPurse = bag.takeObject({ -- coin purse
+            position = {pos.x-4, pos.y+2, pos.z-0.9}
+        })
+        bag.takeObject({
+            position = {pos.x-0.39, pos.y+2, pos.z-0.9},
+            callback_function = function(xpTracker) waitSendGUIDs(xpTracker, coinPurse, sheet, figure, info['collision_object']) end
+        })
+    end
+end
+
+function getInitiativeTrackerPosition()
+    local initiativeTracker = getObjectFromGUID(Global.call('getInitiativeTracker'))
+    if initiativeTracker ~= nil then
+        local trackerPosition = initiativeTracker.call('getNextEmptyPosition')
+        -- cannot pass reference obtained from another object
+        if trackerPosition ~= nil then
+            return vector(trackerPosition.x, trackerPosition.y+1, trackerPosition.z)
+        end
+    end
+    return vector(34, 3, 0.53)
+end
+
+function waitSendGUIDs(xpTracker, coinPurse, sheet, figure, playerMat)
+    Wait.condition(
+        function() sendGUIDs(xpTracker, coinPurse, sheet, figure, playerMat) end,
+        function() return not sheet.spawning and not figure.spawning and not coinPurse.spawning end
+    )
+end
+
+function sendGUIDs(xpTracker, coinPurse, sheet, figure, playerMat)
+    local sheetGUID = sheet.getGUID()
+    local figureGUID = figure.getGUID()
+    xpTracker.call('setCharacterInfo', {sheetGUID = sheetGUID, figureGUID = figureGUID})
+    playerMat.call('setCharacterInfo', {sheetGUID = sheetGUID, figureGUID = figureGUID})
+    figure.call('setCharacterSheet', sheetGUID)
+    coinPurse.call('setCharacterSheet', sheetGUID)
+    self.destruct()
+end

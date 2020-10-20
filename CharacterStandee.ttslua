@@ -1,0 +1,10 @@
+#include CharacterFigure
+
+-- standees have standard bases
+labelPosition = {[primaryCounterName] = {0, 0.1, 0.45}, [secondaryCounterName] = {0, 0.08, 0.8}}
+labelRotation = {[primaryCounterName] = {0, 0, 0}, [secondaryCounterName] = {340, 0, 0}}
+minusPosition = {-0.4, 0.1, 0.42}
+plusPosition = {0.4, 0.1, 0.42}
+size = {[primaryCounterName] = 200, [secondaryCounterName] = 180}
+
+baseConditionDistance = 1.15

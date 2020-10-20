@@ -1,0 +1,85 @@
+monsters = {
+    ['boss'] = '301739',
+    ['black_sludge'] = '0732f0',
+    ['chaos_demon'] = '4d1621',
+    ['giant_viper'] = '1f6b91',
+    ['black_imp'] = '06edf2',
+    ['blood_imp'] = '8d1161',
+    ['living_corpse'] = 'ca388d',
+    ['living_spirit'] = 'cf65b5',
+    ['rat_monstrosity'] = '7fa736',
+    ['blood_monstrosity'] = 'edb7dd',
+    ['stone_golem'] = '8b7ce2',
+    ['vermling_raider'] = '0d6e0f',
+    ['vermling_scout'] = 'e9c2f3',
+    ['zealot'] = 'af721e'
+}
+
+monsterCounts = {
+    ['boss'] = 1,
+    ['black_sludge'] = 6,
+    ['chaos_demon'] = 4,
+    ['giant_viper'] = 10,
+    ['black_imp'] = 10,
+    ['blood_imp'] = 10,
+    ['living_corpse'] = 6,
+    ['living_spirit'] = 4,
+    ['rat_monstrosity'] = 10,
+    ['blood_monstrosity'] = 6,
+    ['stone_golem'] = 6,
+    ['vermling_raider'] = 10,
+    ['vermling_scout'] = 10,
+    ['zealot'] = 6
+}
+
+monsterMats = {
+    [1] = '22fd05',
+    [2] = '0c98cf',
+    [3] = 'b17add',
+    [4] = '14b077'
+}
+
+monsterSleeveBag = '267c36'
+monsterAttackModifierBagGUID = 'b3e6f1'
+
+-- should use bowl guids, and get base position
+standeeBowlXPosition = {[1] = -18.79, [2] = -10.38, [3] = -1.93, [4] = 6.49}
+standeeBowlZPosition = 27.20
+
+function getMonsterEnvelope(name)
+    monster_GUID = monsters[name]
+    return getObjectFromGUID(monster_GUID)
+end
+
+function getMonsterMat(matNumber)
+    monsterMat_GUID = monsterMats[matNumber]
+    return getObjectFromGUID(monsterMat_GUID)
+end
+
+function getMonsterCount(name)
+    return monsterCounts[name]
+end
+
+function getMonsterDeathGUID()
+    return '65dc69'
+end
+
+function getDeathName()
+    return 'Graveyard'
+end
+
+function getMonsterSleeveBag()
+    return monsterSleeveBag
+end
+
+function getMonsterAttackModifierBagGUID()
+    return monsterAttackModifierBagGUID
+end
+
+function getStandeeBowlPosition(params)
+    local positionX = standeeBowlXPosition[params.monsterMatNumber] + math.random(-20, 20)/10
+    local positionY = 3 + params.iterationNumber * 3
+    local positionZ = standeeBowlZPosition + math.random(-20, 20)/10
+
+    return { positionX, positionY, positionZ}
+end
