@@ -1,0 +1,86 @@
+#include Shared/ScenarioSetup
+
+enemyTypes = {
+   [1] = 'chaos_demon',
+   [2] = 'zealot',
+   [3] = 'boss'
+}
+cardType = 'standard'
+
+bossName = 'blood_tumor'
+
+winXp = 20
+rewardLocation = { x = 18.5, z = -6.5}
+
+figurePositions = {
+   [1] = {
+       ['chaos_demon'] = {
+           [1] = {
+               type = {[2] = 'none', [3] = 'none', [4] = 'normal'},
+               positionOffset = {x = -13.27, z = -6.08} },
+           [2] = {
+               type = {[2] = 'normal', [3] = 'normal', [4] = 'normal'},
+               positionOffset = {x = -7.64, z = -0.59} },
+           [3] = {
+               type = {[2] = 'none', [3] = 'normal', [4] = 'normal'},
+               positionOffset = {x = -3.71, z = -0.56} },
+            [4] = {
+                type = {[2] = 'normal', [3] = 'normal', [4] = 'normal'},
+                positionOffset = {x = 0.11, z = 6.05} },
+       },
+       ['zealot'] = {
+        [1] = {
+             type = {[2] = 'elite', [3] = 'elite', [4] = 'elite'},
+             positionOffset = {x = -7.54, z = -5.04} },
+        [2] = {
+            type = {[2] = 'elite', [3] = 'elite', [4] = 'elite'},
+            positionOffset = {x = -5.66, z = 0.48} },
+        [3] = {
+            type = {[2] = 'elite', [3] = 'elite', [4] = 'elite'},
+            positionOffset = {x = 2, z = -6.05} },
+        [4] = {
+            type = {[2] = 'elite', [3] = 'elite', [4] = 'elite'},
+            positionOffset = {x = 5.82, z = -1.68} },
+       }
+   },
+   [2] = {
+       ['zealot'] = {
+           [1] = {
+               type = {[2] = 'normal', [3] = 'normal', [4] = 'elite'},
+               positionOffset =  {x = 9.59, z = 2.76} },
+           [2] = {
+               type = {[2] = 'normal', [3] = 'elite', [4] = 'elite'},
+               positionOffset =  {x = 9.63, z = -8.35} },
+       },
+       ['boss'] = {
+           [1] = {
+                positionOffset =  {x = 11.56, z = -2.58},
+                healthCalc = 'reduceByCx2' }
+        }
+   }
+}
+
+overlayPositionsByRoom = {
+   [1] = {
+       ['gold'] = {[1] = {x = -5.7, z = 7.15}, [2] = {x = -3.78, z = -5.05}, [3] = {x = 3.96, z = 6.01}},
+       ['treasure'] = {[1] = {x = 5.9, z = 7.13} },
+    },
+   [2] = {
+       ['activate'] = {[1] = {x = 7.69, z = -2.84}},
+    }
+}
+
+hexHeight = 700
+
+buttonData = {
+   [1] = { position = {-1.85, 0.1, -0.93}, label = '', message = '', nextButtons = { 2 }, action = "initializeScenario", hint = 'Setup Scenario'},
+   [2] = { position = {0.72, 0.1, 0.26}, label = '', message = '', nextButtons = { 3 }, action = "setupRoom", hint = 'Open door', overrideButtonHeight = hexHeight},
+   [3] = { position = {1.7, 0.1, 0.22}, nextButtons = {}, action = 'generateWinRewards', hint = 'Click for Scenario Rewards'}
+}
+
+function reduceByCx2()
+    local playerCount = saveState['playerCount']
+    local scenarioLevel = saveState['scenarioLevel']
+    local healthByLevel = {[0]=7, [1]=10, [2]=12, [3]=15, [4]=17, [5]=20, [6]=23, [7]=28}
+    return playerCount * (healthByLevel[scenarioLevel]) - (playerCount * 2)
+end

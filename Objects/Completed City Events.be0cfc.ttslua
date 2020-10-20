@@ -1,0 +1,76 @@
+saveState = {}
+
+function onLoad(save_state)
+    if save_state ~= '' then
+        saveState = JSON.decode(save_state)
+    end
+
+    createButtons()
+end
+
+function createButtons()
+    for i = 1, 22 do
+
+        local eventNumber = '' .. i
+        if i <= 9 then
+            eventNumber = '0' .. i
+        end
+
+        local row = (i - 1) % 11
+        local column = math.floor((i - 1) / 11)
+
+        local buttonPosition = {-0.235 + (column * 0.535), 0.1, -0.5 + (row * 0.12)}
+
+        local check = ''
+        if saveState[eventNumber] then
+            check = 'x'
+        end
+
+        _G['toggleEvent' .. eventNumber] = function() toggleEvent(eventNumber) end
+        self.createButton({
+            click_function = 'toggleEvent' .. eventNumber,
+            function_owner = self,
+            label          = check,
+            position       = buttonPosition,
+            width          = 80,
+            height         = 80, -- int,
+            font_size      = 100,
+            color          = {0.5,0.5,0.5,0.75},
+            font_color     = {1,0,0,1.5},
+            scale          = {0.5, 0.5, 0.5}
+        })
+
+        -- remove once artwork is ready?
+        local labelPosition = {-0.335 + (column * 0.535), 0.1, -0.5 + (row * 0.12)}
+        self.createButton({
+            click_function = 'none',
+            function_owner = self,
+            label = eventNumber,
+            position = labelPosition,
+            width = 0,
+            height = 0,
+            font_size = 80,
+            --color = {0,0,0,0},
+            font_color = {1,1,1,1},
+            scale = {0.5, 0.5, 0.5}
+        })
+    end
+end
+
+function toggleEvent(eventNumber)
+    local check = ''
+    if saveState[eventNumber] then
+        saveState[eventNumber] = nil
+    else
+        saveState[eventNumber] = true
+        check = 'x'
+    end
+
+    for _, button in pairs(self.getButtons()) do
+        if button.click_function == 'toggleEvent' .. eventNumber then
+            self.editButton({index = button.index, label = check})
+        end
+    end
+
+    self.script_state = JSON.encode(saveState)
+end

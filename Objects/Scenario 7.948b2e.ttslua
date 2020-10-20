@@ -1,0 +1,111 @@
+#include Shared/ScenarioSetup
+
+enemyTypes = {
+   [1] = 'vermling_scout',
+   [2] = 'zealot',
+   [3] = 'boss'
+}
+cardType = 'standard'
+
+bossName = 'blood_tumor'
+
+winXp = 20
+rewardLocation = {x = 9, z = -9}
+
+figurePositions = {
+   [1] = {
+        ['vermling_scout'] = {
+            [1] = {
+                type = {[2] = 'none', [3] = 'none', [4] = 'normal'},
+                positionOffset = {x = 4.77, z = 8.27} },
+            [2] = {
+                type = {[2] = 'none', [3] = 'elite', [4] = 'elite'},
+                positionOffset = {x = 8.62, z = 5.99} },
+            [3] = {
+                type = {[2] = 'elite', [3] = 'elite', [4] = 'elite'},
+                positionOffset = {x = 10.5, z = 4.8} },
+            [4] = {
+                type = {[2] = 'none', [3] = 'none', [4] = 'normal'},
+                positionOffset = {x = 12.51, z = 3.75} },
+            [5] = {
+                type = {[2] = 'normal', [3] = 'normal', [4] = 'normal'},
+                positionOffset = {x = 12.48, z = 1.66} },
+        },
+        ['zealot'] = {
+            [1] = {
+                type = {[2] = 'none', [3] = 'normal', [4] = 'elite'},
+                positionOffset = {x = 4.75, z = 3.74} },
+            [2] = {
+                type = {[2] = 'elite', [3] = 'elite', [4] = 'elite'},
+                positionOffset = {x = 4.75, z = 1.51} },
+            }
+    },
+   [2] = {
+    ['vermling_scout'] = {
+        [1] = {
+            type = {[2] = 'elite', [3] = 'elite', [4] = 'elite'},
+            positionOffset = {x = 12.45, z = -3.02} },
+        [2] = {
+            type = {[2] = 'none', [3] = 'elite', [4] = 'elite'},
+            positionOffset = {x = 10.42, z = -4.1} },
+        [3] = {
+            type = {[2] = 'normal', [3] = 'normal', [4] = 'elite'},
+            positionOffset = {x = 4.71, z = -2.93} },
+         [4] = {
+             type = {[2] = 'normal', [3] = 'normal', [4] = 'normal'},
+             positionOffset = {x = 8.61, z = -5.18} },
+         [5] = {
+             type = {[2] = 'none', [3] = 'none', [4] = 'normal'},
+             positionOffset = {x = 4.71, z = -0.65} },
+     },
+     ['zealot'] = {
+         [1] = {
+             type = {[2] = 'normal', [3] = 'elite', [4] = 'elite'},
+             positionOffset = {x = -1.13, z = -4.03} },
+         [2] = {
+             type = {[2] = 'normal', [3] = 'normal', [4] = 'elite'},
+             positionOffset = {x = -1.13, z = -1.81} },
+         }
+    },
+   [3] = {
+       ['zealot'] = {
+           [1] = {
+                type = {[2] = 'normal', [3] = 'elite', [4] = 'elite'},
+                positionOffset =  {x = -10.76, z = 3.75} },
+           [2] = {
+               type = {[2] = 'normal', [3] = 'normal', [4] = 'elite'},
+               positionOffset =  {x = -10.76, z = -2.96} },
+       },
+       ['boss'] = {
+           [1] = {
+                positionOffset =  {x = -8.88, z = 0.35},
+                healthCalc = 'reduceByCx2' }
+        }
+   }
+}
+
+overlayPositionsByRoom = {
+   [2] = {
+       ['treasure'] = {[1] = {x = 12.48, z = -5.19} },
+       ['activate'] = {[1] = {x = 6.53, z = 0.43} }
+   },
+   [3] = {
+       ['activate'] = {[1] = {x = -3.01, z = -0.71} }
+   }
+}
+
+hexHeight = 700
+
+buttonData = {
+   [1] = { position = {-1.12, 0.1, -0.95}, nextButtons = { 2 }, action = 'initializeScenario', hint = 'Setup Scenario'},
+   [2] = { position = {0.565, 0.1, -0.05}, nextButtons = { 3 }, action = 'setupRoom', hint = 'Open door', overrideButtonHeight = hexHeight},
+   [3] = { position = {-0.26, 0.1, 0.06}, nextButtons = { 4 }, action = 'setupRoom', hint = 'Open door', overrideButtonHeight = hexHeight},
+   [4] = { position = {0.38, 0.1, 0.74}, nextButtons = {}, action = 'generateWinRewards', hint = 'Click for Scenario Rewards'}
+}
+
+function reduceByCx2()
+    local playerCount = saveState['playerCount']
+    local scenarioLevel = saveState['scenarioLevel']
+    local healthByLevel = {[0]=7, [1]=10, [2]=12, [3]=15, [4]=17, [5]=20, [6]=23, [7]=28}
+    return playerCount * (healthByLevel[scenarioLevel] - 2)
+end

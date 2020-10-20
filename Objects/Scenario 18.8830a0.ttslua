@@ -1,0 +1,91 @@
+#include Shared/ScenarioSetup
+
+enemyTypes = {
+    [1] = 'stone_golem'
+}
+cardType = 'standard'
+
+winXp = 10
+rewardLocation = { x = 13, z = -17}
+
+figurePositions = {
+    [6] = {
+        ['stone_golem'] = {
+            [1] = {
+                type = {[2] = 'elite', [3] = 'elite', [4] = 'elite'},
+                positionOffset = {x = -4.68, z = 8.26 } }
+        }
+    },
+    [7] = {
+        ['stone_golem'] = {
+            [1] = {
+                type = {[2] = 'elite', [3] = 'elite', [4] = 'elite'},
+                positionOffset = {x = -6.55, z = -0.16 } }
+        }
+    },
+    [8] = {
+        ['stone_golem'] = {
+            [1] = {
+                type = {[2] = 'elite', [3] = 'elite', [4] = 'elite'},
+                positionOffset = {x = 10.84, z = -3.62 } }
+        }
+    },
+    [9] = {
+        ['stone_golem'] = {
+            [1] = {
+                type = {[2] = 'elite', [3] = 'elite', [4] = 'elite'},
+                positionOffset = {x = 14.61, z = 7.87 } }
+        }
+    },
+    [10] = {
+        ['stone_golem'] = {
+            [1] = {
+                 type = {[2] = 'normal', [3] = 'elite', [4] = 'elite'},
+                 positionOffset =  {x = -0.79, z = 12.29} },
+            [2] = {
+                type = {[2] = 'normal', [3] = 'normal', [4] = 'elite'},
+                positionOffset =  {x = 8.89, z = 13.2} },
+        }
+    }
+}
+
+overlayPositionsByRoom = {
+    [2] = {
+        ['gold'] = {[1] = {x = -6.68, z = 9.02}, [2] = {x = -10.51, z = 8.81}, [3] = {x = -10.45, z = 11.41} },
+        ['treasure'] = {[1] = {x = -12.62, z = 12.47} },
+        ['activate'] = {[1] = {x = -0.83, z = 10.33}}
+    },
+    [3] = {
+        ['gold'] = {[1] = {x = -10.58, z = 2.31}, [2] = {x = -12.52, z = 5.57} },
+        ['treasure'] = {[1] = {x = -12.52, z = 1.24} },
+        ['activate'] = {[1] = {x = -0.83, z = 3.44}}
+    },
+    [4] = {
+        ['gold'] = {[1] = {x = 1.19, z = -6.6}, [2] = {x = 3.13, z = -7.8}, [3] = {x = 6.94, z = -9.9}, [4] = {x = 8.9, z = -8.9} },
+        ['treasure'] = {[1] = {x = 1.19, z = -8.9} },
+        ['activate'] = {[1] = {x = 4.98, z = 0.17}}
+    },
+    [5] = {
+        ['gold'] = {[1] = {x = 10.84, z = 1.23}, [2] = {x = 12.8, z = 2.36}, [3] = {x = 12.8, z = 11.36},
+                    [4] = {x = 10.84, z = 12.51}, [5] = {x = 10.84, z = 14.72}, [6] = {x = 12.8, z = 15.83} },
+        ['treasure'] = {[1] = {x = 12.8, z = 13.68} },
+        ['activate'] = {[1] = {x = 8.85, z = 7.03}}
+    }
+}
+
+buttonData = {
+    [1] = { position = {-0.75, 0.1, -0.95}, label = '', message = '', nextButtons = { 2, 3, 4, 5, 10 }, action = "initializeScenario", hint = 'Setup Scenario'},
+    -- Doors
+    [2] = { position = {-0.06, 0.1, -0.55}, label = '', message = 'Click the A hex to spawn. Click \'2\' once C tiles have been looted.', nextButtons = { 6 }, action = "setupRoom", hint = 'Open door'},
+    [3] = { position = {-0.06, 0.1, -0.18}, label = '', message = 'Click the A hex to spawn. Click \'2\' once C tiles have been looted.', nextButtons = { 7 }, action = "setupRoom", hint = 'Open door'},
+    [4] = { position = {0.25, 0.1, -0.01}, label = '', message = 'Click the A hex to spawn. Click \'2\' once C tiles have been looted.', nextButtons = { 8 }, action = "setupRoom", hint = 'Open door'},
+    [5] = { position = {0.48, 0.1, -0.36}, label = '', message = 'Click the A hex to spawn. Click \'2\' once C tiles have been looted.', nextButtons = { 9 }, action = "setupRoom", hint = 'Open door'},
+    -- treasure spawns
+    [6] = { position = {-0.37, 0.1, -0.6}, label = '', message = 'Please move golem to an appropriate position.', nextButtons = { }, action = "setupRoom", hint = 'Spawn golem'},
+    [7] = { position = {-0.35, 0.1, -0.12}, label = '', message = 'Please move golem to an appropriate position.', nextButtons = { }, action = "setupRoom", hint = 'Spawn golem'},
+    [8] = { position = {0.25, 0.1, 0.23}, label = '', message = 'Please move golem to an appropriate position.', nextButtons = { }, action = "setupRoom", hint = 'Spawn golem'},
+    [9] = { position = {0.57, 0.1, -0.42}, label = '', message = 'Please move golem to an appropriate position.', nextButtons = { }, action = "setupRoom", hint = 'Spawn golem'},
+    -- Central room spawn
+    [10] = { position = {0.33, 0.1, -0.64}, label = '', message = 'Please move golems to an appropriate position.', nextButtons = { 11 }, action = "setupRoom", hint = 'Setup monsters'},
+    [11] = { position = {0.47, 0.1, 0.95}, nextButtons = {}, action = 'generateWinRewards', hint = 'Click for Scenario Rewards' }
+}

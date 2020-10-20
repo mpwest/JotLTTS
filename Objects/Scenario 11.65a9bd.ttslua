@@ -1,0 +1,114 @@
+#include Shared/ScenarioSetup
+
+enemyTypes = {
+   [1] = 'giant_viper',
+   [2] = 'black_sludge',
+   [3] = 'vermling_scout'
+}
+cardType = 'standard'
+
+bossName = 'blood_tumor'
+
+winItem = 'Flea-Bitten Shawl'
+rewardLocation = { x = 20.21, z = 7.85}
+
+figurePositions = {
+    [1] = {
+        ['giant_viper'] = {
+            [1] = {
+                type = {[2] = 'normal', [3] = 'elite', [4] = 'elite'},
+                positionOffset = {x = -12.22, z = -3.8} },
+            [2] = {
+                type = {[2] = 'normal', [3] = 'normal', [4] = 'elite'},
+                positionOffset = {x = -12.22, z = -6.16} },
+            [3] = {
+                type = {[2] = 'none', [3] = 'normal', [4] = 'normal'},
+                positionOffset = {x = -10.25, z = -2.73} },
+            [4] = {
+                type = {[2] = 'elite', [3] = 'elite', [4] = 'elite'},
+                positionOffset = {x = -10.21, z = -5.03} },
+            [5] = {
+                type = {[2] = 'none', [3] = 'normal', [4] = 'normal'},
+                positionOffset = {x = -10.21, z = -7.4} },
+        },
+        ['black_sludge'] = {
+            [1] = {
+                type = {[2] = 'normal', [3] = 'normal', [4] = 'elite'},
+                positionOffset = {x = -8.25, z = -3.86} }
+        }
+   },
+   [2] = {
+        ['giant_viper'] = {
+            [1] = {
+                type = {[2] = 'none', [3] = 'none', [4] = 'normal'},
+                positionOffset = {x = -2.2, z = -2.7} },
+            [2] = {
+                type = {[2] = 'normal', [3] = 'elite', [4] = 'elite'},
+                positionOffset = {x = -0.14, z = 0.78} },
+            [3] = {
+                type = {[2] = 'normal', [3] = 'normal', [4] = 'elite'},
+                positionOffset = {x = 3.82, z = -6.14} },
+            [4] = {
+                type = {[2] = 'none', [3] = 'normal', [4] = 'normal'},
+                positionOffset = {x = 5.78, z = -0.41} },
+        },
+        ['black_sludge'] = {
+            [1] = {
+                    type = {[2] = 'none', [3] = 'normal', [4] = 'normal'},
+                    positionOffset = {x = -0.18, z = 5.46} },
+            [2] = {
+                type = {[2] = 'elite', [3] = 'normal', [4] = 'elite'},
+                positionOffset = {x = 1.77, z = 6.57} },
+            [3] = {
+                type = {[2] = 'none', [3] = 'normal', [4] = 'normal'},
+                positionOffset = {x = 3.82, z = 5.38} },
+        },
+        ['vermling_scout'] = {
+            [1] = {
+                type = {[2] = 'elite', [3] = 'elite', [4] = 'elite'},
+                positionOffset = {x = 5.82, z = -2.73} }
+        }
+   },
+   [3] = {
+        ['vermling_scout'] = {
+            [1] = {
+                type = {[2] = 'normal', [3] = 'elite', [4] = 'elite'},
+                positionOffset =  {x = 9.61, z = -0.41} },
+            [2] = {
+                type = {[2] = 'none', [3] = 'none', [4] = 'normal'},
+                positionOffset =  {x = 11.63, z = 0.75} },
+            [3] = {
+                type = {[2] = 'none', [3] = 'normal', [4] = 'elite'},
+                positionOffset =  {x = 13.57, z = -2.73} },
+            [4] = {
+                type = {[2] = 'elite', [3] = 'elite', [4] = 'elite'},
+                positionOffset =  {x = 15.7, z = 3.05} },
+            [5] = {
+                type = {[2] = 'none', [3] = 'normal', [4] = 'normal'},
+                positionOffset =  {x = 15.63, z = 0.77} },
+            [6] = {
+                type = {[2] = 'normal', [3] = 'normal', [4] = 'elite'},
+                positionOffset =  {x = 15.62, z = -1.56} },
+            [7] = {
+                type = {[2] = 'elite', [3] = 'elite', [4] = 'elite'},
+                positionOffset =  {x = 17.63, z = -0.45} },
+       }
+   }
+}
+
+overlayPositionsByRoom = {
+   [2] = {
+        ['activate'] = {[1] = {x = -4.13, z = -6.2} }
+   },
+   [3] = {
+        ['bear_trap'] = {[1] = {x = 17.69, z = 4.18}, [2] = {x = 17.62, z = 1.86}, [3] = {x = 19.66, z = 0.72}},
+        ['activate'] = {[1] = {x = 7.71, z = -1.53} }
+   }
+}
+
+buttonData = {
+   [1] = { position = {-2.05, 0.1, -0.93}, label = '', message = '', nextButtons = { 2 }, action = "initializeScenario", hint = 'Setup Scenario'},
+   [2] = { position = {-0.41, 0.1, 0.6}, label = '', message = '', nextButtons = { 3 }, action = "setupRoom", hint = 'Open door'},
+   [3] = { position = {0.74, 0.1, 0.16}, label = '', message = '', nextButtons = { 4 }, action = "setupRoom", hint = 'Open door'},
+   [4] = { position = {1.59 , 0.1, -0.88}, nextButtons = {}, action = 'generateWinRewards', hint = 'Click for Scenario Rewards' }
+}

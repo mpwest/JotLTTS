@@ -1,0 +1,10 @@
+#include Shared/CharacterSheet
+
+perkButtonPosition = {
+	['perk1'] = {x =  perkCol1, z = -0.807}, ['perk2'] = {x =  perkCol1, z = -0.733}, ['perk3'] = {x =  perkCol1, z = -0.606},
+	['perk4'] = {x =  perkCol2, z = -0.606}, ['perk5'] = {x =  perkCol1, z = -0.532}, ['perk6'] = {x =  perkCol1, z = -0.456},
+	['perk7'] = {x =  perkCol2, z = -0.456}, ['perk8'] = {x =  perkCol1, z = -0.326}, ['perk9'] = {x =  perkCol1, z = -0.251},
+	['perk10'] = {x =  perkCol2, z = -0.251}, ['perk11'] = {x =  perkCol1, z = -0.175}, ['perk12'] = {x =  perkCol1, z = -0.031},
+	['perk13'] = {x =  perkCol2, z = -0.031}, ['perk14'] = {x =  perkCol1, z = 0.096}, ['perk15'] = {x =  perkCol1, z = 0.164},
+}
+checkZ = 0.385

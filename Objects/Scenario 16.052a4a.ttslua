@@ -1,0 +1,29 @@
+#include Shared/ScenarioSetup
+
+enemyTypes = {
+   [1] = 'black_imp',
+   [2] = 'blood_imp',
+   [3] = 'rat_monstrosity'
+}
+cardType = 'standard'
+
+bossName = 'blood_tumor'
+
+winXp = 15
+winItem = 'Tower Shield'
+rewardLocation = { x = 9.82, z = -10.69}
+
+figurePositions = {
+    [1] = {
+
+   }
+}
+
+overlayPositionsByRoom = {
+
+ }
+ 
+ buttonData = {
+    [1] = { position = {-1.094, 0.1, -0.93}, label = '', message = '', nextButtons = { 2 }, action = "initializeScenario", hint = 'Setup Scenario'},
+    [2] = { position = {0.36, 0.1, 0.85}, nextButtons = {}, action = 'generateWinRewards', hint = 'Click for Scenario Rewards' }
+ }

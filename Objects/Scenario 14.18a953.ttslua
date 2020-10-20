@@ -1,0 +1,93 @@
+#include Shared/ScenarioSetup
+
+enemyTypes = {
+   [1] = 'blood_imp',
+   [2] = 'giant_viper',
+   [3] = 'zealot'
+}
+cardType = 'standard'
+
+bossName = 'blood_tumor'
+
+rewardLocation = { x = 9.5, z = -11.82}
+
+figurePositions = {
+    [1] = {
+        ['giant_viper'] = {
+            [1] = {
+                type = {[2] = 'normal', [3] = 'elite', [4] = 'elite'},
+                positionOffset = {x = -12.51, z = 0.94} },
+            [2] = {
+                type = {[2] = 'normal', [3] = 'elite', [4] = 'elite'},
+                positionOffset = {x = -10.66, z = 2.11} },
+            [3] = {
+                type = {[2] = 'none', [3] = 'none', [4] = 'elite'},
+                positionOffset = {x = -8.63, z = -3.44} },
+            [4] = {
+                type = {[2] = 'elite', [3] = 'elite', [4] = 'elite'},
+                positionOffset = {x = -6.8, z = -2.38} },
+        },
+        ['zealot'] = {
+            [1] = {
+                type = {[2] = 'none', [3] = 'normal', [4] = 'elite'},
+                positionOffset = {x = -10.6, z = -2.34} },
+            [2] = {
+                type = {[2] = 'elite', [3] = 'elite', [4] = 'elite'},
+                positionOffset = {x = -8.66, z = -1.28} }
+        }
+   },
+   [2] = {
+        ['giant_viper'] = {
+            [1] = {
+                type = {[2] = 'none', [3] = 'elite', [4] = 'elite'},
+                positionOffset = {x = -2.88, z = 6.6} },
+            [2] = {
+                type = {[2] = 'none', [3] = 'elite', [4] = 'elite'},
+                positionOffset = {x = -2.83, z = -4.5} },
+            [3] = {
+                type = {[2] = 'normal', [3] = 'elite', [4] = 'elite'},
+                positionOffset = {x = 2.91, z = 5.49} },
+            [4] = {
+                type = {[2] = 'normal', [3] = 'normal', [4] = 'elite'},
+                positionOffset = {x = 2.88, z = -3.31} },
+            [5] = {
+                type = {[2] = 'none', [3] = 'none', [4] = 'elite'},
+                positionOffset = {x = 8.72, z = 6.6} },
+            [6] = {
+                type = {[2] = 'none', [3] = 'none', [4] = 'elite'},
+                positionOffset = {x = 8.73, z = -4.46} },
+            [7] = {
+                type = {[2] = 'elite', [3] = 'elite', [4] = 'elite'},
+                positionOffset = {x = 12.58, z = 6.63} },
+            [8] = {
+                type = {[2] = 'elite', [3] = 'elite', [4] = 'elite'},
+                positionOffset = {x = 12.56, z = -4.53} },
+        },
+        ['zealot'] = {
+            [1] = {
+                type = {[2] = 'elite', [3] = 'normal', [4] = 'elite'},
+                positionOffset = {x = 2.92, z = 1.11} },
+            [2] = {
+                type = {[2] = 'normal', [3] = 'elite', [4] = 'elite'},
+                positionOffset = {x = 10.57, z = 3.35} },
+            [3] = {
+                type = {[2] = 'normal', [3] = 'elite', [4] = 'elite'},
+                positionOffset = {x = 10.64, z = -1.15} },
+        }
+   }
+}
+
+overlayPositionsByRoom = {
+    [2] = {
+         ['activate'] = {[1] = {x = -4.76, z = -3.43}},
+         ['treasure'] = {[1] = {x = 6.76, z = 1.1}},
+         ['gold'] = {[1] = {x = 10.68, z = 5.53}, [2] = {x = 12.53, z = -2.3}},
+    }
+
+ }
+ 
+ buttonData = {
+    [1] = { position = {-1.094, 0.1, -0.93}, label = '', message = '', nextButtons = { 2 }, action = "initializeScenario", hint = 'Setup Scenario'},
+    [2] = { position = {-0.38, 0.1, 0.28}, label = '', message = '', nextButtons = { 3 }, action = "setupRoom", hint = 'Open door'},
+    [3] = { position = {0.36, 0.1, 0.85}, nextButtons = {}, action = 'generateWinRewards', hint = 'Click for Scenario Rewards' }
+ }

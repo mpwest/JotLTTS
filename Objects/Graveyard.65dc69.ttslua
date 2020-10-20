@@ -1,0 +1,46 @@
+saveState = {}
+
+function onLoad(save_state)
+    if save_state ~= "" then
+        saveState = JSON.decode(save_state)
+    else
+        saveState['monsterNumberMapping'] = {}
+        saveState['availableMonsters'] = {}
+    end
+end
+
+function registerMonster(params)
+    saveState['monsterNumberMapping'][params.monsterType] = params.monsterMatNumber
+
+    self.script_state = JSON.encode(saveState)
+end
+
+function setAvailable(params)
+    saveState['availableMonsters'][params.monsterType] = params.GUIDs
+    self.script_state = JSON.encode(saveState)
+end
+
+function resetMonster(params)
+    local monsterGUID = params.guid
+    local monsterType = params.monsterType
+    table.insert(saveState['availableMonsters'][monsterType], monsterGUID)
+
+    local bowl = saveState['monsterNumberMapping'][monsterType]
+    local monster = getObjectFromGUID(monsterGUID)
+    local dropPosition = Global.call('getStandeeBowlPosition', {monsterMatNumber = bowl, iterationNumber = 1})
+    monster.setPosition(dropPosition)
+
+    self.script_state = JSON.encode(saveState)
+end
+
+function getAvailableMonster(monsterType)
+    if #saveState['availableMonsters'][monsterType] == 0 then
+        return nil
+    end
+    local index = math.random(#saveState['availableMonsters'][monsterType])
+    local guid = saveState['availableMonsters'][monsterType][index]
+    table.remove(saveState['availableMonsters'][monsterType], index)
+
+    self.script_state = JSON.encode(saveState)
+    return guid
+end

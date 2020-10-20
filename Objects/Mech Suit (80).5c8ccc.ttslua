@@ -1,0 +1,24 @@
+rotation = 270
+
+function playLevel5Card(params)
+    local figure = getObjectFromGUID(params.figure)
+    if figure then
+        local figurePosition = figure.getPosition()
+        local bag = getObjectFromGUID(Global.call('getLvl5Bag', 'demolitionist'))
+        if bag then
+            local dropPosition = self.getPosition()
+            dropPosition.y = dropPosition.y + 1
+            figure.setPosition(dropPosition)
+            figure.setLock(true)
+            bag.takeObject({
+                position = figurePosition,
+                rotation = {0, rotation, 0},
+                callback_function = function(mechsuit) transferConditions(figure, mechsuit) end
+            })
+        end
+    end
+end
+
+function transferConditions(figure, mechsuit)
+    figure.call('transferConditions', mechsuit.getGUID())
+end

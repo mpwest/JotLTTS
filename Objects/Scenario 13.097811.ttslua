@@ -1,0 +1,110 @@
+#include Shared/ScenarioSetup
+
+enemyTypes = {
+   [1] = 'black_sludge',
+   [2] = 'blood_imp',
+   [3] = 'zealot'
+}
+cardType = 'standard'
+
+bossName = 'blood_tumor'
+
+rewardLocation = { x = 9.57, z = -11.82}
+
+figurePositions = {
+    [1] = {
+        ['blood_imp'] = {
+            [1] = {
+                type = {[2] = 'none', [3] = 'none', [4] = 'elite'},
+                positionOffset = {x = -13.06, z = 3.43} },
+            [2] = {
+                type = {[2] = 'elite', [3] = 'elite', [4] = 'elite'},
+                positionOffset = {x = -13.41, z = 1.04} },
+            [3] = {
+                type = {[2] = 'elite', [3] = 'elite', [4] = 'elite'},
+                positionOffset = {x = -5, z = 3.43} },
+            [4] = {
+                type = {[2] = 'none', [3] = 'elite', [4] = 'elite'},
+                positionOffset = {x = -5.05, z = 1.04} },
+        },
+        ['black_sludge'] = {
+            [1] = {
+                type = {[2] = 'normal', [3] = 'elite', [4] = 'elite'},
+                positionOffset = {x = -13.1, z = -3.7} },
+            [2] = {
+                type = {[2] = 'normal', [3] = 'normal', [4] = 'elite'},
+                positionOffset = {x = -4.95, z = -3.62} }
+        }
+   },
+   [2] = {
+        ['zealot'] = {
+            [1] = {
+                type = {[2] = 'none', [3] = 'normal', [4] = 'normal'},
+                positionOffset = {x = 3.1, z = 0.97} },
+            [2] = {
+                type = {[2] = 'elite', [3] = 'elite', [4] = 'elite'},
+                positionOffset = {x = 5.1, z = -0.17} },
+            [3] = {
+                type = {[2] = 'none', [3] = 'normal', [4] = 'normal'},
+                positionOffset = {x = 5.1, z = -2.47} },
+            [4] = {
+                type = {[2] = 'normal', [3] = 'normal', [4] = 'elite'},
+                positionOffset = {x = 3.08, z = -3.61} },
+        },
+        ['blood_imp'] = {
+            [1] = {
+                type = {[2] = 'none', [3] = 'normal', [4] = 'elite'},
+                positionOffset = {x = 11.26, z = 0.97} },
+            [2] = {
+                type = {[2] = 'elite', [3] = 'elite', [4] = 'elite'},
+                positionOffset = {x = 11.23, z = -1.3} },
+            [3] = {
+                type = {[2] = 'normal', [3] = 'normal', [4] = 'elite'},
+                positionOffset = {x = 11.23, z = -3.68} },
+            [4] = {
+                type = {[2] = 'normal', [3] = 'elite', [4] = 'elite'},
+                positionOffset = {x = 13.28, z = -0.17} },
+        }
+   },
+   [3] = {
+        ['black_sludge'] = {
+            [1] = {
+                type = {[2] = 'none', [3] = 'none', [4] = 'normal'},
+                positionOffset =  {x = 3.16, z = 8.07} },
+            [2] = {
+                type = {[2] = 'normal', [3] = 'normal', [4] = 'elite'},
+                positionOffset =  {x = 5.15, z = 6.92} },
+            [3] = {
+                type = {[2] = 'elite', [3] = 'elite', [4] = 'elite'},
+                positionOffset =  {x = 7.17, z = 10.58} },
+            [4] = {
+                type = {[2] = 'none', [3] = 'normal', [4] = 'normal'},
+                positionOffset =  {x = 11.28, z = 5.74} },
+       },
+       ['zealot'] = {
+        [1] = {
+                type = {[2] = 'normal', [3] = 'normal', [4] = 'elite'},
+                positionOffset = {x = 5.19, z = 9.22} },
+        [2] = {
+                type = {[2] = 'normal', [3] = 'elite', [4] = 'elite'},
+                positionOffset = {x = 9.3, z = 9.26} },
+        }
+   }
+}
+
+overlayPositionsByRoom = {
+   [2] = {
+        ['activate'] = {[1] = {x = -2.94, z = -2.42} },
+        ['treasure'] = {[1] = {x = 13.3, z = -2.46} }
+   },
+   [3] = {
+        ['activate'] = {[1] = {x = 9.21, z = 2.16} }
+   }
+}
+
+buttonData = {
+   [1] = { position = {-0.97, 0.1, -0.93}, label = '', message = '', nextButtons = { 2 }, action = "initializeScenario", hint = 'Setup Scenario'},
+   [2] = { position = {-0.21, 0.1, 0.16}, label = '', message = '', nextButtons = { 3 }, action = "setupRoom", hint = 'Open door'},
+   [3] = { position = {0.64, 0.1, -0.16}, label = '', message = '', nextButtons = { 4 }, action = "setupRoom", hint = 'Open door'},
+   [4] = { position = {0.34, 0.1, 0.74}, nextButtons = {}, action = 'generateWinRewards', hint = 'Click for Scenario Rewards' }
+}

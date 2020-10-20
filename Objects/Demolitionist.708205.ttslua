@@ -1,0 +1,4 @@
+#include Shared/JOTLCharacterSetupTile
+
+characterEnvelope_GUID = 'f3a54d'
+id = 'demolitionist'

@@ -1,0 +1,148 @@
+positionData = {
+    ['0ecdab'] = { buttonPositionX = -1.012,  buttonPositionZ = -0.48,   labelPositionX = -1.179,  labelPositionZ = -0.510,  stickerPosition = {1.012,  0.1, -0.510}},  --1
+    ['e21cfe'] = { buttonPositionX = -1.06,   buttonPositionZ = -0.345,  labelPositionX = -1.055,  labelPositionZ = -0.305,  stickerPosition = {1.06,   0.1, -0.305}},  --2
+    ['6d01d7'] = { buttonPositionX = -0.0748, buttonPositionZ = 0.11,    labelPositionX = -0.082,  labelPositionZ = 0.14,    stickerPosition = {0.0748, 0.1, 0.14}},    --3
+    ['f9bb98'] = { buttonPositionX = -0.88,   buttonPositionZ = -0.2,    labelPositionX = -0.885,  labelPositionZ = -0.242,  stickerPosition = {0.88,   0.1, -0.242}},  --4
+    ['1ae7d4'] = { buttonPositionX = -0.668,  buttonPositionZ = -0.133,  labelPositionX = -0.818,  labelPositionZ = -0.085,  stickerPosition = {0.668,  0.1, -0.085}},  --5
+    ['ea8614'] = { buttonPositionX = -0.345,  buttonPositionZ = -0.35,   labelPositionX = -0.365,  labelPositionZ = -0.40,   stickerPosition = {0.345,  0.1, -0.40}},   --6
+    ['474c89'] = { buttonPositionX = -0.65,   buttonPositionZ = 0.146,   labelPositionX = -0.752,  labelPositionZ = 0.24,    stickerPosition = {0.65,   0.1, 0.24}},    --7
+    ['1f74f1'] = { buttonPositionX = -0.087,  buttonPositionZ = -0.05,   labelPositionX = -0.222,  labelPositionZ = -0.083,  stickerPosition = {0.087,  0.1, -0.083}},  --8
+    ['6a39dc'] = { buttonPositionX = -0.185,  buttonPositionZ = -0.082,  labelPositionX = -0.222,  labelPositionZ = 0.025,   stickerPosition = {0.185,  0.1, 0.025}},   --9a
+    ['1c6e0c'] = { buttonPositionX = -0.735,  buttonPositionZ = 0.140,   labelPositionX = -0.764,  labelPositionZ = 0.249,   stickerPosition = {0.735,  0.1, 0.249}},   --9b
+    ['a3a16b'] = { buttonPositionX = -0.768,  buttonPositionZ = 0.51,    labelPositionX = -0.78,   labelPositionZ = 0.46,    stickerPosition = {0.768,  0.1, 0.46}},    --10
+    ['103e13'] = { buttonPositionX = -0.745,  buttonPositionZ = 0.06,    labelPositionX = -0.76,   labelPositionZ = -0.035,  stickerPosition = {0.745,  0.1, -0.035}},  --11
+    ['a23084'] = { buttonPositionX = 0.009,   buttonPositionZ = -0.395,  labelPositionX = -0.113,  labelPositionZ = -0.475,  stickerPosition = {-0.009,   0.1, -0.475}},  --12
+    ['7590e0'] = { buttonPositionX = -0.4,    buttonPositionZ = 0.04,    labelPositionX = -0.516,  labelPositionZ = 0.0826,  stickerPosition = {0.4,    0.1, 0.0826}},  --13
+    ['d65f04'] = { buttonPositionX = -0.2,    buttonPositionZ = -0.29,   labelPositionX = -0.242,  labelPositionZ = -0.265,  stickerPosition = {0.2,    0.1, -0.265}},  --14
+    ['53f87e'] = { buttonPositionX = -0.37,   buttonPositionZ = -0.15,   labelPositionX = -0.387,  labelPositionZ = -0.202,  stickerPosition = {0.37,   0.1, -0.202}},  --15
+    ['571e39'] = { buttonPositionX = -0.426,  buttonPositionZ = -0.465,  labelPositionX = -0.405,  labelPositionZ = -0.52,   stickerPosition = {0.426,  0.1, -0.52}},   --16
+    ['ca2d82'] = { buttonPositionX = 0.322,   buttonPositionZ = -0.17,   labelPositionX = 0.326,   labelPositionZ = -0.06,   stickerPosition = {-0.322,   0.1, -0.06}},   --17
+    ['618048'] = { buttonPositionX = 0.05,    buttonPositionZ = -0.56,   labelPositionX = -0.0646, labelPositionZ = -0.617,  stickerPosition = {-0.05,    0.1, -0.617}},  --18
+    ['633e13'] = { buttonPositionX = -0.89,   buttonPositionZ = 0.095,   labelPositionX = -0.96,   labelPositionZ = 0.065,   stickerPosition = {0.89,   0.1, 0.065}},   --19
+    ['f7c98f'] = { buttonPositionX = 0.055,   buttonPositionZ = -0.085,  labelPositionX = 0.04,    labelPositionZ = -0.128,  stickerPosition = {-0.055,   0.1, -0.128}},  --20
+    ['40aca4'] = { buttonPositionX = 0.8635,  buttonPositionZ = -0.0126, labelPositionX = 0.867,   labelPositionZ = 0.01,    stickerPosition = {-0.8635,  0.1, 0.01}},    --21
+    ['98aaf8'] = { buttonPositionX = -1.145,  buttonPositionZ = 0.01,    labelPositionX = -1.145,  labelPositionZ = -0.045,  stickerPosition = {1.145,  0.1, -0.045}},  --22
+    ['678a36'] = { buttonPositionX = 0.068,   buttonPositionZ = -0.275,  labelPositionX = -0.02,   labelPositionZ = -0.242,  stickerPosition = {-0.068,   0.1, -0.242}},  --23
+    ['2b5187'] = { buttonPositionX = -0.48,   buttonPositionZ = -0.6,    labelPositionX = -0.553,  labelPositionZ = -0.735,  stickerPosition = {0.48,   0.1, -0.735}},  --24
+    ['c36fb5'] = { buttonPositionX = 0.595,   buttonPositionZ = -0.163,  labelPositionX = 0.490,   labelPositionZ = -0.233,  stickerPosition = {-0.595,   0.1, -0.233}},  --25
+}
+
+function onSave()
+    self.script_state = JSON.encode({loc = locations})
+end
+
+function onLoad(save_state)
+    if save_state ~= "" then
+        locations = JSON.decode(save_state).loc
+    end
+    if locations == nil then locations = {} end
+
+    for guid, buttonData in pairs(positionData) do
+        createStickerButton(guid)
+        if locations[guid] == true then
+            createCheckLabel(guid)
+        end
+    end
+
+    loadingStickers = {}
+end
+
+function createStickerButton(guid)
+    _G[guid .. "_ButtonClick"] = function (obj, color, alt_click) clickedMapLayer(guid, alt_click) end
+    self.createButton({
+        click_function = guid .. "_ButtonClick",
+        function_owner = self,
+        position = {positionData[guid].buttonPositionX, 0.15, positionData[guid].buttonPositionZ},
+        scale = {0.6, 1, 0.7},
+        height = 30,
+        width = 30,
+        font_size = 10,
+        color = {0,0,0,0}
+    })
+    self.createButton(button_parameters)
+end
+
+function createCheckLabel(guid)
+    self.createButton({
+        click_function = guid,
+        function_owner = self,
+        position = {positionData[guid].labelPositionX, 0.18, positionData[guid].labelPositionZ},
+        height = 0,
+        width = 0,
+        font_size = 30,
+        label = 'x',
+        font_color = {1.25,0,0,1.25}
+    })
+end
+
+function removeCompletedCheck(guid)
+    for _, button in pairs(self.getButtons()) do
+        if button.click_function == guid then
+            self.removeButton(button.index)
+            return
+        end
+    end
+end
+
+function clickedMapLayer(guid, alt_click)
+    if locations[guid] == nil then
+        placeSticker(guid)
+        return
+    end -- alt_click irrelevant
+
+    if alt_click then
+        removeSticker(guid)
+        return
+    end
+
+    toggleCheck(guid)
+end
+
+function toggleCheck(guid)
+    locations[guid] = not (locations[guid] or false)
+    if locations[guid] then
+        createCheckLabel(guid)
+    else
+        removeCompletedCheck(guid)
+    end
+end
+
+function removeSticker(guid)
+    removeCompletedCheck(guid)
+    local bag = getObjectFromGUID(Global.call('getMapStickerBagGUID'))
+    local sticker = getObjectFromGUID(guid)
+    if sticker ~= nil then
+        bag.putObject(sticker)
+        locations[guid] = nil
+    end
+end
+
+function placeSticker(guid)
+    locations[guid] = false
+    local bag = getObjectFromGUID(Global.call('getMapStickerBagGUID'))
+    local bagObjects = bag.getObjects()
+    for _, obj in pairs(bagObjects) do
+        if obj.guid == guid then
+                bag.takeObject({
+                    position = self.positionToWorld(positionData[guid].stickerPosition),
+                    rotation = self.getRotation(),
+                    guid = guid
+                }).setLock(true)
+            return true
+        end
+    end
+    return false
+end
+
+function addStickerFromImport(params)
+    local guid = params.guid
+    local checked = params.checked
+    if positionData[guid] == nil then
+        return false-- sticker got a different guid at some point
+    end
+    placeSticker(guid)
+    if checked then
+        createCheckLabel(guid)
+    end
+    return true
+end

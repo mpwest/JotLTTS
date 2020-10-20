@@ -1,0 +1,8 @@
+#include Shared/CharacterModel
+
+modelRotation = 270
+className = 'Demolitionist'
+
+function calculateHealth(level)
+    return 0 -- should be immediately overridden
+end

@@ -1,0 +1,139 @@
+elementPositions = { -- if this gets updated, use self.positionToWorld(), and relative positions
+    Fire = {inert = {27.17, 2.27, -13.95}, waning = {29.93, 2.27, -13.96}, strong = {32.71, 2.27, -14.05}},
+    Ice = {inert = {28.15, 2.27, -15.14}, waning = {30.91, 2.27, -15.15}, strong = {33.69, 2.27, -15.24}},
+    Air = {inert = {27.24, 2.27, -16.28}, waning = {30.00, 2.27, -16.29}, strong = {32.78, 2.27, -16.38}},
+    Earth = {inert = {28.20, 2.27, -17.32}, waning = {30.96, 2.27, -17.33}, strong = {33.74, 2.27, -17.42}},
+    Light = {inert = {27.21, 2.27, -18.59}, waning = {29.97, 2.27, -18.60}, strong = {32.75, 2.27, -18.69}},
+    Dark = {inert = {28.11, 2.27, -19.60}, waning = {30.87, 2.27, -19.61}, strong = {33.65, 2.27, -19.70}}
+}
+
+buttonHeight = {
+    Fire = -0.795,
+    Ice = -0.52,
+    Air = -0.221,
+    Earth = 0.07,
+    Light = 0.36,
+    Dark = 0.64
+}
+
+white = {1,1,1}
+
+function onLoad()
+    self.createButton({
+        click_function = 'getElementBoard',
+        function_owner = self,
+        position = {0, 0.25, -0.08},
+        scale = {0.1, 0.1, 0.1},
+        width = 3000,
+        height = 1000,
+        color = {1, 1, 1, 0},
+        tooltip = 'Get an Elemental Infusion Board'
+    })
+
+    self.createButton({
+        click_function = "waneAll",
+        function_owner = self,
+        width          = 2000,
+        height         = 380,
+        position = {0,0.3,0.89},
+        color = {1,1,1,0},
+        scale = {0.15,0.15,0.15}
+    })
+
+    for element, height in pairs(buttonHeight) do
+        createElementButton("Create", element, -1.05, buttonHeight[element])
+        createElementButton("Consume", element, 1.05, buttonHeight[element])
+    end
+end
+
+function createElementButton(effect, element, x, z)
+    if effect == 'Consume' then
+        _G[effect .. element] = function(obj, color) consume(element, Player[color].steam_name) end
+    elseif effect == 'Create' then
+        _G[effect .. element] = function(obj, color) create(element, Player[color].steam_name) end
+    end
+
+    self.createButton({
+        click_function = effect .. element,
+        function_owner = self,
+        position = {x, 0.25, z},
+        scale = {0.1, 0.1, 0.1},
+        width = 925,
+        height = 925,
+        color = {1, 1, 1, 0},
+        tooltip = effect .. ' ' .. element
+    })
+end
+
+function waneAll()
+    for _, token in pairs(findElements({0,0,0}, {10,1,8})) do
+        local elementToken = token.hit_object
+
+        if elementPositions[elementToken.getName()] ~= nil then
+            local element = elementToken.getName()
+
+            if (elementToken.getPosition().x - self.getPosition().x) > 1 then
+                elementToken.setPosition(elementPositions[element].waning)
+                broadcastToAll(element .. " is now Waning!", white)
+            elseif elementToken.getPosition().x - self.getPosition().x > -1 then
+                elementToken.setPosition(elementPositions[element].inert)
+                broadcastToAll(element .. " is now Inert!", white)
+            end
+        end
+    end
+end
+
+function create(element, playerName)
+    for _, token in pairs(findElements({0, 0.5, 0}, {8, 1, 8})) do
+        if token.hit_object.getName() == element then
+            token.hit_object.setPosition(elementPositions[element].strong)
+            broadcastToAll(playerName .. ' created ' .. element, white)
+            return
+        end
+    end
+end
+
+function consume(element, playerName)
+    -- x coordinate in cast adjusted right and smaller area, to only detect element tokens at least half in the waning column
+    for _, token in pairs(findElements({-0.34, 0.5, 0}, {5, 1, 8})) do
+        if token.hit_object.getName() == element then
+            token.hit_object.setPosition(elementPositions[element].inert)
+            broadcastToAll(playerName .. ' consumed ' .. element, white)
+            return
+        end
+    end
+
+    broadcastToAll("No " .. element .. " to consume!", white)
+end
+
+function getElementBoard()
+    local bag = getObjectFromGUID(Global.call('getElementsBag')).takeObject({position = {114, 1, -23.74}, smooth = false})
+    bag.takeObject({position = {30.44, 2.17, -16.43}, rotation = {0.00, 180.00, 0.00}, smooth = false}).lock()
+
+    for element, positions in pairs(elementPositions) do
+        bag.takeObject({position = positions.inert, rotation = {0.00, 180.00, 0.00}})
+    end
+    bag.destruct()
+end
+
+function findElements(origin, size)
+    return Physics.cast({
+        origin = self.positionToWorld(origin),
+        direction={0,1,0},
+        type = 3,
+        size = size,
+        max_distance = 0.1,
+        debug = false,
+    })
+end
+
+function cleanup()
+    for _, token in pairs(findElements({0,0,0}, {10,1,8})) do
+        local elementToken = token.hit_object
+
+        if elementPositions[elementToken.getName()] ~= nil then
+            local element = elementToken.getName()
+            elementToken.setPosition(elementPositions[element].inert)
+        end
+    end
+end

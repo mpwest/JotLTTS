@@ -1,0 +1,163 @@
+#include Shared/ScenarioSetup
+
+enemyTypes = {
+   [1] = 'rat_monstrosity',
+   [2] = 'vermling_raider',
+   [3] = 'vermling_scout'
+}
+cardType = 'standard'
+
+winItem = 'Ring of Strength'
+rewardLocation = { x = 10, z = -10}
+
+figurePositions = {
+   [1] = {
+        ['vermling_raider'] = {
+            [1] = {
+                type = {[2] = 'normal', [3] = 'normal', [4] = 'normal'},
+                positionOffset = {x = -11.81, z = -5.48} },
+        },
+        ['vermling_scout'] = {
+            [1] = {
+                type = {[2] = 'elite', [3] = 'elite', [4] = 'elite'},
+                positionOffset = {x = -11.81, z = -2.92} },
+            [2] = {
+                type = {[2] = 'normal', [3] = 'elite', [4] = 'elite'},
+                positionOffset = {x = -14.03, z = 0.79} },
+            [3] = {
+                type = {[2] = 'none', [3] = 'normal', [4] = 'elite'},
+                positionOffset = {x = -14.03, z = -4.31} },
+            [4] = {
+                type = {[2] = 'none', [3] = 'none', [4] = 'normal'},
+                positionOffset = {x = -11.81, z = -0.46} },
+            [5] = {
+                type = {[2] = 'none', [3] = 'none', [4] = 'normal'},
+                positionOffset = {x = -14.03, z = -6.78} },
+        },
+    },
+    [2] = {
+        ['rat_monstrosity'] = {
+            [1] = {
+                type = {[2] = 'elite', [3] = 'elite', [4] = 'elite'},
+                positionOffset =  {x = -2.96, z = -3.04} },
+            [2] = {
+                type = {[2] = 'normal', [3] = 'elite', [4] = 'elite'},
+                positionOffset =  {x = -5.24, z = -1.66} },
+            [3] = {
+                type = {[2] = 'normal', [3] = 'elite', [4] = 'elite'},
+                positionOffset =  {x = -5.24, z = -6.75} },
+            [4] = {
+                type = {[2] = 'none', [3] = 'normal', [4] = 'elite'},
+                positionOffset =  {x = -0.84, z = -1.66} },
+        },
+        ['vermling_raider'] = {
+            [1] = {
+                type = {[2] = 'normal', [3] = 'normal', [4] = 'normal'},
+                positionOffset =  {x = -0.84, z = 0.73} },
+        },
+        ['vermling_scout'] = {
+            [1] = {
+                type = {[2] = 'none', [3] = 'normal', [4] = 'elite'},
+                positionOffset =  {x = -7.33, z = -0.47} },
+            [2] = {
+                type = {[2] = 'none', [3] = 'none', [4] = 'elite'},
+                positionOffset =  {x = -2.96, z = -5.45} },
+       },
+    },
+    [3] = {
+        ['rat_monstrosity'] = {
+            [1] = {
+                type = {[2] = 'elite', [3] = 'elite', [4] = 'elite'},
+                positionOffset =  {x = 5.88, z = -0.52} },
+            [2] = {
+                type = {[2] = 'normal', [3] = 'normal', [4] = 'elite'},
+                positionOffset =  {x = 5.88, z = -2.92} },
+            [3] = {
+                type = {[2] = 'normal', [3] = 'normal', [4] = 'elite'},
+                positionOffset =  {x = 8.11, z = 0.76} },
+            [4] = {
+                type = {[2] = 'none', [3] = 'normal', [4] = 'elite'},
+                positionOffset =  {x = 12.39, z = 0.76} },
+        },
+        ['vermling_raider'] = {
+            [1] = {
+                type = {[2] = 'normal', [3] = 'normal', [4] = 'normal'},
+                positionOffset =  {x = 10.23, z = -2.92} },
+        },
+        ['vermling_scout'] = {
+            [1] = {
+                type = {[2] = 'normal', [3] = 'elite', [4] = 'elite'},
+                positionOffset =  {x = 10.23, z = -5.48} },
+            [2] = {
+                type = {[2] = 'normal', [3] = 'elite', [4] = 'elite'},
+                positionOffset =  {x = 12.39, z = -1.61} },
+            [3] = {
+                type = {[2] = 'none', [3] = 'normal', [4] = 'elite'},
+                positionOffset =  {x = 10.23, z = 2.07} },
+       },
+    },
+    [4] = {
+        ['rat_monstrosity'] = {
+            [1] = {
+                type = {[2] = 'elite', [3] = 'elite', [4] = 'elite'},
+                positionOffset =  {x = 3.65, z = 8.29} },
+            [2] = {
+                type = {[2] = 'elite', [3] = 'elite', [4] = 'elite'},
+                positionOffset =  {x = 8.11, z = 11.15} },
+            [3] = {
+                type = {[2] = 'normal', [3] = 'elite', [4] = 'elite'},
+                positionOffset =  {x = 8.11, z = 8.29} },
+            [4] = {
+                type = {[2] = 'normal', [3] = 'normal', [4] = 'elite'},
+                positionOffset =  {x = 5.88, z = 7.06} },
+            [5] = {
+                type = {[2] = 'none', [3] = 'normal', [4] = 'elite'},
+                positionOffset =  {x = 5.88, z = 4.67} },
+            [6] = {
+                type = {[2] = 'none', [3] = 'normal', [4] = 'elite'},
+                positionOffset =  {x = 10.23, z = 7.06} },
+        },
+    },
+}
+
+overlayPositionsByRoom = {
+    [2] = {
+        ['activate'] = {[1] = {x = -9.5, z = -4.28} }
+    },
+    [3] = {
+        ['activate'] = {[1] = {x = 3.63, z = -1.68} }
+    },
+    [4] = {
+        ['activate'] = {[1] = {x = 8.11, z = 3.34} }
+    },
+    [5] = {
+        ['rubble'] = {[1] = {x = -2.96, z = 2.11} },
+        ['treasure'] = {[1] = {x = -2.96, y = 1, z = 2.11} },
+    },
+    [6] = {
+        ['rubble'] = {[1] = {x = -0.79, z = -6.72} },
+        ['treasure'] = {[1] = {x = -0.79, y = 1, z = -6.72} },
+    },
+    [7] = {
+        ['rubble'] = {[1] = {x = 12.39, z = -4.2} },
+        ['treasure'] = {[1] = {x = 12.39, y = 1, z = -4.2} },
+    },
+    [8] = {
+        ['rubble'] = {[1] = {x = 5.88, z = 9.7} },
+        ['treasure'] = {[1] = {x = 5.88, y = 1, z = 9.7} },
+    },
+}
+
+hexHeight = 700
+
+buttonData = {
+   [1] = { position = {-1.16, 0.1, -0.95}, nextButtons = { 2 }, action = 'initializeScenario', hint = 'Setup Scenario'},
+   [2] = { position = {-0.74, 0.1, 0.32}, nextButtons = { 3, 5, 6 }, action = 'setupRoom', hint = 'Open door', overrideButtonHeight = hexHeight},
+   [3] = { position = {0.28, 0.1, 0.13}, nextButtons = { 4, 7 }, action = 'setupRoom', hint = 'Open door', overrideButtonHeight = hexHeight},
+   [4] = { position = {0.63, 0.1, -0.27}, nextButtons = { 5, 8 }, action = 'setupRoom', hint = 'Open door', overrideButtonHeight = hexHeight},
+   [5] = {position = {-0.24, 0.1, -0.17}, nextButtons = {}, action = 'setupRoom', hint = 'Destroy nest', overrideButtonHeight = hexHeight},
+   [6] = {position = {-0.06, 0.1, 0.53}, nextButtons = {}, action = 'setupRoom', hint = 'Destroy nest', overrideButtonHeight = hexHeight},
+   [7] = {position = {0.97, 0.1, 0.33}, nextButtons = {}, action = 'setupRoom', hint = 'Destroy nest', overrideButtonHeight = hexHeight},
+   [8] = {position = {0.46, 0.1, -0.76}, nextButtons = { 9 }, action = 'setupRoom', hint = 'Destroy nest', overrideButtonHeight = hexHeight},
+   [9] = { position = {0.43, 0.1, 0.9}, nextButtons = {}, action = 'generateWinRewards', hint = 'Click for Scenario Rewards' }
+}

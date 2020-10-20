@@ -1,0 +1,84 @@
+#include Shared/ScenarioSetup
+
+enemyTypes = {
+   [1] = 'blood_imp',
+   [2] = 'blood_monstrosity',
+   [3] = 'boss'
+}
+cardType = 'standard'
+
+bossName = 'first_of_the_order'
+
+winXp = 25
+WinGold = 30
+rewardLocation = { x = 15.63, z = -8.5}
+
+figurePositions = {
+    [1] = {
+        ['blood_monstrosity'] = {
+            [1] = {
+                type = {[2] = 'normal', [3] = 'normal', [4] = 'elite'},
+                positionOffset = {x = -14.18, z = 1.28} },
+            [2] = {
+                type = {[2] = 'elite', [3] = 'elite', [4] = 'elite'},
+                positionOffset = {x = -12.14, z = -4.42} },
+            [3] = {
+                type = {[2] = 'normal', [3] = 'elite', [4] = 'elite'},
+                positionOffset = {x = -12.16, z = -6.84} },
+            [4] = {
+                type = {[2] = 'none', [3] = 'normal', [4] = 'elite'},
+                positionOffset = {x = -10.17, z = -1.06} },
+        }
+   },
+   [2] = {
+    ['blood_monstrosity'] = {
+        [1] = {
+            type = {[2] = 'none', [3] = 'none', [4] = 'normal'},
+            positionOffset = {x = 1.92, z = -3.39} },
+        [2] = {
+            type = {[2] = 'elite', [3] = 'elite', [4] = 'elite'},
+            positionOffset = {x = 5.85, z = -1.06} },
+        [3] = {
+            type = {[2] = 'none', [3] = 'normal', [4] = 'normal'},
+            positionOffset = {x = 5.87, z = -7.98} },
+    },
+    ['blood_imp'] = {
+        [1] = {
+            type = {[2] = 'normal', [3] = 'elite', [4] = 'elite'},
+            positionOffset = {x = 3.91, z = -2.2} },
+        [2] = {
+            type = {[2] = 'normal', [3] = 'normal', [4] = 'elite'},
+            positionOffset = {x = 5.89, z = -3.32} },
+    }
+    },
+   [3] = {
+        ['boss'] = {
+            [1] = {
+                positionOffset =  {x = -4.15, z = -4.52},
+                healthCalc = 'fotoHP' }
+        }
+   }
+}
+
+overlayPositionsByRoom = {
+   [3] = {
+        ['activate'] = {[1] = {x = -0.12, z = 4.73}, },
+        ['treasure'] = {[1] = {x = -6, z = -7.97}, },
+   }
+}
+
+hexHeight = 1400
+
+buttonData = {
+   [1] = { position = {-2.15, 0.1, -0.93}, label = '', message = '', nextButtons = { 2 }, action = "initializeScenario", hint = 'Setup Scenario'},
+   [2] = { position = {0.18, 0.1, 0.7}, label = '', message = '', nextButtons = { 3 }, action = "setupRoom", hint = 'Open door', overrideButtonHeight = hexHeight},
+   [3] = { position = {-0.01, 0.1, -0.49}, label = '', message = '', nextButtons = { 4 }, action = "setupRoom", hint = 'Open door'},
+   [4] = { position = {2.05, 0.1, 0.7}, nextButtons = {}, action = 'generateWinRewards', hint = 'Click for Scenario Rewards' }
+}
+
+function fotoHP()
+    local playerCount = saveState['playerCount']
+    local scenarioLevel = saveState['scenarioLevel']
+    local healthByLevel = {[0]=10, [1]=14, [2]=17, [3]=20, [4]=24, [5]=28, [6]=32, [7]=36}
+    return playerCount * (healthByLevel[scenarioLevel])
+    end

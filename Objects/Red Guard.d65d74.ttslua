@@ -1,0 +1,4 @@
+#include Shared/JOTLCharacterSetupTile
+
+characterEnvelope_GUID = '4869c0'
+id = 'redguard'

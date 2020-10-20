@@ -1,0 +1,4 @@
+#include Shared/MonsterMat
+
+matNumber = 2
+sleevePosition = {57.11, 0.7, 7.06}

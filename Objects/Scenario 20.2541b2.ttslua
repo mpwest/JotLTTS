@@ -1,0 +1,160 @@
+#include Shared/ScenarioSetup
+
+enemyTypes = {
+    [1] = 'black_sludge',
+    [2] = 'chaos_demon',
+    [3] = 'giant_viper',
+    [4] = 'rat_monstrosity'
+}
+cardType = 'standard'
+
+winGold = 10
+rewardLocation = { x = 10, z = -11.5}
+
+figurePositions = {
+    [1] = {
+        ['chaos_demon'] = {
+            [1] = {
+                type = {[2] = 'normal', [3] = 'normal', [4] = 'normal'},
+                positionOffset = {x = -4.85, z = 1.31 } },
+            [2] = {
+                type = {[2] = 'none', [3] = 'none', [4] = 'normal'},
+                positionOffset = {x = 2.98, z = 1.23 } },
+            [3] = {
+                type = {[2] = 'normal', [3] = 'elite', [4] = 'elite'},
+                positionOffset = {x = 10.97, z = 5.93 } }
+        }
+    },
+    [3] = { --B
+        ['rat_monstrosity'] = {
+            [1] = {
+                type = {[2] = 'normal', [3] = 'normal', [4] = 'elite'},
+                positionOffset = {x = -13.5, z = -4.5 } },
+            [2] = {
+                type = {[2] = 'normal', [3] = 'elite', [4] = 'elite'},
+                positionOffset = {x = -13.5, z = -2.5 } },
+        }
+    },
+    [4] = { --C
+        ['black_sludge'] = {
+            [1] = {
+                type = {[2] = 'normal', [3] = 'normal', [4] = 'elite'},
+                positionOffset = {x = -6, z = -6.5 } },
+            [2] = {
+                type = {[2] = 'normal', [3] = 'elite', [4] = 'elite'},
+                positionOffset = {x = -4, z = -6.5 } },
+        }
+    },
+    [5] = { --D
+        ['giant_viper'] = {
+            [1] = {
+                type = {[2] = 'normal', [3] = 'normal', [4] = 'elite'},
+                positionOffset = {x = -1, z = -6 } },
+            [2] = {
+                type = {[2] = 'normal', [3] = 'elite', [4] = 'elite'},
+                positionOffset = {x = -2.5, z = -7.75 } },
+            [3] = {
+                type = {[2] = 'normal', [3] = 'elite', [4] = 'elite'},
+                positionOffset = {x = 0.5, z = -7.75 } },
+    }
+    },
+    [8] = { --G
+        ['rat_monstrosity'] = {
+            [1] = {
+                type = {[2] = 'normal', [3] = 'normal', [4] = 'elite'},
+                positionOffset = {x = 15.5, z = 0.5 } },
+            [2] = {
+                type = {[2] = 'normal', [3] = 'elite', [4] = 'elite'},
+                positionOffset = {x = 15.5, z = -1.5 } },
+        }
+    },
+    [11] = { --K
+        ['black_sludge'] = {
+            [1] = {
+                type = {[2] = 'normal', [3] = 'normal', [4] = 'elite'},
+                positionOffset = {x = 4, z = 12 } },
+            [2] = {
+                type = {[2] = 'normal', [3] = 'elite', [4] = 'elite'},
+                positionOffset = {x = 6, z = 12 } },
+        }
+    },
+    [12] = { --L
+        ['chaos_demon'] = {
+            [1] = {
+                type = {[2] = 'normal', [3] = 'elite', [4] = 'elite'},
+                positionOffset = {x = 11.25, z = 11.75 } },
+        }
+    }
+}
+
+goodsPileLocation = { x = -10.75, z = -7.5}
+overlayPositionsByRoom = {
+    [2] = {
+        ['treasure'] = {[1] = goodsPileLocation }
+    },
+    [6] = {
+        ['treasure'] = {[1] = goodsPileLocation }
+    },
+    [9] = {
+        ['treasure'] = {[1] = goodsPileLocation }
+    },
+    [10] = {
+        ['treasure'] = {[1] = goodsPileLocation }
+    },
+    [13] = {
+        ['treasure'] = {[1] = goodsPileLocation }
+    }
+}
+
+hexHeight = 800
+
+buttonData = {
+    [1] = { position = {-1, 0.1, -0.95}, label = '', message = 'Click each lettered hex for results', nextButtons = { 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 }, action = "initializeScenario", hint = 'Setup Scenario'},
+    -- Loot
+    [2] = { position = {-0.82, 0.35, 0.34}, label = '', message = 'Find 1 good', nextButtons = { }, action = "setupRoom", hint = 'Loot A', overrideButtonHeight = hexHeight},
+    [3] = { position = {-0.67, 0.1, 0.25}, label = '', message = 'Spawn 2 Rat Monstrosities', nextButtons = { }, action = "setupRoom", hint = 'Loot B', overrideButtonHeight = hexHeight},
+    [4] = { position = {-0.37, 0.1, 0.25}, label = '', message = 'Spawn 2 Black Sludges', nextButtons = { }, action = "setupRoom", hint = 'Loot C', overrideButtonHeight = hexHeight},
+    [5] = { position = {-0.07, 0.1, 0.25}, label = '', message = 'Spawn 3 Giant Vipers', nextButtons = { }, action = "setupRoom", hint = 'Loot D', overrideButtonHeight = hexHeight},
+    [6] = { position = {0.38, 0.1, 0.35}, label = '', message = 'Find 1 good', nextButtons = { }, action = "setupRoom", hint = 'Loot E', overrideButtonHeight = hexHeight},
+    [7] = { position = {0.69, 0.1, -0.02}, label = '', message = 'Find Ring of Restoration (Item 32)', nextButtons = { }, action = "getRing", hint = 'Loot F', overrideButtonHeight = hexHeight},
+    [8] = { position = {0.84, 0.1, 0.1}, label = '', message = 'Spawn 2 Rat Monstrosities', nextButtons = { }, action = "setupRoom", hint = 'Loot G', overrideButtonHeight = hexHeight},
+    [9] = { position = {-0.37, 0.1, -0.62}, label = '', message = 'Find 1 good', nextButtons = { }, action = "setupRoom", hint = 'Loot H', overrideButtonHeight = hexHeight},
+    [10] = { position = {-0.07, 0.1, -0.62}, label = '', message = 'Find 1 good', nextButtons = { }, action = "setupRoom", hint = 'Loot J', overrideButtonHeight = hexHeight},
+    [11] = { position = {0.38, 0.1, -0.71}, label = '', message = 'Spawn 2 Black Sludges', nextButtons = { }, action = "setupRoom", hint = 'Loot K', overrideButtonHeight = hexHeight},
+    [12] = { position = {0.84, 0.1, -0.62}, label = '', message = 'Spawn 1 Chaos Demon', nextButtons = { }, action = "setupRoom", hint = 'Loot L', overrideButtonHeight = hexHeight},
+    [13] = { position = {1, 0.1, -0.54}, label = '', message = 'Find 1 good', nextButtons = { }, action = "setupRoom", hint = 'Loot M', overrideButtonHeight = hexHeight},
+    [14] = { position = {0.36, 0.1, 0.92 }, nextButtons = {}, action = 'generateWinRewards', hint = 'Click for Scenario Rewards' }
+}
+
+function getRing()
+    cleanupButton(7)
+    local unavailableItemDeckGUID = Global.call('getItemDeck', 'unavailable')
+    local unavailableItems = getObjectFromGUID(unavailableItemDeckGUID)
+    if unavailableItems ~= nil then
+        if not findRingInDeck(unavailableItems) then
+            local availableItemDeckGUID = Global.call('getItemDeck', 'available')
+            local availableItems = getObjectFromGUID(availableItemDeckGUID)
+            if availableItems ~= nil then
+                findRingInDeck(availableItems)
+            end
+        end
+    end
+end
+
+function findRingInDeck(itemDeck)
+    local scenarioPosition = self.getPosition()
+    local itemPosition = vector(scenarioPosition.x + 10, scenarioPosition.y + 1, scenarioPosition.z - 9)
+    local itemContents = itemDeck.getObjects()
+    for i, item in pairs(itemContents) do
+        if item.name == 'Ring of Restoration' then
+            -- Bag or Deck returns {{string name, string description, string guid, int index, string lua_script, string lust_script_state}, ...}
+            itemDeck.takeObject({
+                position          = itemPosition,
+                rotation          = {0, 180, 0},
+                guid              = item.guid,
+            })
+            return true
+        end
+    end
+    return false
+end

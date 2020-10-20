@@ -1,0 +1,126 @@
+local trackerAreaGuid = 'd25dd8'
+
+function onLoad()
+    createRefreshButton()
+end
+
+function createRefreshButton()
+    self.createButton({
+      click_function = 'refresh',
+      function_owner = self,
+      position       = {0, 0.2, -1.10},
+      width          = 1000,
+      height         = 550,
+      font_size      = 500,
+      font_color     = {1,1,1,4},
+      color = {0,0,0,0.2},
+      scale = {0.3,0.3,0.3}
+    })
+end
+
+function placeButton(index, initiativeValue)
+    local label = '--'
+    if( initiativeValue ~= 100) then
+        label = initiativeValue
+    end
+    buttonParameters = {
+      click_function = 'doNothing',
+      function_owner = self,
+      label          = label,
+      position       = {-0.155, 0.2, -0.81 + index * 0.203},
+      width          = 0,
+      height         = 0,
+      font_size      = 390,
+      font_color     = {0.8,0.8,0.8,1},
+      scale = {0.1,0.1,0.1}
+    }
+    self.createButton(buttonParameters)
+end
+
+local cardZones = {
+    '813930',
+    '971a6d',
+    'a8a296',
+    '4aeff6',
+    '18acde',
+    '5021da',
+    'a1df1f',
+    'bdced7',
+    '104b57',
+}
+
+function getInitiativeValues()
+    local initiativeMappings = {}
+    for _, cardZoneGuid in ipairs(cardZones) do
+        for _, obj in ipairs(getObjectFromGUID(cardZoneGuid).getObjects()) do
+            if(obj.tag == 'Deck') then
+                local cards = obj.getObjects()
+                local initiativeValue = tonumber( string.match( cards[#cards].name, '%d%d') )
+                if(initiativeValue > 0) then
+                    initiativeMappings[cards[#cards].description ..' Initiative'] = initiativeValue
+                end
+            elseif(obj.tag == 'Card') then
+                if(obj.getDescription()~='') then
+                    local initiativeValue = tonumber( string.match(obj.getName(), '%d%d') )
+                    if(initiativeValue > 0) then
+                        initiativeMappings[obj.getDescription() ..' Initiative'] = initiativeValue
+                    end
+                end
+            end
+        end
+    end
+    return initiativeMappings
+end
+
+function sortPairs(t, order)
+    local keys = {}
+    for k in pairs(t) do keys[#keys+1] = k end
+    if order then
+        table.sort(keys, function(a,b) return order(t, a, b) end)
+    else
+        table.sort(keys)
+    end
+    local i = 0
+    return function()
+        i = i + 1
+        if keys[i] then
+            return keys[i], t[keys[i]]
+        end
+    end
+end
+
+function refresh()
+    orderInitiatives(true)
+end
+
+function orderInitiatives(addLabels)
+    self.clearButtons()
+    createRefreshButton()
+    local initiatives = getInitiativeValues()
+
+    local toMove = {}
+    for _, obj in ipairs(getObjectFromGUID(trackerAreaGuid).getObjects()) do
+        if(obj.getName()~='' and obj.getName()~='Initiative Tracker' and obj.getName ~= 'Play Surface') then
+            toMove[obj.getName()] = obj
+            if( initiatives[obj.getName()]== nil) then
+                initiatives[obj.getName()] = 100 --Rendered as XX
+            end
+        end
+    end
+
+    local order = 0
+    for k,tracker in sortPairs(initiatives, function(tbl,numA,numB) return tbl[numB] > tbl[numA] end) do
+        if toMove[k] ~= nil  then
+            toMove[k].setPositionSmooth({34, 2.40, 0.53 - order*1.27}, false, true)
+            if addLabels then placeButton(order, tracker) end
+        end
+        order = order + 1
+    end
+end
+
+function getNextEmptyPosition()
+    orderInitiatives(false)
+    local objs = getObjectFromGUID(trackerAreaGuid).getObjects()
+    local nextSlot = #objs - 3 -- start ordering at 0 not 1, and adjust for
+    return {x = 34, y = 2.40, z = 0.53 - nextSlot*1.27}
+end

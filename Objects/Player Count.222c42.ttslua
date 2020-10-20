@@ -1,0 +1,56 @@
+#include Shared/SimpleCounter
+
+max = 5
+min = 2
+counterName = "PlayerCount"
+labelPosition = {-0.25, 0.12, 0.03}
+minusPosition = {0.68, 0.12, 0.56}
+plusPosition = {0.68, 0.12, -0.54}
+
+soloLabel = "X"
+soloPosition = vector(0.745, 0.005, 1.72)
+
+-- used for scenarioSetup
+function getScenarioSetupPlayerCount()
+    local playerCount = saveState[counterName]
+    return math.min(playerCount, 4)
+end
+
+function getRewardParameters()
+    return {solo = saveState['solo'], playerCount = saveState[counterName]}
+end
+
+function toggleSolo()
+    saveState['solo'] = not (saveState['solo'] or false)
+    self.script_state = JSON.encode(saveState)
+    for _, button in pairs(self.getButtons()) do
+        if button.click_function == 'toggleSolo' then
+            self.editButton({index = button.index, label = calculateLabel()})
+        end
+    end
+end
+
+function calculateLabel()
+    if saveState['solo'] then
+        return soloLabel
+    else
+        return ""
+    end
+end
+
+function initialize()
+    self.createButton({
+        click_function = "toggleSolo",
+        function_owner = self,
+        label          = calculateLabel(),
+        position       = soloPosition,
+        scale          = Vector(2.25, 1, 2.25),
+        font_color     = "Red",
+        color          = {0, 0, 0, 1}
+        --[[
+        rotation       = -- Vector,,
+        width          = -- int,
+        height         = -- int,
+        font_size      = -- int,]]
+    })
+end

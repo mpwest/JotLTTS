@@ -1,0 +1,38 @@
+#include Shared/ScenarioSetup
+
+enemyTypes = {
+    [1] = 'vermling_raider',
+}
+
+cardType = 'single'
+
+
+figurePositions = {
+    [1] = {
+        ['vermling_raider'] = {
+            [1] = {
+                type = {[2] = 'elite', [3] = 'elite', [4] = 'elite'},
+                positionOffset = {x = 14.05, z = -6.84} },
+            [2] = {
+                type = {[2] = 'none', [3] = 'normal', [4] = 'elite'},
+                positionOffset = {x = 19.98, z = -5.64} },
+            [3] = {
+                type = {[2] = 'normal', [3] = 'normal', [4] = 'elite'},
+                positionOffset = {x = 19.93, z = 5.66} },
+            [4] = {
+                type = {[2] = 'none', [3] = 'normal', [4] = 'elite'},
+                positionOffset = {x = 12.07, z = 1.15} },
+            [5] = {
+                type = {[2] = 'normal', [3] = 'normal', [4] = 'normal'},
+                positionOffset = {x = 6.17, z = -2.23} },
+            [6] = {
+                type = {[2] = 'normal', [3] = 'normal', [4] = 'normal'},
+                positionOffset = {x = 16.07, z = -5.66} },
+        }
+    }
+}
+
+buttonData = {
+    [1] = { position = {-0.67, 0.1, -0.91}, label = 'Click the scenario number\nfor automated setup', labelPosition = {-0.67, 0, -1.1},
+        message = 'When the scenario is complete, unlock (\'L\'), and delete the scenario sheet.', nextButtons = { }, action = "initializeScenario", hint = 'Setup Scenario'}
+}

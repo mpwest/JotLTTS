@@ -1,0 +1,6 @@
+#include Shared/GHCharacterSetupTile
+
+characterEnvelope_GUID = 'cf0cf3'
+id = 'mindthief'
+skillCount = 10
+hasSummons = true

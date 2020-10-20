@@ -1,0 +1,55 @@
+xpLocation = vector(-0.245, 0.11, 0.265)
+xpColour = color(1, 1, 1, 1)
+xpSize = 100
+
+goldLocation = vector(0.245, 0.11, 0.265)
+goldColour = color(1, 1, 1, 1)
+goldSize = 100
+
+saveState = {}
+
+function onLoad(save_state)
+    if save_state ~= '' then
+        saveState = JSON.decode(save_state)
+    end
+
+    showRewards()
+end
+
+function addRewards(params)
+    saveState['xp'] = params.xp
+    saveState['gold'] = params.gold
+    showRewards()
+end
+
+function showRewards()
+    if (saveState['xp'] ~= nil and saveState['xp'] > 0) then
+        addLabel(saveState['xp'], xpColour, xpLocation, xpSize)
+    end
+
+    if (saveState['gold'] ~= nil and saveState['gold'] > 0) then
+        addLabel(saveState['gold'], goldColour, goldLocation, goldSize)
+    end
+end
+
+function addLabel(text, fontColour, location, fontSize)
+    self.createButton({
+        click_function = 'none',
+        function_owner = self,
+        label          = text,
+        position       = location,
+        width          = 0,
+        height         = 0,
+        font_size      = fontSize,
+        font_color     = fontColour
+    })
+end
+
+function onCollisionEnter(collision_info)
+    local target = collision_info['collision_object']
+    if (target.getVar("jotl_Class") or "") == 'characterSheet' then
+        target.call('addXP', {xp = saveState['xp']})
+        target.call('addGold', {gold = saveState['gold']})
+        self.destruct()
+    end
+end

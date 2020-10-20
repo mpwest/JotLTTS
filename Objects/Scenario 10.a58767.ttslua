@@ -1,0 +1,99 @@
+#include Shared/ScenarioSetup
+
+enemyTypes = {
+   [1] = 'black_sludge',
+   [2] = 'chaos_demon',
+   [3] = 'stone_golem',
+}
+
+cardType = 'standard'
+
+
+winXp = 15
+rewardLocation = { x = 19.5, z = 10}
+
+figurePositions = {
+   [1] = {
+        ['black_sludge'] = {
+            [1] = {
+                type = {[2] = 'elite', [3] = 'elite', [4] = 'elite'},
+                positionOffset = {x = -12.06, z = -3.29} },
+            [2] = {
+                type = {[2] = 'none', [3] = 'elite', [4] = 'elite'},
+                positionOffset = {x = -14, z = -6.71} },
+            [3] = {
+                type = {[2] = 'normal', [3] = 'normal', [4] = 'elite'},
+                positionOffset = {x = -12.09, z = 3.66} },
+            [4] = {
+                type = {[2] = 'normal', [3] = 'normal', [4] = 'elite'},
+                positionOffset = {x = -16.04, z = -5.55} },
+            [5] = {
+                type = {[2] = 'normal', [3] = 'normal', [4] = 'normal'},
+                positionOffset = {x = -14.06, z = 2.51} },
+            [6] = {
+                type = {[2] = 'none', [3] = 'normal', [4] = 'normal'},
+                positionOffset = {x = -16.05, z = 3.66} },
+        }
+    },
+   [2] = {
+        ['stone_golem'] = {
+            [1] = {
+                type = {[2] = 'elite', [3] = 'elite', [4] = 'elite'},
+                positionOffset =  {x = 3.88, z = -3.23} },
+            [2] = {
+                type = {[2] = 'normal', [3] = 'normal', [4] = 'elite'},
+                positionOffset =  {x = -2.09, z = -2.11} },
+            [3] = {
+                type = {[2] = 'none', [3] = 'none', [4] = 'normal'},
+                positionOffset =  {x = 3.88, z = -0.89} },
+            [4] = {
+                type = {[2] = 'none', [3] = 'normal', [4] = 'normal'},
+                positionOffset =  {x = -2.07, z = -4.34} },
+        }
+    },
+   [3] = {
+        ['chaos_demon'] = {
+            [1] = {
+                type = {[2] = 'normal', [3] = 'none', [4] = 'normal'},
+                positionOffset =  {x = 11.67, z = -3.2} },
+            [2] = {
+                type = {[2] = 'none', [3] = 'normal', [4] = 'normal'},
+                positionOffset =  {x = 13.67, z = -2.07} },
+            [3] = {
+                type = {[2] = 'none', [3] = 'normal', [4] = 'normal'},
+                positionOffset =  {x = 13.67, z = -4.41} },
+            },
+        ['black_sludge'] = {
+            [1] = {
+                type = {[2] = 'elite', [3] = 'elite', [4] = 'elite'},
+                positionOffset =  {x = 17.64, z = -8.87} },
+            [2] = {
+                type = {[2] = 'normal', [3] = 'elite', [4] = 'elite'},
+                positionOffset =  {x = 17.65, z = 2.53} },
+            },
+    }
+}
+
+overlayPositionsByRoom = {
+    [1] = {
+        ['bear_trap'] = {[1] = {x = -17.99, z = 2.48}, [2] = {x = -14.06, z = 0.16}, [3] = {x =-16.02, z = -3.24}, [4] = {x =-12.06, z = -5.62} },
+    },
+    [2] = {
+        ['poison_trap'] = {[1] = {x = -6.05, z = 0.12}, [2] = {x = -6.07, z = -2.1}, [3] = {x = -0.09, z = -0.952}, [4] = {x = -0.11, z = -5.46}, [5] = {x = 5.82, z = -2.07}, [6] = {x = 6, z = -4.32} },
+        ['activate'] = {[1] = {x = -10.2, z = -4.4} }
+    },
+    [3] = {
+        ['bear_trap'] = {[1] = {x = 13.64, z = 2.48}, [2] = {x = 17.6, z = -2.05}, [3] = {x =17.63, z = -4.42}, [4] = {x = 13.66, z = -8.96} },
+        ['treasure'] = {[1] = {x = 17.66, z = 0.21} },
+        ['activate'] = {[1] = {x = 7.79, z = -3.17} }
+    }
+}
+
+hexHeight = 800
+
+buttonData = {
+   [1] = { position = {-1.88, 0.1, -0.933}, nextButtons = {2}, action = 'initializeScenario', hint = 'Setup Scenario'},
+   [2] = { position = {-0.90, 0.1, 0.38}, nextButtons = {3}, action = 'setupRoom', hint = 'Open door', overrideButtonHeight = hexHeight},
+   [3] = { position = {0.68, 0.1, 0.28}, nextButtons = { 4 }, action = 'setupRoom', hint = 'Open door', overrideButtonHeight = hexHeight},
+   [4] = { position = {1.76, 0.1, -0.68}, nextButtons = {}, action = 'generateWinRewards', hint = 'Click for Scenario Rewards'}
+}

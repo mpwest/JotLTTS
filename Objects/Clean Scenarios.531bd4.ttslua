@@ -1,0 +1,73 @@
+scenarioBoxes = {
+    [1] = '2aa2f8',
+    [2] = '094d0c',
+    [3] = '4265a1',
+    [4] = '42277d',
+    [5] = '56a1c4',
+    [6] = 'f74e1e',
+    [7] = '64c55b',
+    [8] = 'f44fd7',
+    [9] = '638f91',
+    [10] = '986374',
+    [11] = 'ac3d84',
+    [12] = '485f0d',
+    [13] = 'f77dc4',
+    [14] = '7610e0',
+    [15] = '52ed14',
+    [16] = '72ddf3',
+    [17] = '782f2f',
+    [18] = 'b56d4d',
+    [19] = '5dae4a',
+    [20] = '9d5e53',
+    [21] = 'e8501e',
+    [22] = 'cf4796',
+    [23] = '570ed8',
+    [24] = 'e384f5',
+    [25] = '549b8c'
+}
+
+function onLoad(save_state)
+    createMoveButtons()
+end
+
+function onCollisionEnter(collision_info)
+    local objectName = collision_info['collision_object'].getName()
+    for i = 1, 25 do
+        if objectName == 'Scenario ' .. i then
+            putAway(collision_info['collision_object'], i)
+        end
+    end
+end
+
+function createMoveButtons()
+    local buttonWidth = 800
+    local buttonHeight = 1000
+
+    self.createButton({
+        click_function = 'getOut',
+        function_owner = self,
+        position       = {0.7, 0.1, 0},
+        scale          = {1,1,1},
+        width          = buttonWidth,
+        height         = buttonHeight,
+        color          = {0,0,0,0},
+        tooltip        = 'Get scenarios out',
+    })
+end
+
+function getOut()
+    for index, guid in pairs(scenarioBoxes) do
+        local box = getObjectFromGUID(guid)
+        if box ~= nil then
+            box.takeObject({position = {0, (index * 0.5) + 3, 0}, smooth = false})
+        end
+    end
+end
+
+function putAway(scenarioTile, boxNumber)
+    local box = getObjectFromGUID(scenarioBoxes[boxNumber])
+    if box ~= nil then
+        box.reset()
+        box.putObject(scenarioTile)
+    end
+end

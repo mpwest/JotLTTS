@@ -1,0 +1,83 @@
+bagPositions = {
+    ['ad6e66'] = {clean = {-31.37, -6, 27.36}, convenient = {-31.37, 0.18, 27.36}}, -- reward tiles
+    ['d6ebae'] = {clean = {-44.06, -6, -17.94}, convenient = {-44.06, 0.01, -17.94}}, -- map stickers
+    ['b3e6f1'] = {clean = {51.63, -6, 25.28}, convenient = {51.63, 0.18, 25.28}}, -- monster modifier decks
+    ['267c36'] = {clean = {51.80, -6, -17.61}, convenient = {51.80, 0.18, -17.61}}, -- monster sleeves
+    ['3aa934'] = {clean = {-22.41, -6, 54.91}, convenient = {-22.41, 0.18, 54.91}}, -- hatchet lvl 5 bag
+    ['7577f7'] = {clean = {-16.02, -6, 54.92}, convenient = {-16.02, 0.18, 54.92}}, -- demo lvl 5 bag
+    ['72f164'] = {clean = {-9.79, -6, 54.94}, convenient = {-9.79, 0.18, 54.94}}, -- voidwarden lvl 5 bag
+    ['3ba6fb'] = {clean = {-3.44, -6, 54.75}, convenient = {-3.44, 0.18, 54.75}}, -- red guard lvl 5 bag
+    ['aae07f'] = {clean = {56.29, -6, -27.06}, convenient = {56.29, 0.18, -27.06}}, -- element board bag
+    ['2dd407'] = {clean = {-22.32, -6, 50.16}, convenient = {-22.32, 4.10, 50.16}}, -- hatchet
+    ['f3a54d'] = {clean = {-15.99, -6, 50.16}, convenient = {-15.99, 4.10, 50.16}}, -- demo
+    ['38ef50'] = {clean = {-9.66, -6, 50.16}, convenient = {-9.66, 4.10, 50.16}}, -- voidwarden
+    ['4869c0'] = {clean = {-3.33, -6, 50.16}, convenient = {-3.33, 4.10, 50.16}}, -- red guard
+    ['aae839'] = {clean = {-22.40, -6, 52.35}, convenient = {-22.40, 0.20, 52.35}}, -- hatchet box
+    ['bacffd'] = {clean = {-16.07, -6, 52.35}, convenient = {-16.07, 0.20, 52.35}}, -- demo box
+    ['5c222b'] = {clean = {-9.74, -6, 52.35}, convenient = {-9.74, 0.20, 52.35}}, -- voidwarden box
+    ['6e7be4'] = {clean = {-3.41, -6, 52.35}, convenient = {-3.41, 0.20, 52.35}}, -- red guard box
+    ['7dfec2'] = {clean = {10.83, -6, 51.33}, convenient = {10.83, 4.10, 51.33}}, -- brute
+    ['547e40'] = {clean = {15.05, -6, 51.33}, convenient = {15.05, 4.10, 51.33}}, -- cragheart
+    ['cf0cf3'] = {clean = {19.27, -6, 51.33}, convenient = {19.27, 4.10, 51.33}}, -- mindthief
+    ['a1f046'] = {clean = {23.49, -6, 51.33}, convenient = {23.49, 4.10, 51.33}}, -- scoundrel
+    ['932784'] = {clean = {27.71, -6, 51.33}, convenient = {27.71, 4.10, 51.33}}, -- spellweaver
+    ['1f6056'] = {clean = {31.93, -6, 51.33}, convenient = {31.93, 4.10, 51.33}}, -- tinkerer
+    ['be17d1'] = {clean = {-26.32, -6, 19.47}, convenient = {-26.32, 1.80, 19.47}}, -- old objects
+    ['88557f'] = {clean = {0, -6, 60}, convenient = {120.00, 0.18, 120.00}} -- Scenario 23 content
+}
+
+function onLoad(save_state)
+    createMoveButtons()
+end
+
+function createMoveButtons()
+    local buttonWidth = 600
+    local buttonHeight = 800
+
+    self.createButton({
+        click_function = 'putAway',
+        function_owner = self,
+        position       = {-0.8, 0.1, 0},
+        scale          = {1,1,1},
+        width          = buttonWidth,
+        height         = buttonHeight,
+        color          = {1,1,1,0},
+        tooltip        = 'Put hidden items away',
+    })
+    self.createButton({
+        click_function = 'getOut',
+        function_owner = self,
+        position       = {0.9, 0.1, 0},
+        scale          = {1,1,1},
+        width          = buttonWidth,
+        height         = buttonHeight,
+        color          = {1,1,1,0},
+        tooltip        = 'Get hidden items out',
+    })
+end
+
+function getOut()
+    for guid, positions in pairs(bagPositions) do
+        local bag = getObjectFromGUID(guid)
+        if bag ~= nil then
+            bag.setLock(false)
+            bag.setPosition(positions.convenient)
+            bag.setLock(true)
+            bag.interactable = true
+            bag.tooltip = true
+        end
+    end
+end
+
+function putAway()
+    for guid, positions in pairs(bagPositions) do
+        local bag = getObjectFromGUID(guid)
+        if bag ~= nil then
+            bag.setLock(false)
+            bag.setPosition(positions.clean)
+            bag.setLock(true)
+            bag.interactable = false
+            bag.tooltip = false
+        end
+    end
+end

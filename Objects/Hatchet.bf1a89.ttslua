@@ -1,0 +1,3 @@
+#include Shared/MedHealthCharacter
+
+className = 'Hatchet'

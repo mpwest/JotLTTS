@@ -1,0 +1,4 @@
+#include Shared/JOTLCharacterSetupTile
+
+characterEnvelope_GUID = '2dd407'
+id = 'hatchet'

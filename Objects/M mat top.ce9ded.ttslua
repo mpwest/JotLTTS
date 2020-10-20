@@ -1,0 +1,35 @@
+#include Shared/AttackModifiers
+
+Casts = {
+   draw = {0, 0.71, 0.15},
+   discard = {-1.745, 0.71, 0.15},
+}
+
+curseType = 'monsterCurse'
+curseName = 'Monster Curse'
+
+function onLoad(save_state)
+   createButt('draw', -2.34, -0.02, 'Monster', 'Draw a Modifier Card')
+   createButt('cleanupAndShuffle', -1.44, -0.02, 'Monster', 'Shuffle the Modifier Deck')
+   createButt('getDeck', -0, 0.2, 'Default', 'Get the Modifier Deck')
+   createButt('curse', -1.44, 0.38, 'Monster', 'Add curse card')
+   createButt('bless', -2.34, 0.38, 'Monster', 'Add bless card')
+   getTempDecks()
+end
+
+function getTempDecks()
+    tempModifierDeck['Bless'] = getObjectFromGUID(Global.call('getTempModifierDeck', 'bless'))
+    tempModifierDeck['Monster Curse'] = getObjectFromGUID(Global.call('getTempModifierDeck', 'monsterCurse'))
+end
+
+function getDeck()
+    getObjectFromGUID(Global.call('getMonsterAttackModifierBagGUID')).takeObject({
+       position = {51.61, 0.80, 18.87},
+       rotation = {0.00, 180.00, 180.00},
+       flip = false
+    })
+end
+
+function announceDraw(card, name)
+     broadcastToAll('Monster Drew Attack Modifier: ' .. card.getDescription(), color['white'])
+ end

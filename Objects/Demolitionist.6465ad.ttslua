@@ -1,0 +1,27 @@
+#include Shared/MedHealthCharacter
+
+className = 'Demolitionist'
+
+function transferConditions(mechsuitGUID)
+    local mechsuit = getObjectFromGUID(mechsuitGUID)
+    if mechsuit ~= nil then
+        if saveState['conditions'] ~= nil then
+            for guid, name in pairs(saveState['conditions']) do
+                local token = getObjectFromGUID(guid)
+                if token ~= nil then
+                    token.call('updateFigure', mechsuitGUID)
+                    mechsuit.call('registerCondition', token)
+                end
+            end
+        end
+        local level = 1
+        local characterSheet = getObjectFromGUID(saveState['characterSheet'])
+        if characterSheet ~= nil then
+            level = characterSheet.call('getCharacterLevel')
+        end
+        local maxHealth = calculateHealth(level) + 5
+        local healedHealth = saveState['Health'] + 10
+        mechsuit.call('setCounter', math.min(maxHealth, healedHealth))
+    end
+    self.setLock(false)
+end

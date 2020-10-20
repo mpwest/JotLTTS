@@ -1,0 +1,105 @@
+#include Shared/ScenarioSetup
+
+enemyTypes = {
+   [1] = 'living_corpse',
+   [2] = 'zealot',
+   [3] = 'boss'
+}
+cardType = 'standard'
+
+bossName = 'blood_horror'
+
+winXp = 20
+rewardLocation = { x = 15, z = 14}
+shopItems = {[1] = 'Amulet of Life', [2] = 'Robes of Evocation', [3] = 'Comfortable Shoes', [4] = 'Battle-Axe', [5] = 'Black Candle', [6] = 'Stun Powder', [7] = 'Stun Powder'} -- 2 copies of stun powder
+
+figurePositions = {
+   [1] = {
+        ['zealot'] = {
+            [1] = {
+                type = {[2] = 'normal', [3] = 'elite', [4] = 'elite'},
+                positionOffset = {x = -3.09, z = -1.78} },
+            [2] = {
+                type = {[2] = 'normal', [3] = 'normal', [4] = 'elite'},
+                positionOffset = {x = -7.26, z = -1.78} },
+        },
+        ['boss'] = {
+            [1] = {
+                 positionOffset =  {x = -5.22, z = 9.06},
+                 healthCalc = 'reduceByCx2' }
+         }
+    },
+   [2] = {
+       ['zealot'] = {
+           [1] = {
+                type = {[2] = 'normal', [3] = 'normal', [4] = 'normal'},
+                positionOffset =  {x = -5.13, z = -10.14} },
+           [2] = {
+               type = {[2] = 'none', [3] = 'normal', [4] = 'normal'},
+               positionOffset =  {x = -1.09, z = -7.71} },
+       },
+    },
+    [3] = {
+    ['zealot'] = {
+        [1] = {
+            type = {[2] = 'elite', [3] = 'elite', [4] = 'elite'},
+            positionOffset =  {x = 7.35, z = -7.64} },
+        [2] = {
+            type = {[2] = 'none', [3] = 'none', [4] = 'normal'},
+            positionOffset =  {x = 5.23, z = -6.47} },
+        [3] = {
+            type = {[2] = 'none', [3] = 'normal', [4] = 'normal'},
+            positionOffset =  {x = 9.35, z = -8.86} },
+        },
+    },
+    [4] = {
+        ['zealot'] = {
+            [1] = {
+                type = {[2] = 'elite', [3] = 'elite', [4] = 'elite'},
+                positionOffset =  {x = 11.49, z = 1.89} },
+            [2] = {
+                type = {[2] = 'normal', [3] = 'normal', [4] = 'elite'},
+                positionOffset =  {x = 7.32, z = 4.2} },
+            [3] = {
+                type = {[2] = 'none', [3] = 'normal', [4] = 'normal'},
+                positionOffset =  {x = 11.49, z = -0.52} },
+            [4] = {
+                type = {[2] = 'none', [3] = 'none', [4] = 'normal'},
+                positionOffset =  {x = 3.12, z = -0.48} },
+            },
+        }
+}
+
+overlayPositionsByRoom = {
+    [1] = {
+        ['bear_trap'] = {[1] = {x = -7.22, z = -4.16}, [2] = {x = -5.18, z = -3}, [3] = {x =-3.16, z = -4.15} },
+    },
+    [2] = {
+        ['bear_trap'] = {[1] = {x = -1.01, z = -10.07}, [2] = {x = -0.95, z = -12.47} },
+        ['activate'] = {[1] = {x = -5.2, z = -5.3} }
+    },
+    [3] = {
+        ['activate'] = {[1] = {x = 1.06, z = -11.21} }
+    },
+    [4] = {
+            ['treasure'] = {[1] = {x = 13.6, z = 5.41} },
+            ['activate'] = {[1] = {x = 7.25, z = -5.35} }
+    }
+}
+
+hexHeight = 700
+
+buttonData = {
+   [1] = { position = {-0.962, 0.1, -0.933}, nextButtons = { 2 }, action = 'initializeScenario', hint = 'Setup Scenario'},
+   [2] = { position = {-0.355, 0.1, 0.36}, nextButtons = { 3 }, action = 'setupRoom', hint = 'Open door', overrideButtonHeight = hexHeight},
+   [3] = { position = {0.068, 0.1, 0.77}, nextButtons = { 4 }, action = 'setupRoom', hint = 'Open door', overrideButtonHeight = hexHeight},
+   [4] = { position = {0.5, 0.1, 0.36}, nextButtons = { 5 }, action = 'setupRoom', hint = 'Open door', overrideButtonHeight = hexHeight},
+   [5] = { position = {0.88, 0.1, -0.88}, nextButtons = {}, action = 'generateWinRewards', hint = 'Click for Scenario Rewards' }
+}
+
+function reduceByCx2()
+    local playerCount = saveState['playerCount']
+    local scenarioLevel = saveState['scenarioLevel']
+    local healthByLevel = {[0]=7, [1]=10, [2]=12, [3]=15, [4]=17, [5]=20, [6]=23, [7]=28}
+    return playerCount * (healthByLevel[scenarioLevel])
+end

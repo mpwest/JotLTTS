@@ -1,0 +1,6 @@
+#include Shared/GHCharacterSetupTile
+
+characterEnvelope_GUID = '7dfec2'
+id = 'brute'
+skillCount = 10
+hasSummons = false

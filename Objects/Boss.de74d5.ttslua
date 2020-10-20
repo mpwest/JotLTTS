@@ -1,0 +1,6 @@
+#include Shared/BossEnvelope
+
+hasScenarioOneCard = false
+hasBasicCards = false
+
+figureCount = 1

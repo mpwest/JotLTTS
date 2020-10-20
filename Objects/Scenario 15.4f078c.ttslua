@@ -1,0 +1,69 @@
+#include Shared/ScenarioSetup
+
+enemyTypes = {
+    [1] = 'black_imp',
+    [2] = 'blood_imp',
+    [3] = 'zealot'
+}
+cardType = 'standard'
+
+winGold = 10
+rewardLocation = { x = 13.2, z = -15}
+shopItems = {[1] = 'Hawk Helm', [2] = 'Bladed Armor', [3] = 'Boots of Striding', [4] = 'Volatile Bomb', [5] = 'Barbed Chain', [6] = 'Oak Charm', [7] = 'Oak Charm'} -- 2 copies of oak charm
+
+figurePositions = {
+    [1] = {
+        ['zealot'] = {
+            [1] = {
+                type = {[2] = 'normal', [3] = 'elite', [4] = 'elite'},
+                positionOffset = {x = -6.88, z = 3.11 } }
+        }
+    },
+    [2] = {
+        ['zealot'] = {
+            [1] = {
+                 type = {[2] = 'normal', [3] = 'elite', [4] = 'elite'},
+                 positionOffset = {x = 0.94, z = 7.74} },
+            [2] = {
+                type = {[2] = 'normal', [3] = 'normal', [4] = 'elite'},
+                positionOffset = {x = 0.94, z = -1.28} },
+            [3] = {
+                type = {[2] = 'normal', [3] = 'normal', [4] = 'elite'},
+                positionOffset = {x = 12.45, z = 3.13} },
+        }
+    },
+    [3] = {
+        ['zealot'] = {
+            [1] = {
+                 type = {[2] = 'normal', [3] = 'elite', [4] = 'elite'},
+                 positionOffset =  {x = 12.5, z = 10} },
+            [2] = {
+                type = {[2] = 'normal', [3] = 'normal', [4] = 'elite'},
+                positionOffset =  {x = 12.5, z = -3.5} },
+        }
+    }
+}
+
+overlayPositionsByRoom = {
+    [2] = {
+        ['activate'] = {[1] = {x = -4.89, z = 3.43} }
+    },
+    [3] = {
+        ['activate'] = {[1] = {x = 2.81, z = 8.79}, [2] = {x = 10.73, z = 8.79}, [3] = {x = 2.81, z = -2.44}, [4] = {x = 10.73, z = -2.44} }
+    }
+}
+
+buttonData = {
+    [1] = { position = {-0.85, 0.1, -0.95}, label = '', message = 'Spawn imps manually. ', nextButtons = { 2 }, action = "initializeScenario", hint = 'Setup Scenario'},
+    [2] = { position = {-0.3, 0.1, -0.21}, label = '', message = 'Click any \'D\' door once tables are destroyed.', nextButtons = { 3, 4, 5, 6 },
+            action = "setupRoom", hint = 'Open door', overrideButtonWidth = 500, overrideButtonHeight = 1000},
+    [3] = { position = {0.17, 0.1, -0.54}, label = '', message = '', nextButtons = { 7 }, action = "setupAllDRooms", hint = 'Open \'D\' doors'},
+    [4] = { position = {0.17, 0.1, 0.15}, label = '', message = '', nextButtons = { 7 }, action = "setupAllDRooms", hint = 'Open \'D\' doors'},
+    [5] = { position = {0.65, 0.1, -0.54}, label = '', message = '', nextButtons = { 7 }, action = "setupAllDRooms", hint = 'Open \'D\' doors'},
+    [6] = { position = {0.65, 0.1, 0.15}, label = '', message = '', nextButtons = { 7 }, action = "setupAllDRooms", hint = 'Open \'D\' doors'},
+    [7] = { position = {0.62, 0.1, 0.89}, nextButtons = {}, action = 'generateWinRewards', hint = 'Click to get Scenario Rewards' }
+}
+
+function setupAllDRooms()
+    setupRoom(3)
+end

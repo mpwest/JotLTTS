@@ -1,0 +1,87 @@
+#include Shared/ScenarioSetup
+
+enemyTypes = {
+   [1] = 'chaos_demon',
+   [2] = 'zealot',
+   [3] = 'boss'
+}
+cardType = 'standard'
+
+bossName = 'blood_tumor'
+
+winXp = 25
+rewardLocation = { x = -5, z = 6.5}
+
+figurePositions = {
+   [1] = {
+       ['chaos_demon'] = {
+           [1] = {
+               type = {[2] = 'none', [3] = 'normal', [4] = 'elite'},
+               positionOffset = {x = -2.79, z = -14.5} },
+           [2] = {
+               type = {[2] = 'normal', [3] = 'normal', [4] = 'normal'},
+               positionOffset = {x = -7.14, z = -12.03} },
+           [3] = {
+               type = {[2] = 'normal', [3] = 'normal', [4] = 'normal'},
+               positionOffset = {x = 1.6, z = -11.93} },
+       }
+   },
+   [2] = {
+       ['chaos_demon'] = {
+           [1] = {
+               type = {[2] = 'normal', [3] = 'normal', [4] = 'elite'},
+               positionOffset = {x = 8.38, z = -2.97} },
+           [2] = {
+               type = {[2] = 'none', [3] = 'normal', [4] = 'normal'},
+               positionOffset = {x = 12.83, z = -3} }
+       },
+       ['zealot'] = {
+           [1] = {
+                type = {[2] = 'elite', [3] = 'elite', [4] = 'elite'},
+                positionOffset = {x = 10.63, z = 0.93} }
+       }
+   },
+   [3] = {
+       ['zealot'] = {
+           [1] = {
+               type = {[2] = 'normal', [3] = 'elite', [4] = 'elite'},
+               positionOffset =  {x = 12.68, z = 9.68} },
+           [2] = {
+               type = {[2] = 'normal', [3] = 'normal', [4] = 'elite'},
+               positionOffset =  {x = 8.36, z = 9.62} },
+       },
+       ['boss'] = {
+           [1] = {
+                positionOffset =  {x = 10.58, z = 10.97},
+                healthCalc = 'reduceBy4C' }
+        }
+   }
+}
+
+overlayPositionsByRoom = {
+   [1] = {
+       ['poison_trap'] = {[1] = {x = -13.97, z = -15.73}, [2] = {x = -11.84, z = -11.93}, [3] = {x = -9.55, z = -15.77}, [4] = {x = -0.59, z = -10.65}, [5] = {x = -0.51, z = -8.15} },
+   },
+   [2] = {
+       ['bear_trap'] = {[1] = {x = 3.81, z = -10.58}, [2] = {x = 3.89, z = -8.15}, [3] = {x = 8.26, z = -8.04}, [4] = {x = 8.43, z = -5.51}, [5] = {x = 10.47, z = -4.33} },
+       ['treasure'] = {[1] = {x = 10.52, z = -6.77} },
+       ['activate'] = {[1] = {x = 1.75, z = -9.38} }
+   },
+   [3] = {
+       ['activate'] = {[1] = {x = 10.62, z = 3.38} }
+   }
+}
+
+buttonData = {
+   [1] = { position = {-0.92, 0.1, -0.13}, label = '', message = '', nextButtons = { 2 }, action = "initializeScenario", hint = 'Setup Scenario'},
+   [2] = { position = {0.1, 0.1, 0.5}, label = '', message = '', nextButtons = { 3 }, action = "setupRoom", hint = 'Open door'},
+   [3] = { position = {0.58, 0.1, -0.18}, label = '', message = '', nextButtons = { 4 }, action = "setupRoom", hint = 'Open door'},
+   [4] = { position = {0, 0.1, -0.39}, nextButtons = {}, action = 'generateWinRewards', hint = 'Click for Scenario Rewards' }
+}
+
+function reduceBy4C()
+    local playerCount = saveState['playerCount']
+    local scenarioLevel = saveState['scenarioLevel']
+    local healthByLevel = {[0]=7, [1]=10, [2]=12, [3]=15, [4]=17, [5]=20, [6]=23, [7]=28}
+    return playerCount * (healthByLevel[scenarioLevel] - 4)
+end

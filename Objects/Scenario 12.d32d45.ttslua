@@ -1,0 +1,155 @@
+#include Shared/ScenarioSetup
+
+enemyTypes = {
+    [1] = 'living_corpse',
+    [2] = 'living_spirit'
+}
+cardType = 'standard'
+
+winItem = 'Flea-Bitten Shawl'
+rewardLocation = { x = 12.7, z = 11}
+
+figurePositions = {
+    [2] = {
+        ['living_corpse'] = {
+            [1] = {
+                 type = {[2] = 'normal', [3] = 'elite', [4] = 'elite'},
+                 positionOffset = {x = -1.28, z = -3.86} }
+        }
+    },
+    [3] = {
+        ['living_corpse'] = {
+            [1] = {
+                 type = {[2] = 'normal', [3] = 'elite', [4] = 'elite'},
+                 positionOffset = {x = 0.29, z = -4.67} }
+        }
+    },
+    [4] = {
+        ['living_spirit'] = {
+            [1] = {
+                 type = {[2] = 'normal', [3] = 'normal', [4] = 'elite'},
+                 positionOffset = {x = 1.79, z = -4.74} }
+        }
+    },
+    [5] = {
+        ['living_spirit'] = {
+            [1] = {
+                 type = {[2] = 'normal', [3] = 'normal', [4] = 'elite'},
+                 positionOffset = {x = 3.39, z = -3.65} }
+        }
+    },
+    [6] = {
+        ['living_corpse'] = {
+            [1] = {
+                 type = {[2] = 'normal', [3] = 'normal', [4] = 'normal'},
+                 positionOffset = {x = -7.14, z = -7.42} },
+            [2] = {
+                type = {[2] = 'none', [3] = 'none', [4] = 'normal'},
+                positionOffset = {x = -1.05, z = -8.56} },
+            [3] = {
+                type = {[2] = 'none', [3] = 'normal', [4] = 'normal'},
+                positionOffset = {x = 3.11, z = -8.56} },
+            [4] = {
+                type = {[2] = 'normal', [3] = 'normal', [4] = 'normal'},
+                positionOffset = {x = 9.36, z = -7.42} },
+        },
+        ['living_spirit'] = {
+            [1] = {
+                 type = {[2] = 'normal', [3] = 'normal', [4] = 'elite'},
+                 positionOffset = {x = -5.09, z = -13.27} },
+            [2] = {
+                type = {[2] = 'normal', [3] = 'normal', [4] = 'elite'},
+                positionOffset = {x = -1.02, z = -13.27} },
+            [3] = {
+                type = {[2] = 'normal', [3] = 'elite', [4] = 'elite'},
+                positionOffset = {x = 3.14, z = -13.27} },
+            [4] = {
+                type = {[2] = 'normal', [3] = 'elite', [4] = 'elite'},
+                positionOffset = {x = 7.19, z = -13.27} },
+        }
+    },
+
+}
+
+overlayPositionsByRoom = {
+
+    [2] = {
+        ['rubble'] = {[1] = {x = -9.18, z = 0.96} }
+    },
+    [3] = {
+        ['rubble'] = {[1] = {x = -0.94, z = 0.96} }
+    },
+    [4] = {
+        ['rubble'] = {[1] = {x = 3.25, z = 0.96} }
+    },
+    [5] = {
+        ['rubble'] = {[1] = {x = 11.43, z = 0.96} }
+    },
+    [6] = {
+        ['activate'] = {[1] = {x = -5.07, z = -3.95}, [2] = {x = 7.26, z = -3.95} }
+    },
+    [7] = {
+        ['rubble'] = {[1] = {x = -2.99, z = -12.1} }
+    },
+    [8] = {
+        ['rubble'] = {[1] = {x = 5.24, z = -12.1} }
+    },
+}
+
+buttonData = {
+    [1] = { position = {-0.9, 0.1, -0.95}, label = '', message = 'Click destroyed pillars to spawn enemies.', nextButtons = { 2, 3, 4, 5 }, action = "initializeScenario", hint = 'Setup Scenario'},
+    [2] = { position = {-0.58, 0.1, -0.05}, label = '', message = '', nextButtons = { }, action = "destroyPillarA", hint = 'Destroy pillar'},
+    [3] = { position = {-0.06, 0.1, -0.05}, label = '', message = '', nextButtons = { }, action = "destroyPillarB", hint = 'Destroy pillar'},
+    [4] = { position = {0.2, 0.1, -0.05}, label = '', message = '', nextButtons = { }, action = "destroyPillarC", hint = 'Destroy pillar'},
+    [5] = { position = {0.72, 0.1, -0.05}, label = '', message = '', nextButtons = { }, action = "destroyPillarD", hint = 'Destroy pillar'},
+
+    [6] = { nextButtons = { 7, 8, 9 }, action = "none" },
+
+    [7] = { position = {0.2, -0.1, 0.76}, label = '', message = '', nextButtons = { }, action = "setupRoom", hint = 'Destroy pillar'},
+    [8] = { position = {-0.35, -0.1, 0.76}, label = '', message = '', nextButtons = { }, action = "setupRoom", hint = 'Destroy pillar'},
+    [9] = { position = {-0.79, -0.1, -0.97}, nextButtons = {}, action = 'generateWinRewards', hint = 'Click for Scenario Rewards' }
+}
+
+function destroyPillarA()
+    cleanupButton(2)
+    setupRoom(2)
+    destroyPillar()
+end
+
+function destroyPillarB()
+    cleanupButton(3)
+    setupRoom(3)
+    destroyPillar()
+end
+
+function destroyPillarC()
+    cleanupButton(4)
+    setupRoom(4)
+    destroyPillar()
+end
+
+function destroyPillarD()
+    cleanupButton(5)
+    setupRoom(5)
+    destroyPillar()
+end
+
+function destroyPillar()
+    if saveState['pillars'] == nil then
+        saveState['pillars'] = 1
+    else
+        saveState['pillars'] = saveState['pillars'] + 1
+    end
+    if saveState['pillars'] == 4 then
+        self.setLock(false)
+        cleanupButton(6)
+        self.setRotation({180, 0, 0})
+        setupRoom(6)
+        Wait.time(postFlip, 2)
+    end
+    save()
+end
+
+function postFlip()
+    self.setLock(true)
+end
