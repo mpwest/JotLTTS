@@ -1,0 +1,230 @@
+#include Shared/RewardLogic
+
+treasure = {
+    ['Scenario 2']  = 14,
+    ['Scenario 3']  = 10,
+    ['Scenario 4']  = 16,
+    ['Scenario 5']  = 9,
+    ['Scenario 7']  = 12,
+    ['Scenario 8']  = 4,
+    ['Scenario 9']  = 1,
+    ['Scenario 10']  = 8,
+    ['Scenario 13']  = 5,
+    ['Scenario 14']  = 15,
+    ['Scenario 17']  = 3,
+    ['Scenario 18']  = { [2] = {x = 12.8, z = 13.68}, [6] = {x = -12.52, z = 1.24}, [7] = {x = -12.62, z = 12.47}, [13] = {x = 1.19, z = -8.9} },
+    ['Scenario 21']  = 11,
+}
+
+playerColorMapping = {
+    ['Red'] = {0.856, 0.1, 0.094, 1},
+    ['White'] = {1,1,1,1},
+    ['Blue'] = {0.118, 0.53, 1, 1},
+    ['Green'] = {0.192, 0.701, 0.168, 1},
+    ['Purple'] = {0.627, 0.125, 0.941, 1},
+    ['Black'] = {0.5, 0.5, 0.5, 1}
+}
+
+saveState = {}
+
+function onLoad(save_state)
+    if save_state ~= nil then
+        saveState = JSON.decode(save_state)
+    end
+    if saveState == nil then
+        saveState = {}
+    end
+    if saveState['lootedIndex'] == nil then
+        saveState['lootedIndex'] = {}
+    end
+
+    createLootChecks()
+end
+
+function createLootChecks()
+    for i = 1, 16 do
+        local row = (i - 1) % 8
+        local column = math.floor((i - 1) / 8)
+        local buttonPosition = {-0.235 + (column * 0.535), 0.1, -0.525 + (row * 0.156)}
+
+        local check = ''
+        if saveState['lootedIndex'][i] then
+            check = 'x'
+        end
+
+        _G['toggleLoot' .. i] = function() toggleLoot(i) end
+        self.createButton({
+            click_function = 'toggleLoot' .. i,
+            function_owner = self,
+            label          = check,
+            position       = buttonPosition,
+            width          = 40,
+            height         = 40, -- int,
+            font_size      = 50,
+            color          = {0,0,0,0.01},
+            font_color     = {1,0,0,130},
+        })
+    end
+end
+
+function toggleLoot(index)
+    local check = ''
+    if saveState['lootedIndex'][index] then
+        saveState['lootedIndex'][index] = nil
+    else
+        saveState['lootedIndex'][index] = true
+        check = 'x'
+    end
+
+    for _, button in pairs(self.getButtons()) do
+        if button.click_function == 'toggleLoot' .. index then
+            self.editButton({index = button.index, label = check})
+        end
+    end
+
+    self.script_state = JSON.encode(saveState)
+end
+
+function findLootIndex(params)
+    local scenarioName = params.scenarioName
+    local treasurePosition = params.treasurePosition
+    local scenarioPosition = params.scenarioPosition
+
+    local scenarioTreasure = treasure[scenarioName]
+    if type(scenarioTreasure) == "table" then
+
+        return findLootByPosition(scenarioTreasure, treasurePosition, scenarioPosition)
+    else
+        return scenarioTreasure
+    end
+end
+
+function findLootByPosition(scenarioTreasure, treasurePosition, scenarioPosition)
+    local relativeX = treasurePosition.x - scenarioPosition.x
+    local relativeZ = treasurePosition.z - scenarioPosition.z
+
+    for treasureIndex, expectedRelativePosition in pairs(scenarioTreasure) do
+        local distance = math.sqrt((expectedRelativePosition.x - relativeX)^2 + (expectedRelativePosition.z - relativeZ)^2)
+        if distance < 2 then
+            return treasureIndex
+        end
+    end
+    return nil
+end
+
+function getLoot(params)
+    local index = params.index
+    local playerColor = params.playerColor
+    if saveState['lootedIndex'][index] then
+        broadcastToAll('This treasure has been looted already.', {1,1,1,1})
+    else
+        self.call('loot' .. index, playerColor)
+        toggleLoot(index)
+    end
+end
+
+function loot1(playerColor)
+    gainXPOrGoldTreasure(10, 0, playerColor)
+end
+
+function loot2(playerColor)
+    getItemTreasure('Ring of Strength',31, playerColor)
+end
+
+function loot3(playerColor)
+    gainXPOrGoldTreasure(15, 0, playerColor)
+end
+
+function loot4(playerColor)
+    gainXPOrGoldTreasure(0, 5, playerColor)
+end
+
+function loot5(playerColor)
+    gainCheck(playerColor)
+end
+
+function loot6(playerColor)
+    gainXPOrGoldTreasure(0, 10, playerColor)
+end
+
+function loot7(playerColor)
+    gainXPOrGoldTreasure(0, 5, playerColor)
+end
+
+function loot8(playerColor)
+    broadcastToAll('Suffer 3 damage, gain poison', playerColorMapping[playerColor])
+end
+
+function loot9(playerColor)
+    gainXPOrGoldTreasure(0, 5, playerColor)
+end
+
+function loot10(playerColor)
+    getItemTreasure('Fateful Compass', 27, playerColor)
+end
+
+function loot11(playerColor)
+    getItemTreasure('Ring of Haste', 30, playerColor)
+end
+
+function loot12(playerColor)
+    gainXPOrGoldTreasure(0, 5, playerColor)
+end
+
+function loot13(playerColor)
+    gainXPOrGoldTreasure(0, 5, playerColor)
+end
+
+function loot14(playerColor)
+    getMoneyTokens(3, playerColor)
+    broadcastToAll('Coins can be tracked in your character\'s coin purse, and transferred to your character by dropping it on your character sheet', {1,1,1,1})
+end
+
+function loot15(playerColor)
+    gainCheck(playerColor)
+end
+
+function loot16(playerColor)
+    getItemTreasure('Mana Potion', 14, playerColor)
+end
+
+function gainCheck(playerColor)
+    broadcastToAll('Gain 1 checkmark', playerColorMapping[playerColor])
+end
+
+function getItemTreasure(itemName, itemNumber, playerColor)
+    local dropLocationData = Global.call('getHandPosition', playerColor)
+    local dropLocation = vector(dropLocationData.x, dropLocationData.y, dropLocationData.z)
+    local broadcast = itemName .. ' (Item ' .. itemNumber .. ')'
+    broadcastToAll(broadcast, playerColorMapping[playerColor])
+    getItem(itemName, dropLocation)
+end
+
+function gainXPOrGoldTreasure(xp, gold, playerColor)
+    if xp > 0 then
+        broadcastToAll('Gain ' .. xp .. ' experience', playerColorMapping[playerColor])
+    end
+    if gold > 0 then
+        broadcastToAll('Gain ' .. gold .. ' gold', playerColorMapping[playerColor])
+    end
+
+    local rewardBagGUID = Global.call('getRewardTileBagGUID')
+    local rewardBag = getObjectFromGUID(rewardBagGUID)
+    local dropLocationData = Global.call('getHandPosition', playerColor)
+    -- must be passed as a table, since passing a vector only passes a reference
+    local dropLocation = vector(dropLocationData.x, dropLocationData.y, dropLocationData.z)
+    gainXPOrGold(rewardBag, xp, gold, dropLocation)
+end
+
+function getMoneyTokens(amount, playerColor)
+    local s = 's'
+    if amount == 1 then s = '' end
+    broadcastToAll('Gain ' .. amount .. ' money token' .. s, playerColorMapping[playerColor])
+    local moneyBagGUID = Global.call('getOverlayBag', 'gold')
+    local moneyBag = getObjectFromGUID(moneyBagGUID)
+    if moneyBag ~= nil then
+        for _ = 1, amount do
+            bag.takeObject({position = Global.call('getHandPosition', playerColor)})
+        end
+    end
+end

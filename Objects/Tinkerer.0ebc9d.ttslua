@@ -1,0 +1,6 @@
+#include Shared/GHCharacterSetupTile
+
+characterEnvelope_GUID = '1f6056'
+id = 'tinkerer'
+skillCount = 12
+hasSummons = true

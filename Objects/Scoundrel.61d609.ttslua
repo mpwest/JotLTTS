@@ -1,0 +1,6 @@
+#include Shared/GHCharacterSetupTile
+
+characterEnvelope_GUID = 'a1f046'
+id = 'scoundrel'
+skillCount = 9
+hasSummons = false

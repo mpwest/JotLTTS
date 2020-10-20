@@ -1,0 +1,6 @@
+#include Shared/GHCharacterSetupTile
+
+characterEnvelope_GUID = '932784'
+id = 'spellweaver'
+skillCount = 8
+hasSummons = true

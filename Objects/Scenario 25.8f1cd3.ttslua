@@ -1,0 +1,173 @@
+#include Shared/ScenarioSetup
+
+enemyTypes = {
+    [1] = 'living_spirit',
+    [2] = 'vermling_raider',
+    [3] = 'vermling_scout'
+}
+cardType = 'standard'
+
+winItem = 'Jet Boots'
+rewardLocation = { x = -14, z = 6}
+
+figurePositions = {
+    [1] = {
+        ['living_spirit'] = {
+            [1] = {
+                type = {[2] = 'normal', [3] = 'normal', [4] = 'normal'},
+                positionOffset = {x = -11.23, z = -5.35} },
+            [2] = {
+                type = {[2] = 'none', [3] = 'normal', [4] = 'normal'},
+                positionOffset = {x = -11.23, z = 1.09} },
+        },
+    },
+    [2] = {
+        ['vermling_scout'] = {
+            [1] = {
+                 type = {[2] = 'elite', [3] = 'normal', [4] = 'elite'},
+                 positionOffset = {x = -1.87, z = -2.15} },
+            [2] = {
+                type = {[2] = 'none', [3] = 'normal', [4] = 'elite'},
+                positionOffset = {x = -1.87, z = 0.04} },
+            [3] = {
+                type = {[2] = 'none', [3] = 'normal', [4] = 'elite'},
+                positionOffset = {x = -1.87, z = -4.23} },
+            [4] = {
+                type = {[2] = 'normal', [3] = 'normal', [4] = 'normal'},
+                positionOffset = {x = -3.7, z = -1.02} },
+            [5] = {
+                type = {[2] = 'normal', [3] = 'normal', [4] = 'normal'},
+                positionOffset = {x = -3.7, z = -3.16} },
+        },
+        ['vermling_raider'] = {
+            [1] = {
+                type = {[2] = 'normal', [3] = 'normal', [4] = 'normal'},
+                positionOffset = {x = 3.83, z = 1.06} },
+            [2] = {
+                type = {[2] = 'none', [3] = 'normal', [4] = 'normal'},
+                positionOffset = {x = 3.83, z = -1.1} },
+        },
+        ['living_spirit'] = {
+            [1] = {
+                type = {[2] = 'normal', [3] = 'normal', [4] = 'normal'},
+                positionOffset = {x = 3.83, z = -5.3} },
+            [2] = {
+                type = {[2] = 'none', [3] = 'none', [4] = 'normal'},
+                positionOffset = {x = 5.73, z = -4.23} },
+        }
+    },
+    [3] = {
+        ['living_spirit'] = {
+            [1] = {
+                type = {[2] = 'elite', [3] = 'elite', [4] = 'elite'},
+                positionOffset = {x = 2.05, z = 6.66} },
+            [2] = {
+                type = {[2] = 'none', [3] = 'normal', [4] = 'normal'},
+                positionOffset = {x = 5.73, z = 4.45} },
+            [3] = {
+                type = {[2] = 'none', [3] = 'none', [4] = 'normal'},
+                positionOffset = {x = -1.87, z = 4.45} },
+        }
+     },
+     [4] = {
+        ['vermling_scout'] = {
+            [1] = {
+                 type = {[2] = 'elite', [3] = 'elite', [4] = 'elite'},
+                 positionOffset = {x = 11.43, z = 5.55} },
+            [2] = {
+                type = {[2] = 'normal', [3] = 'elite', [4] = 'elite'},
+                positionOffset = {x = 9.5, z = 2.28} },
+            [3] = {
+                type = {[2] = 'normal', [3] = 'elite', [4] = 'elite'},
+                positionOffset = {x = 13.17, z = 2.28} },
+            [4] = {
+                type = {[2] = 'none', [3] = 'normal', [4] = 'elite'},
+                positionOffset = {x = 11.43, z = -3.13} },
+        },
+        ['living_spirit'] = {
+             [1] = {
+                  type = {[2] = 'normal', [3] = 'normal', [4] = 'normal'},
+                  positionOffset =  {x = 13.17, z = 8.74} },
+             [2] = {
+                  type = {[2] = 'none', [3] = 'none', [4] = 'normal'},
+                  positionOffset = {x = 9.5, z = -4.24} }
+        }
+    }
+}
+
+overlayPositionsByRoom = {
+    [2] = {
+        ['activate'] = {[1] = {x = -9.32, z = -2.05}}
+    },
+    [3] = {
+        ['activate'] = {[1] = {x = 2.01, z = 2.25}}
+    },
+    [4] = {
+        ['activate'] = {[1] = {x = 7.68, z = 7.7}}
+    },
+    [5] = {
+        ['activate'] = {[1] = {x = 15.23, z = -3.22}}
+    },
+    [6] = {
+        ['rubble'] = {[1] = {x = -16.87, z = -2.18}}
+    },
+    [7] = {
+        ['rubble'] = {[1] = {x = -13.07, z = -2.18}}
+    },
+    [8] = {
+        ['rubble'] = {[1] = {x = -7.45, z = -1.07}}
+    },
+    [9] = {
+        ['rubble'] = {[1] = {x = -3.69, z = -5.37}}
+    },
+    [10] = {
+        ['rubble'] = {[1] = {x = 0.08, z = 1.15}}
+    },
+    [11] = {
+        ['rubble'] = {[1] = {x = 3.92, z = -3.25}}
+    },
+    [12] = {
+        ['rubble'] = {[1] = {x = 0.1, z = 5.59}}
+    },
+    [13] = {
+        ['rubble'] = {[1] = {x = 3.88, z = 5.59}}
+    },
+    [14] = {
+        ['rubble'] = {[1] = {x = 9.58, z = 4.48}}
+    },
+    [15] = {
+        ['rubble'] = {[1] = {x = 9.58, z = 0.06}}
+    },
+    [16] = {
+        ['rubble'] = {[1] = {x = 13.38, z = 4.48}}
+    },
+    [17] = {
+        ['rubble'] = {[1] = {x = 13.38, z = 0.06}}
+    },
+}
+
+hexHeight = 800
+
+buttonData = {
+    [1] = { position = {-1.84, 0.1, -0.95}, message = 'Click the summoning stones once they are destroyed', nextButtons = { 2, 6, 7 }, action = "initializeScenario", hint = 'Setup Scenario'},
+    -- rooms
+    [2] = {position = {-0.88, 0.1, 0.2}, nextButtons = { 3, 8, 9, 10 , 11}, action = "setupRoom", hint = 'Open door', overrideButtonHeight = hexHeight},
+    [3] = {position = {0.19, 0.1, -0.22}, nextButtons = { 4, 12 , 13}, action = "setupRoom", hint = 'Open door', overrideButtonHeight = hexHeight},
+    [4] = {position = {0.72, 0.1, -0.73}, nextButtons = { 5, 14, 15, 16 , 17}, action = "setupRoom", hint = 'Open door', overrideButtonHeight = hexHeight},
+    [5] = {position = {1.44, 0.1, 0.3}, nextButtons = { 18 }, action = "setupRoom", hint = 'Open door', overrideButtonHeight = hexHeight},
+    -- pillars
+    [6] = { position = {-1.59, 0.1, 0.19}, nextButtons = { }, action = "setupRoom", hint = 'Destroy pillar', overrideButtonHeight = hexHeight},
+    [7] = { position = {-1.24, 0.1, 0.19}, nextButtons = { }, action = "setupRoom", hint = 'Destroy pillar', overrideButtonHeight = hexHeight},
+    [8] = { position = {-0.7, 0.1, 0.09}, nextButtons = { }, action = "setupRoom", hint = 'Destroy pillar', overrideButtonHeight = hexHeight},
+    [9] = { position = {-0.34, 0.1, 0.51}, nextButtons = { }, action = "setupRoom", hint = 'Destroy pillar', overrideButtonHeight = hexHeight},
+    [10] = { position = {0.01, 0.1, -0.11}, nextButtons = { }, action = "setupRoom", hint = 'Destroy pillar', overrideButtonHeight = hexHeight},
+    [11] = { position = {0.37, 0.1, 0.31}, nextButtons = { }, action = "setupRoom", hint = 'Destroy pillar', overrideButtonHeight = hexHeight},
+    [12] = { position = {0.01, 0.1, -0.52}, nextButtons = { }, action = "setupRoom", hint = 'Destroy pillar', overrideButtonHeight = hexHeight},
+    [13] = { position = {0.37, 0.1, -0.52}, nextButtons = { }, action = "setupRoom", hint = 'Destroy pillar', overrideButtonHeight = hexHeight},
+    [14] = { position = {0.9, 0.1, -0.43}, nextButtons = { }, action = "setupRoom", hint = 'Destroy pillar', overrideButtonHeight = hexHeight},
+    [15] = { position = {0.9, 0.1, 0}, nextButtons = { }, action = "setupRoom", hint = 'Destroy pillar', overrideButtonHeight = hexHeight},
+    [16] = { position = {1.26, 0.1, -0.43}, nextButtons = { }, action = "setupRoom", hint = 'Destroy pillar', overrideButtonHeight = hexHeight},
+    [17] = { position = {1.26, 0.1, 0}, nextButtons = { }, action = "setupRoom", hint = 'Destroy pillar', overrideButtonHeight = hexHeight},
+    -- win
+    [18] = { position = {-0.9, 0.1, -0.45}, nextButtons = {}, action = 'generateWinRewards', hint = 'Click for Scenario Rewards' }
+}

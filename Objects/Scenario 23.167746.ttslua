@@ -1,0 +1,161 @@
+#include Shared/ScenarioSetup
+
+enemyTypes = {
+    [1] = 'giant_viper',
+    [2] = 'rat_monstrosity',
+    [3] = 'stone_golem',
+    [4] = 'vermling_raider'
+}
+cardType = 'standard'
+
+winItem = 'Barbed Axe'
+rewardLocation = { x = 9, z = -10}
+
+figurePositions = {
+    [1] = {
+        ['rat_monstrosity'] = {
+            [1] = {
+                type = {[2] = 'normal', [3] = 'normal', [4] = 'normal'},
+                positionOffset = {x = -1, z = 0} },
+            [2] = {
+                type = {[2] = 'normal', [3] = 'normal', [4] = 'normal'},
+                positionOffset = {x = 10.9, z = 0} },
+            [3] = {
+                type = {[2] = 'elite', [3] = 'elite', [4] = 'elite'},
+                positionOffset = {x = -1, z = 7} },
+            [4] = {
+                type = {[2] = 'elite', [3] = 'elite', [4] = 'elite'},
+                positionOffset = {x = 10.9, z = 7} }
+        }
+    },
+    [2] = {
+        ['giant_viper'] = {
+            -- Bs
+            [1] = {
+                 type = {[2] = 'normal', [3] = 'normal', [4] = 'normal'},
+                 positionOffset = {x = 3, z = 12} },
+            [2] = {
+                type = {[2] = 'normal', [3] = 'normal', [4] = 'normal'},
+                positionOffset = {x = 7, z = 12} },
+        },
+        ['vermling_raider'] = {
+            -- C
+            [1] = {
+                 type = {[2] = 'elite', [3] = 'elite', [4] = 'elite'},
+                 positionOffset =  {x = 5, z = 11} }
+         }
+    },
+    [3] = {
+        ['stone_golem'] = {
+            -- D
+            [1] = {
+                 type = {[2] = 'elite', [3] = 'elite', [4] = 'elite'},
+                 positionOffset =  {x = 5, z = 11} }
+         }
+    }
+}
+
+overlayPositionsByRoom = {
+    [1] = {
+        ['bear_trap'] = {[1] = {x = 0.9, z = -1.2}, [2] = {x = 8.9, z = -1.2} }
+    }
+}
+
+buttonData = {
+    [1] = { position = {-1.05, 0.1, -0.94}, label = '', message = 'Click the scenario number again for the next wave.', nextButtons = { 2 }, action = "initializeScenarioWithCrowd", hint = 'Setup Scenario'},
+    [2] = { position = {-1.05, 0.1, -0.94}, label = '', message = 'Click the scenario number again for the next wave',
+            nextButtons = { 3 }, action = "turnCrowdAndSpawn2", hint = 'Spawn wave'},
+    [3] = { position = {-1.05, 0.1, -0.94}, label = '', message = '', nextButtons = { 4 }, action = "turnCrowdAndSpawn3", hint = 'Spawn wave'},
+    [4] = { position = {0.36, 0.1, 0.9}, nextButtons = {}, action = 'generateWinRewards', hint = 'Click for Scenario Rewards' }
+}
+
+crowdMemberPositions = {
+    [1] = { x = -5, z = 11.5 }, [2] = { x = -9, z = 9 }, [3] = { x = -9, z = -2.25 }, [4] = { x = -5, z = -4.6},
+     [5] = { x = -5, z = 0.1 }, [6] = { x = -5, z = 7 }, [7] = { x = -9, z = 4.6 }, [8] = { x = -9, z = 2.3 },
+}
+
+proHatchetName = 'Cheering for Hatchet'
+antiHatchetName = 'Cheering for monsters'
+
+extraContentBag = '88557f'
+
+function initializeScenarioWithCrowd()
+    initializeScenario()
+    setupCrowd()
+end
+
+function setupCrowd()
+    local bag = getObjectFromGUID(extraContentBag)
+    local crowdGUIDs = {}
+    local proHatchetCount = 0
+    local antiHatchetCount = 0
+    local pagePosition = self.getPosition()
+    saveState['crowdGUIDs'] = {}
+
+    for i, crowdMemberRelativePosition in pairs(crowdMemberPositions) do
+        local proHatchet = randomCheering(proHatchetCount, antiHatchetCount, 4)
+        if proHatchet then
+            proHatchetCount = proHatchetCount + 1
+        else
+            antiHatchetCount = antiHatchetCount + 1
+        end
+
+        local crowdMemberPosition = calculatePosition(pagePosition, crowdMemberRelativePosition)
+
+        local crowdMember = bag.takeObject({
+            position = crowdMemberPosition,
+            rotation = {0,180,0},
+            callback_function = function(figure) initializeCrowdMember(figure, proHatchet) end
+        })
+        addItemToCleanup(crowdMember)
+    end
+
+    broadcastToAll('Flip crowd members to switch their support.', {1,1,1})
+end
+
+function randomCheering(proHatchetCount, antiHatchetCount, max)
+    if proHatchetCount >= max then
+        return false
+    end
+    if antiHatchetCount >= max then
+        return true
+    end
+
+    local proHatchet = math.random(0, 1)
+    return proHatchet == 1
+end
+
+function initializeCrowdMember(figure, proHatchet)
+    if proHatchet then
+        figure.flip()
+    else
+        figure.call('setCounter', 2 * (saveState['playerCount']- 1))
+    end
+    table.insert(saveState['crowdGUIDs'], figure.getGUID())
+    save()
+end
+
+function turnCrowdAndSpawn2()
+    setupRoom(2)
+    turnCrowd(2)
+end
+
+function turnCrowdAndSpawn3()
+    setupRoom(3)
+    turnCrowd(0)
+end
+
+function turnCrowd(maxProHatchet)
+    local crowdGUIDs = saveState['crowdGUIDs']
+    local currentProHatchet = 0
+    for _, crowdMemberGUID in pairs(crowdGUIDs) do
+        local crowdMember = getObjectFromGUID(crowdMemberGUID)
+        if crowdMember.getName() == proHatchetName then
+            if currentProHatchet < maxProHatchet then
+                currentProHatchet = currentProHatchet + 1
+            else
+                crowdMember.flip()
+            end
+        end
+    end
+end

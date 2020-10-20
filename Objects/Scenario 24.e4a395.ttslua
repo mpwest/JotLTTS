@@ -1,0 +1,82 @@
+#include Shared/ScenarioSetup
+
+enemyTypes = {
+    [1] = 'black_imp',
+    [2] = 'chaos_demon'
+}
+cardType = 'standard'
+
+winItem = 'Robes of Command'
+rewardLocation = { x = 10, z = -11}
+
+figurePositions = {
+    [1] = {
+        ['black_imp'] = {
+            [1] = {
+                type = {[2] = 'normal', [3] = 'normal', [4] = 'normal'},
+                positionOffset = {x = 3.13, z = 8.94} },
+            [2] = {
+                type = {[2] = 'none', [3] = 'normal', [4] = 'normal'},
+                positionOffset = {x = 5.16, z = 7.82} },
+            [3] = {
+                type = {[2] = 'normal', [3] = 'normal', [4] = 'normal'},
+                positionOffset = {x = 3.14, z = -2.69} },
+            [4] = {
+                type = {[2] = 'none', [3] = 'none', [4] = 'normal'},
+                positionOffset = {x = 5.16, z = -1.48} },
+        },
+        ['chaos_demon'] = {
+            [1] = {
+                type = {[2] = 'none', [3] = 'normal', [4] = 'elite'},
+                positionOffset = {x = 9.18, z = 3.14} },
+            [2] = {
+                type = {[2] = 'normal', [3] = 'normal', [4] = 'normal'},
+                positionOffset = {x = 11.14, z = 4.33} },
+            [3] = {
+                type = {[2] = 'normal', [3] = 'normal', [4] = 'normal'},
+                positionOffset = {x = 11.14, z = 2.03} },
+        }
+    },
+    [2] = {
+        ['black_imp'] = {
+            [1] = {
+                 type = {[2] = 'normal', [3] = 'elite', [4] = 'elite'},
+                 positionOffset = {x = 7, z = -5} },
+            [2] = {
+                type = {[2] = 'normal', [3] = 'elite', [4] = 'elite'},
+                positionOffset = {x = 7, z = 11.5} },
+            [3] = {
+                type = {[2] = 'normal', [3] = 'normal', [4] = 'elite'},
+                positionOffset = {x = 5.3, z = -6} },
+            [4] = {
+                type = {[2] = 'normal', [3] = 'normal', [4] = 'elite'},
+                positionOffset = {x = 5.3, z = 12.8} },
+        },
+        ['chaos_demon'] = {
+            [1] = {
+                 type = {[2] = 'normal', [3] = 'elite', [4] = 'elite'},
+                 positionOffset = {x = 15.75, z = 3.5} }
+        }
+    },
+    [3] = {
+
+        ['chaos_demon'] = {
+            [1] = {
+                 type = {[2] = 'normal', [3] = 'elite', [4] = 'elite'},
+                 positionOffset = {x = 16, z = 3.5} },
+            [2] = {
+                 type = {[2] = 'normal', [3] = 'normal', [4] = 'elite'},
+                 positionOffset = {x = 16, z = 6} },
+            [3] = {
+                type = {[2] = 'normal', [3] = 'normal', [4] = 'elite'},
+                positionOffset = {x = 16, z = 1} },
+         }
+    }
+}
+
+buttonData = {
+    [1] = { position = {-0.99, 0.1, -0.95}, message = 'Click section \'1\' header when ready.', nextButtons = { 2}, action = "initializeScenario", hint = 'Setup Scenario'},
+    [2] = { position = {-0.33, 0.1, 0.52}, message = 'Click section \'1\' header when ready.', nextButtons = { 3 }, action = 'setupRoom', hint = 'Continue'},
+    [3] = { position = {-0.01, 0.1, 0.52}, nextButtons = { 4 }, action = 'setupRoom', hint = 'Continue'},
+    [4] = { position = {0.34, 0.1, 0.85}, nextButtons = {}, action = 'generateWinRewards', hint = 'Click for Scenario Rewards' }
+}

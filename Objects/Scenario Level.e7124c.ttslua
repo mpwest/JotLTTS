@@ -1,0 +1,23 @@
+#include Shared/SimpleCounter
+
+max = 7
+min = 0
+counterName = "Level"
+labelPosition = {-0.25, 0.12, 0.03}
+minusPosition = {0.68, 0.12, 0.56}
+plusPosition = {0.68, 0.12, -0.54}
+
+function getLevel()
+    levelCounter = getCounter()
+    if levelCounter ~= nill then
+        return tonumber(levelCounter.label)
+    end
+end
+
+function initialize()
+    -- default to 1, to avoid mistakes
+    if save_state == "" then
+        saveState[counterName] = 1
+        self.script_state = JSON.encode(saveState)
+    end
+end
