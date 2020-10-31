@@ -1,0 +1,41 @@
+saveState = {}
+
+toggleLabel = 'X'
+
+function onLoad(save_state)
+    if save_state ~= '' then
+        saveState = JSON.decode(save_state)
+    end
+
+    createToggleButton()
+end
+
+function createToggleButton()
+    self.createButton({
+        click_function = 'toggleConditionFollow',
+        function_owner = self,
+        label          = calculateLabel(),
+        position       = {0.85, 0.1, 0.01},
+        scale          = vector(2.25, 1, 2.25),
+        color          = {0,0,0,1},
+        font_color     = "Red",
+    })
+end
+
+function toggleConditionFollow()
+    saveState['enableConditionFeature'] = not saveState['enableConditionFeature']
+    for _, button in pairs(self.getButtons()) do
+        if button.click_function == 'toggleConditionFollow' then
+            self.editButton({index = button.index, label = calculateLabel()})
+        end
+    end
+    self.script_state = JSON.encode(saveState)
+end
+
+function calculateLabel()
+    return (saveState['enableConditionFeature'] and toggleLabel or '')
+end
+
+function isConditionFeatureEnabled()
+    return saveState['enableConditionFeature']
+end
