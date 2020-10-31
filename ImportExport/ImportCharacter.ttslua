@@ -186,6 +186,8 @@ function updateModifierDeck(baseModifierDeck, perkModifierDeck, modifierDeckChan
 
     local perkRemaining = #perkModifierDeck.getObjects()
 
+    local possibleReplacements = {}
+
     for _, change in ipairs(modifierDeckChanges) do
         if change['action'] == 'remove' then
             removeCard(baseModifierDeck, change['cardName'], {perkDeckPosition.x, 1.5, perkDeckPosition.z - 2.5})
@@ -196,7 +198,30 @@ function updateModifierDeck(baseModifierDeck, perkModifierDeck, modifierDeckChan
                 addCard(baseModifierDeck, perkModifierDeck, change['cardName'])
             end
             perkRemaining = perkRemaining - 1
+        elseif change['action'] == 'replaceableAdd' then -- relies on order of perks to add card then replace it
+            table.insert(possibleReplacements, change['cardName'])
+        elseif change['action'] == 'replace' then
+            local found = false
+            for index, cardName in ipairs(possibleReplacements) do
+                if cardName == change['cardName'] then
+                    table.remove(possibleReplacements, int)
+                    found = true
+                    break
+                end
+            end
+            if found == false then
+                broadcastToAll('Issue with perks. Cannot replace a card that has not been added', 'Red')
+            end
         end
+    end
+
+    for _, card in ipairs(possibleReplacements) do
+        if perkRemaining == 1 then
+            Wait.frames(function() moveLastCard(perkDeckPosition, card, baseModifierDeck.getPosition(), {180, 0, 0}) end, 30)
+        else
+            addCard(baseModifierDeck, perkModifierDeck, card)
+        end
+        perkRemaining = perkRemaining - 1
     end
 end
 
@@ -222,12 +247,21 @@ function getCharacterItems(itemList, basePosition, condense)
 
     local availableItems = getObjectFromGUID(getItemDeck('available'))
     local unavailableItems = getObjectFromGUID(getItemDeck('unavailable'))
+    local availableRemaining = 0
+    local unavailableRemaining = 0
+    local availableItemPosition = vector(-26.07, 2.13, -7.47)
+    local unavailableItemPosition = vector(-26.10, 2.13, -3.99)
 
-    local availableRemaining = #availableItems.getObjects()
-    local unavailableRemaining = #unavailableItems.getObjects()
+    if availableItems then
+        availableRemaining = #availableItems.getObjects()
+        availableItemPosition = availableItems.getPosition()
+    end
 
-    local availableItemPosition = availableItems.getPosition()
-    local unavailableItemPosition = unavailableItems.getPosition()
+    if unavailableItems then
+        unavailableRemaining = #unavailableItems.getObjects()
+        unavailableItemPosition = unavailableItems.getPosition()
+    end
+
     local cardRotation = {0,180,0}
     for _, itemName in pairs(itemList) do
         if availableRemaining == 1 then

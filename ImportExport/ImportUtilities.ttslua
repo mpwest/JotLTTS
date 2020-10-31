@@ -96,19 +96,26 @@ function moveLastCard(deckPosition, expectedCardName, movePosition, cardRotation
 end
 
 function removeCard(deck, cardName, cardPosition, cardRotation)
-    for _, card in pairs(deck.getObjects()) do
-        if card.name == cardName then
-            deck.takeObject({position = cardPosition, rotation = cardRotation, guid = card.guid, smooth = false})
-            return true
+    if deck ~= nil then
+        for _, card in pairs(deck.getObjects()) do
+            if card.name == cardName then
+                deck.takeObject({position = cardPosition, rotation = cardRotation, guid = card.guid, smooth = false})
+                return true
+            end
         end
+        return false
     end
     return false
 end
 
-function addCard(destinationDeck, sourceDeck, cardName)
+function addCard(destinationDeck, sourceDeck, cardName, destinationPosition)
     for _, card in pairs(sourceDeck.getObjects()) do
         if card.name == cardName then
-            destinationDeck.putObject(sourceDeck.takeObject({guid = card.guid}))
+            if destinationDeck then
+                destinationDeck.putObject(sourceDeck.takeObject({guid = card.guid}))
+            else
+                sourceDeck.takeObject({guid = card.guid, position = destinationPosition})
+            end
             return
         end
     end

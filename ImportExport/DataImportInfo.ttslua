@@ -21,9 +21,13 @@ eventDeckGUID = '1ba3bb'
 
 jotlClasses = {'Demolitionist', 'Hatchet', 'Red Guard', 'Voidwarden'}
 
-classHasSummons = {'Mindthief', 'Spellweaver', 'Tinkerer'}
+classHasSummons = {'Beast Tyrant', 'Diviner', 'Doomstalker', 'Elementalist', 'Mindthief', 'Spellweaver', 'Summoner', 'Tinkerer'}
 
-ghHandSize = {['Brute'] = 10, ['Cragheart'] = 11, ['Mindthief'] = 10, ['Scoundrel'] = 9, ['Spellweaver'] = 8, ['Tinkerer'] = 12}
+ghHandSize = {
+    ['Brute'] = 10, ['Cragheart'] = 11, ['Mindthief'] = 10, ['Scoundrel'] = 9, ['Spellweaver'] = 8, ['Tinkerer'] = 12,
+    ['Sunkeeper'] = 11, ['Nightshroud'] = 9, ['Sawbones'] = 12, ['Elementalist'] = 10, ['Berserker'] = 10, ['Summoner'] = 9, -- sawbones 12 includes medpacs
+    ['Beast Tyrant'] = 10, ['Quartermaster'] = 9, ['Doomstalker'] = 12, ['Plagueherald'] = 11, ['Soothsinger'] = 9, ['Diviner'] = 9
+}
 
 regularSpacing = {
     ['charBag'] = {x = -4.46, y = 1, z = -41},

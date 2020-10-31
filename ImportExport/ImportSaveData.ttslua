@@ -44,21 +44,34 @@ function importPriorVersion(saveInfoJSON)
         updateLoot(saveInfo['lootIndex'])
     end
     Wait.frames(function() broadcastToAll('Try setting up scenarios 1 and 2 for a tutorial on the new setup process.', {1,1,1,1}) end, 300)
-    Wait.frames(function() allowImport = true end, 60 * (#saveInfo['characters'] + 5))
+    Wait.frames(function() allowImport = true end, 60 * (#(saveInfo['characters'] or {}) + 5))
     return true
 end
 
 function addToStore(itemList)
     local available =  getObjectFromGUID(getItemDeck('available'))
     local unavailable = getObjectFromGUID(getItemDeck('unavailable'))
-    local itemsRemaining = #unavailable.getObjects()
-    local unavailablePosition = unavailable.getPosition()
+    local itemsRemaining = 0
+    local unavailablePosition = vector(-26.10, 2.13, -3.99)
+    if unavailable then
+        itemsRemaining = #unavailable.getObjects()
+        local unavailablePosition = unavailable.getPosition()
+    end
+
+    local availablePosition = vector(-26.07, 2.13, -7.47)
+    if available then
+        available.getPosition()
+    end
 
     for _, item in pairs(itemList) do
         if itemsRemaining == 1 then
-            Wait.frames(function() moveLastCard(unavailablePosition, item, available.getPosition()) end, 30)
-        else
-            addCard(available, unavailable, item)
+            Wait.frames(function() moveLastCard(unavailablePosition, item, availablePosition) end, 30)
+        elseif itemsRemaining > 1 then
+            if available then
+                addCard(available, unavailable, item)
+            else
+
+            end
         end
         itemsRemaining = itemsRemaining - 1
     end

@@ -77,6 +77,10 @@ function exportMap(params)
     end
     for guid, value in pairs(saveState['map']) do
         local sticker = getObjectFromGUID(guid)
+        if guid == '686fdf' and sourceVersion <= 2 then
+            -- ignore item. Causes unneeded error
+            saveState['map'][guid] = nil
+        end
         if sticker == nil and value == false then -- sticker has been placed and removed, but is still referenced on map save data
             saveState['map'][guid] = nil
         else
@@ -84,7 +88,7 @@ function exportMap(params)
         end
     end
     if sourceVersion <= 2 then
-        -- if check was never placed, old versions have no reference to them on the save state. Find guids and check to see if they exists
+        -- if check was never placed, old versions have no reference to them on the save state. Find guids and check to see if they exist
         local checkGuids = mapTile.getVar('tableML')
         if checkGuids ~= nil then
             for guid, data in pairs(checkGuids) do
@@ -113,4 +117,18 @@ function exportLootIndex(params)
         saveState['lootIndex'] = {}
     end
     save()
+end
+
+
+function checkCharacterSheet(sheetName)
+    if sheetName == 'Character Sheet' then return true end
+
+    local characterIndex = saveState['currentCharacter']
+    if sheetName == saveState['characters'][characterIndex].class .. ' Character Sheet' then return true end
+    return false
+end
+
+function formatExpectedSheetName(sheetName)
+    local characterIndex = saveState['currentCharacter']
+    broadcastToAll('Expected an item with name \'Character Sheet\' or ' .. saveState['characters'][characterIndex].class .. ' Character Sheet', 'Red')
 end

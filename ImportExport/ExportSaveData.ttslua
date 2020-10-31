@@ -2,9 +2,10 @@
 #include ExportTypes
 
 maxSourceVersion = 2
-white = color(1,1,1,1)
 green = color(76/255, 177/255, 71/255, 1)
 blue = color(31/255, 136/255, 255/255, 1)
+
+wait = true
 
 saveState = {}
 
@@ -12,7 +13,6 @@ function onLoad(save_state)
     if save_state ~= nil then
         saveState = JSON.decode(save_state)
     end
-
     if saveState == nil then saveState = {} end
 
     if saveState['complete'] ~= nil and saveState['complete'] then
@@ -21,30 +21,25 @@ function onLoad(save_state)
     else
         local version = getVersion()
         if saveState['sourceVersion'] == nil or version == saveState['sourceVersion'] then
-            saveState['sourceVersion'] = version
+            broadcastToAll('Exporting data from version ' .. version or '(unknown)')
             requestSaveData(version)
         else
-            broadcastToAll('This save token has begun exporting data from a different version of this mod. Please spawn a new instance of the save token from the target version and choosing \'Expand\'.', white)
+            broadcastToAll('This Save Tool has begun exporting data from a different version of this mod. Please spawn a new instance of the Save Tool from the target version and choosing \'Expand\'.', 'Red')
         end
     end
+    wait = false
 end
 
 function getVersion()
     if Global.getVar('getVersion') then
         return Global.call('getVersion')
     end
-    -- version 1 and 2 can be differentiated by presence of Gloomhaven character boxes
-    local bruteTuckBoxGUID = '7dfec2'
-    if getObjectFromGUID(bruteTuckBoxGUID) ~= nil then
-        return 2
-    else
-        return 1
-    end
+    return getVersionCustom()
 end
 
 function tryPushSaveData()
     if Global.getVar('importPriorVersion') then
-        broadcastToAll('Import from version ' .. saveState['sourceVersion'], {1,1,1,1})
+        broadcastToAll('Import from version ' .. saveState['sourceVersion'], 'White')
         if Global.call('importPriorVersion', JSON.encode(saveState)) then
             selfDestruct()
         end
@@ -57,39 +52,42 @@ function selfDestruct()
 end
 
 function requestSaveData(version)
-    local next = saveState['next'] or 'CharacterInfoTile'
+    local next = saveState['next'] or requestData[version].firstStep
     local request = requestData[version][next]
 
-    broadcastToAll(request.message, white)
+    broadcastToAll(request.name, 'Blue')
+    print(request.message)
 end
 
 function onCollisionEnter(collision_info)
-    if saveState == nil or saveState['sourceVersion'] == nil  then -- collision event triggered before onLoad completed, ignore collision
-        return
-    end
-
-    local next = saveState['next'] or 'CharacterInfoTile'
-    local version = saveState['sourceVersion']
-    local request = requestData[version][next]
-    local target = collision_info['collision_object']
+    if wait then return end
 
     if saveState['complete'] then
         return
     end
 
-    if target.getName() == '' and target.tag == 'Tile' then -- presumably the ground, ignore collision. we don't do anything with unnamed tiles anyways
+    local version = saveState['sourceVersion'] or getVersion()
+    local next = saveState['next'] or requestData[version].firstStep
+    local request = requestData[version][next]
+    local target = collision_info['collision_object']
+
+    if target.interactable == false and not allowImportUninteractable(target.getName()) then-- presumably the ground/background items, ignore collision
         return
     end
 
-    -- fix this for non-skippable types
-    if target.getName() == 'NEXT' and target.getGMNotes() == 'Continue export data process' then
+    if target.getName() == 'NEXT Tool' and target.getGMNotes() == 'Continue export data process' then
+        setWait()
         saveState['next'] = request.next or request.continueOrNext or saveState['next']
         requestSaveData(version)
         return
     end
 
-    if checkValidTarget(target, saveState['sourceVersion'], next) then
-        self.call('export' .. next, {target = target, version = saveState['sourceVersion']})
+    if checkValidTarget(target, version, next) then
+        setWait()
+        if saveState['sourceVersion'] == nil then
+            saveState['sourceVersion'] = version
+        end
+        self.call('export' .. next, {target = target, version = version})
         saveState['next'] = request.continue or request.continueOrNext
         if saveState['next'] == 'Done' then
             complete()
@@ -102,10 +100,25 @@ function onCollisionEnter(collision_info)
     save()
 end
 
+function setWait()
+    wait = true
+    Wait.time(function() wait = false end, 1)
+end
+
+function allowImportUninteractable(name)
+    for _, allowedName in pairs(allowedUninteractableNames) do
+        if name == allowedName then
+            return true
+        end
+    end
+    return false
+end
+
 function checkValidTarget(target, version,  next)
     local type = target.tag
     if not checkType(type, validTypeData[version][next].type) then return false end
-    if not checkName(target, validTypeData[version][next].name) then return false end
+    if not checkName(target, validTypeData[version][next].name, validTypeData[version][next].expectedShort) then return false end
+    if not checkNameFunction(target, validTypeData[version][next].nameFunction, validTypeData[version][next].expectedNameFunction) then return false end
     if not checkMinMax(target, validTypeData[version][next].min, validTypeData[version][next].max) then return false end
 
     return true
@@ -120,7 +133,7 @@ function checkType(type, possibleTypes)
     return false
 end
 
-function checkName(target, expectedNames)
+function checkName(target, expectedNames, expectedShort)
     local possibleNames = ''
     local foundName = false
     if expectedNames then
@@ -131,9 +144,25 @@ function checkName(target, expectedNames)
                 possibleNames = possibleNames .. ' '.. matchName
             end
         end
-        broadcastToAll('Expected an item with name:' .. possibleNames, {1,1,1,1})
+        if target.getName() ~= '' then
+            broadcastToAll('Expected an item with name:' .. (expectedShort or possibleNames), 'Red')
+        end
     else
         return true
+    end
+end
+
+function checkNameFunction(target, nameFunction, expectedNameFunction)
+    if nameFunction == nil then return true end
+    if self.call(nameFunction, target.getName()) then
+        return true
+    else
+        if expectedNameFunction then
+            local expected = self.call(expectedNameFunction, target.getName())
+        else
+            broadcastToAll('Object does not match expected name', 'Red')
+        end
+        return false
     end
 end
 
@@ -145,17 +174,23 @@ function checkMinMax(target, min, max)
             return true
         end
     end
+    local objectType = 'bag'
+    local objectContents = 'objects'
+    if target.tag == 'Deck' then
+        objectType = 'deck'
+        objectContents = 'cards'
+    end
 
     if min then
         if #(target.getObjects()) < min then
-            broadcastToAll('Expected a deck with at least ' .. min .. ' cards', {1,1,1,1})
+            broadcastToAll('Expected a ' .. objectType .. ' with at least ' .. min .. ' ' .. objectContents, 'Red')
             return false
         end
     end
 
     if max then
         if #(target.getObjects()) > max then
-            broadcastToAll('Expected a deck with at most ' .. max .. ' cards', {1,1,1,1})
+            broadcastToAll('Expected a ' .. objectType .. ' with at most ' .. max .. ' ' .. objectContents, 'Red')
             return false
         end
     end
@@ -186,15 +221,15 @@ end
 
 function flashSuccess(secondaryColor)
     Wait.time(function() self.setColorTint(secondaryColor) end, 0.25)
-    Wait.time(function() self.setColorTint(white) end, 0.5)
+    Wait.time(function() self.setColorTint('White') end, 0.5)
     Wait.time(function() self.setColorTint(secondaryColor) end, 0.75)
-    Wait.time(function() self.setColorTint(white) end, 1)
+    Wait.time(function() self.setColorTint('White') end, 1)
 end
 
 function complete()
     saveState['complete'] = true
     self.setColorTint(green)
-    broadcastToAll(completeMessage, {1,1,1,1})
+    broadcastToAll(completeMessage, 'Green')
 end
 
 function save()
