@@ -37,7 +37,9 @@ function getTempDecks()
 end
 
 function announceDraw(card, name)
-     broadcastToAll(name .. ' Drew ' .. card.getName(), color['white'])
+    if card.getName() ~= nil then
+        broadcastToAll((name or 'Player') .. ' Drew ' .. (card.getName() or ''), color['white'])
+    end
  end
 
 function createButtons()
@@ -109,6 +111,10 @@ function getEmptyActiveSlot(checkSlots)
    end
 
    return false
+end
+
+function isOccupied()
+    return #getCards(Casts['draw']) > 2
 end
 
 -- set character data for level 5 card functionality

@@ -12,6 +12,8 @@ buttonColor = {1,1,1, 0.2 }
 minusButtonLabel = '-'
 plusButtonLabel = '+'
 
+baseConditionDistance = 1.15
+
 function initialize()
 	if saveState['max'] == nil or saveState['max'] == 0 then
         local level = Global.call('getScenarioLevel')
@@ -33,6 +35,7 @@ end
 function onCollisionEnter(collision_info)
     local objectName = collision_info['collision_object'].getName()
     if objectName == Global.call('getDeathName') then
+		clearConditions()
         self.destruct()
     end
 end

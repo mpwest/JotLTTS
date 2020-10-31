@@ -1,16 +1,5 @@
 jotl_Class = 'figure'
 
---[[conditionPositioningOld = {
-    ['Disarm'] = {position = vector(1.3, 0.3, 0), rotation = vector(90, 300, 0)},
-    ['Stun'] = {position = vector(1.45, 0.4, -0.5), rotation = vector(90, 325, 0)},
-    ['Immobilize'] = {position = vector(1.12, 0.3, -0.44), rotation = vector(90, 325, 0)},
-    ['Wound'] = {position = vector(0.13, 0.3, -1.35), rotation = vector(90, 0, 0)},
-    ['Poison'] = {position = vector(0.44, 0.4, -1.06), rotation = vector(90, 350, 0)},
-    ['Muddle'] = {position = vector(-0.87, 0.3, -1.24), rotation = vector(90, 35, 0)},
-    ['Strengthen'] = {position = vector(-0.87, 0.4, -0.85), rotation = vector(90, 35, 0)},
-    ['Invisible'] = {position = vector(-1.3, 0.3, 0), rotation = vector(90, 55, 0)},
-}]]
-
 conditionPositioning = {
     ['Disarm'] = {angle = 0, adjustmentDistance = 0.15, rotation = vector(90, 300, 0)},
     ['Stun'] = {angle = 341, adjustmentDistance = 0.38, rotation = vector(90, 325, 0)},
@@ -25,25 +14,26 @@ conditionPositioning = {
 function registerCondition(conditionToken)
     if Global.getVar('checkAllowConditionAttach') ~= nil then
         if not Global.call('checkAllowConditionAttach') then
-            return
+            return false
         end
     end
     ensureConditionTableExists()
 
     local guid = conditionToken.getGUID()
     if saveState['conditions'][guid] ~= nil then
-        return
+        return false
     end
 
     local conditionName = conditionToken.getName()
     if hasCondition(conditionName) then
-        return
+        return false
     end
 
-    move(conditionToken, conditionName)
+    conditionToken.call('move', {figure = self, baseDistance = baseConditionDistance})
 
     saveState['conditions'][guid] = conditionName
     self.script_state = JSON.encode(saveState)
+    return true
 end
 
 function hasCondition(conditionName)
@@ -56,22 +46,21 @@ function hasCondition(conditionName)
     return false
 end
 
-function calculatePosition(conditionName)
-    local offset = vector(
-        math.cos(math.rad(conditionPositioning[conditionName].angle)) * (baseConditionDistance + conditionPositioning[conditionName].adjustmentDistance),
-        0.4,
-        math.sin(math.rad(conditionPositioning[conditionName].angle)) * (baseConditionDistance + conditionPositioning[conditionName].adjustmentDistance)
-    )
-    return self.getPosition() + offset
-end
-
-function calculateRotation(conditionName)
-    return conditionPositioning[conditionName].rotation
-end
-
 function removeCondition(guid)
     saveState['conditions'][guid] = nil
     self.script_state = JSON.encode(saveState)
+end
+
+function clearConditions()
+    if saveState['conditions'] ~= nil then
+        for guid, name in pairs(saveState['conditions']) do
+            local token = getObjectFromGUID(guid)
+            if token ~= nil then
+                token.destruct()
+            end
+        end
+        saveState['conditions'] = nil
+    end
 end
 
 function onPickUp()
@@ -80,7 +69,7 @@ function onPickUp()
 end
 
 function onDrop()
-    Wait.frames(function() moveConditions = false end, 3)
+    Wait.frames(function() moveConditions = false end, 10)
 end
 
 function updateConditionPositions()
@@ -88,16 +77,11 @@ function updateConditionPositions()
         for guid, name in pairs(saveState['conditions']) do
             local token = getObjectFromGUID(guid)
             if token ~= nil then
-                move(token, name)
+                token.call('move', {figure = self, baseDistance = baseConditionDistance})
             end
         end
         Wait.frames(updateConditionPositions, 1)
     end
-end
-
-function move(conditionToken, conditionName)
-    conditionToken.setPosition(calculatePosition(conditionName))
-    conditionToken.setRotation(calculateRotation(conditionName))
 end
 
 function ensureConditionTableExists()

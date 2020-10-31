@@ -7,12 +7,17 @@ function onLoad(save_state)
 end
 
 function onCollisionEnter(collision_info)
-    if collision_info['collision_object'].getVar('jotl_Class') == 'figure' and saveState['figureGuid'] == nil then
+    if checkAttach(collision_info['collision_object']) then
         self.unregisterCollisions()
-        collision_info['collision_object'].call('registerCondition', self)
         saveState['figureGuid'] = collision_info['collision_object'].getGUID()
         self.script_state = JSON.encode(saveState)
     end
+end
+
+function checkAttach(object)
+    return object.getVar('jotl_Class') == 'figure'
+        and saveState['figureGuid'] == nil
+        and object.call('registerCondition', self)
 end
 
 function onPickUp()
@@ -29,4 +34,20 @@ function updateFigure(guid) -- used when replacing figure
     saveState['figureGuid'] = guid
     self.script_state = JSON.encode(saveState)
     self.unregisterCollisions()
+end
+
+function move(params)
+    local figure = params.figure
+    local baseDistance = params.baseDistance
+    self.setPositionSmooth(calculatePosition(figure, baseDistance), false, true)
+    self.setRotationSmooth(conditionRotation, false, true)
+end
+
+function calculatePosition(figure, baseDistance)
+    local offset = vector(
+        math.cos(math.rad(conditionAngle)) * (baseDistance + conditionDistanceAdjustment),
+        0.4,
+        math.sin(math.rad(conditionAngle)) * (baseDistance + conditionDistanceAdjustment)
+    )
+    return figure.getPosition() + offset
 end

@@ -15,17 +15,31 @@ level5FigureBags = {
 }
 
 characterTuckboxes = {
+    ['Beast Tyrant'] = '942129',
+    ['Berserker'] = '2b9fec',
     ['Brute'] = '7dfec2',
     ['Cragheart'] = '547e40',
     ['Demolitionist'] = 'f3a54d',
+    ['Diviner'] = 'ec7fd1',
+    ['Doomstalker'] = '929fbb',
+    ['Elementalist'] = '34df40',
     ['Hatchet'] = '2dd407',
     ['Mindthief'] = 'cf0cf3',
+    ['Nightshroud'] = 'e43728',
+    ['Plagueherald'] = '6cd377',
+    ['Quartermaster'] = 'f89271',
     ['Red Guard'] = '4869c0',
+    ['Sawbones'] = '2701a8',
     ['Scoundrel'] = 'a1f046',
+    ['Soothsinger'] = '5ac1f9',
     ['Spellweaver'] = '932784',
+    ['Summoner'] = 'dd71ca',
+    ['Sunkeeper'] = 'e7eebf',
     ['Tinkerer'] = '1f6056',
     ['Voidwarden'] = '38ef50'
 }
+
+medpackInitiativeBagGUID = '5ed1cd'
 
 playerMatData = {
     [1] = {
@@ -60,6 +74,10 @@ end
 
 function getCharacterTuckboxGUID(className)
     return characterTuckboxes[className]
+end
+
+function getMedpackInitiativeBagGUID()
+    return medpackInitiativeBagGUID
 end
 
 function getPlayerMatInfo(playerNumber)

@@ -4,17 +4,24 @@ function onLoad(save_state)
     if save_state ~= "" then
       saveState = JSON.decode(save_state)
     end
-    if saveState['characterSheetGUID'] ~= nil then
-        createXPAddButton()
-    end
+    createGoldAddButton()
 end
 
-function createXPAddButton()
+function onSave()
+    updateLabel(0)
+    return JSON.encode(saveState)
+end
+
+function createGoldAddButton()
     self.createButton({
         click_function = 'addGold',
         function_owner = self,
-        position       = labelPosition,
-        color          = {180/255, 180/255, 180/255, 0},
+        position       = {0, 1, 0},
+        label          = #self.getObjects(),
+        color          = {180/255, 180/255, 180/255, 0.01},
+        scale          = {1,2,1},
+        font_color     = {0,0,0,300},
+        font_size      = 250,
         width          = 500,
         height         = 500,
         tooltip        = 'Add to character sheet and reset'
@@ -22,13 +29,13 @@ function createXPAddButton()
 end
 
 function setCharacterSheet(characterSheetGUID)
-    createXPAddButton()
     saveState['characterSheetGUID'] = characterSheetGUID
     self.script_state = JSON.encode(saveState)
 end
 
 function filterObjectEnter(enter_object)
     if enter_object.getName() == 'Coin' then
+        updateLabel(1)
         return true
     else
         return false
@@ -41,5 +48,10 @@ function addGold()
         local totalGold = #(self.getObjects()) * Global.call('getScenarioRewardInfo').goldMultiplier
         characterSheet.call('addGold', {gold = totalGold})
         self.reset()
+        updateLabel(0)
     end
+end
+
+function updateLabel(newObjectCount)
+    self.editButton({index = 0, label = tostring(#self.getObjects() + newObjectCount)})
 end

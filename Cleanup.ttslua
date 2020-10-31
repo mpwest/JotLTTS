@@ -47,6 +47,18 @@ function onDestroy()
         for _, guid in pairs(saveState['cleanup']) do
             local obj = getObjectFromGUID(guid)
             if obj ~= nil then
+                if obj.tag == 'Tileset' and obj.getTable('saveState') ~= nil then
+                    local conditionData = obj.getTable('saveState')['conditions']
+                    if conditionData ~= nil then
+                        for conditionGuid, conditionName in pairs(conditionData) do
+                            local conditionToken = getObjectFromGUID(conditionGuid)
+                            if conditionToken then
+                                conditionToken.destruct()
+                            end
+                        end
+                    end
+
+                end
                 obj.destruct()
             end
         end

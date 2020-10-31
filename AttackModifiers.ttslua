@@ -168,7 +168,7 @@ function curse()
     local curseDeck = getObjectFromGUID(Global.call('getTempModifierDeck', curseType))
     if #curseDeck.getObjects() == 0 then
         removeBlessCurse()
-        Wait.time(function() addCard(curseDeck, 'Monster Curse') end, 2)
+        Wait.time(function() addCard(curseDeck, curseName) end, 2)
     else
         addCard(curseDeck, curseName)
     end

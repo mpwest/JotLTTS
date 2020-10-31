@@ -7,7 +7,7 @@ overlayBags = {
     ['rubble'] = 'e198c4'
 }
 
-itemDecks = {['available'] = '326c84', ['unavailable'] = '3c4bd0'}
+itemDecks = {['available'] = '3ac82c', ['unavailable'] = '3c4bd0'}
 
 scenarioLevelTrackerGUID = 'e7124c'
 playerCountTrackerGUID = '222c42'
@@ -18,6 +18,7 @@ mapStickerBagGUID = 'd6ebae'
 mapTileGUID = 'a002d8'
 elementsBagGUID = 'aae07f'
 elementTrackerGUID = '0193f3'
+conditionControlGUID = '705e43'
 
 scenarioRewards = {
     [0] = {goldMultiplier = 2, bonusXP = 4},
@@ -35,6 +36,50 @@ tempModifierDeck = {
     ['playerCurse'] = '1d366e',
     ['monsterCurse'] = '4c71f2'
 }
+
+--[[
+function initializeScenarioData()
+    if saveState['overlayBags'] == nil then
+        saveState['overlayBags'] = overlayBags
+    end
+    if saveState['itemDecks'] == nil then
+        saveState['itemDecks'] = itemDecks
+    end
+    if saveState['scenarioRewards'] == nil then
+        saveState['scenarioRewards'] = scenarioRewards
+    end
+    if saveState['scenarioLevelTrackerGUID'] == nil then
+        saveState['scenarioLevelTrackerGUID'] = scenarioLevelTrackerGUID
+    end
+    if saveState['playerCountTrackerGUID'] == nil then
+        saveState['playerCountTrackerGUID'] = playerCountTrackerGUID
+    end
+    if saveState['treasureIndexGUID'] == nil then
+        saveState['treasureIndexGUID'] = treasureIndexGUID
+    end
+    if saveState['rewardTileBagGUID'] == nil then
+        saveState['rewardTileBagGUID'] = rewardTileBagGUID
+    end
+    if saveState['initiativeTrackerGUID'] == nil then
+        saveState['initiativeTrackerGUID'] = initiativeTrackerGUID
+    end
+    if saveState['mapStickerBagGUID'] == nil then
+        saveState['mapStickerBagGUID'] = mapStickerBagGUID
+    end
+    if saveState['mapTileGUID'] == nil then
+        saveState['mapTileGUID'] = mapTileGUID
+    end
+    if saveState['elementsBagGUID'] == nil then
+        saveState['elementsBagGUID'] = elementsBagGUID
+    end
+    if saveState['elementTrackerGUID'] == nil then
+        saveState['elementTrackerGUID'] = elementTrackerGUID
+    end
+    if saveState['conditionControlGUID'] == nil then
+        saveState['conditionControlGUID'] = conditionControlGUID
+    end
+    save()
+end ]]
 
 function getScenarioLevel()
     local scenarioLevelTracker = getObjectFromGUID(scenarioLevelTrackerGUID)
@@ -102,4 +147,13 @@ end
 
 function getElementTracker()
     return elementTrackerGUID
+end
+
+function checkAllowConditionAttach()
+    local conditionControl = getObjectFromGUID(conditionControlGUID)
+    if conditionControl then
+        return conditionControl.call('isConditionFeatureEnabled')
+    else
+        return false
+    end
 end

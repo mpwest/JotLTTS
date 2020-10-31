@@ -1,0 +1,15 @@
+function  onCollisionEnter(collision_info)
+    local obj = collision_info['collision_object']
+    if obj.getName() == 'Player Mat' then
+        updateDescription(obj)
+    end
+end
+
+function updateDescription(mat)
+    local figure = getObjectFromGUID(mat.getVar('saveState')['figure'])
+    if figure and figure.getName ~= 'Sawbones' then
+            self.setDescription(figure.getName())
+    else
+        self.setDescription('Medpack')
+    end
+end

@@ -1,9 +1,9 @@
 function onCollisionEnter(info)
 
-    if info['collision_object'].getName() == 'Player Mat'  then
+    if info['collision_object'].getName() == 'Player Mat' and not info['collision_object'].call('isOccupied') then
         local pos = info['collision_object'].getPosition()
         local bag = getObjectFromGUID(characterEnvelope_GUID).takeObject({ --Character Envelope
-            position       = {pos.x-5, pos.y+1, pos.z-41},
+            position       = {pos.x-5, pos.y+1, pos.z-45.6},
             rotation       = {0.00, 180.00, 0.00},
             smooth         = false
         })

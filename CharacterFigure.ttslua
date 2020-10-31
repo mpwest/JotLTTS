@@ -8,7 +8,7 @@ primaryCounterName = 'Health'
 secondaryCounterName = 'BonusCounter'
 min = {[primaryCounterName] = 0, [secondaryCounterName] = 0}
 max = {[primaryCounterName] = 26, [secondaryCounterName] = 1000}
-labelColor = {[primaryCounterName] = {0,0,0,4.5}, [secondaryCounterName] = {0.15, 0.15, 0.15, 4.5}}
+labelColor = {[primaryCounterName] = {0,0,0,4.5}, [secondaryCounterName] = {31/255, 85/255, 207/255, 4.5}}
 hideZero = {[primaryCounterName] = false, [secondaryCounterName] = true}
 buttonColor = {1,1,1,0}
 minusButtonLabel = '-'
@@ -37,9 +37,11 @@ end
 function onCollisionEnter(collision_info)
     if collision_info['collision_object'].getName() == 'Player Mat' then
         initializeHealth()
+        clearConditions()
     elseif collision_info['collision_object'].getName() == className .. ' Character Sheet' and lostSheet() then
         saveState['characterSheet'] = collision_info['collision_object'].getGUID()
         initializeHealth()
+        clearConditions()
         self.script_state = JSON.encode(saveState)
     end
 end

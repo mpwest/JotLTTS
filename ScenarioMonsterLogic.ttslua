@@ -58,6 +58,7 @@ function placeStandeeFromEnvelope(enemyEnvelope, position, elite, overrideHealth
         position          = position,
         rotation          = {0.00, 180.00, 0.00},
         guid              = bossStandeeGUID,
+        smooth            = true,
         callback_function = callback
     })
 end
