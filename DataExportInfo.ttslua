@@ -1,0 +1,133 @@
+completeMessage = 'Done exporting data. Please right click the Save Tool and select Save Object, then load the new version and import object from Objects menu at the top of the screen.'
+
+commonRequestDataV1Base = {
+    firstStep = 'CharacterInfoTile',
+    ['CharacterInfoTile'] = { name = 'Character portrait tile', message = 'Please drop the Save Tool on a character portrait tile to be imported. If there are no more, please drop the token on the NEXT Tool',
+        continue = 'CharacterSheet', next = 'AvailableStore', quantity = 0},
+    ['CharacterSheet'] = { name = 'Character sheet', message = 'Please drop the Save Tool on the associated character sheet.', continue = 'AbilityDeckInUse', quantity = 1},
+    ['AbilityDeckInUse'] = { name = 'In-use abilities', message = 'Please drop the Save Tool on that character\'s In-Use ability deck. Skip this step if you are still using any A or B cards with the NEXT Tool. Unused available cards will follow.',
+        continue = 'AbilityDeckUnused', next = 'CharacterItems', quantity = 1},
+    ['AbilityDeckUnused'] = { name = 'Not-in-use abilities', message = 'Please drop the Save Tool on that character\'s Not-In-Use ability deck. This should not include A and B cards. ' ..
+        'Drop the token on the NEXT Tool if level 1 cards are not yet available', continue = 'CharacterItems', quantity = 1},
+    ['CharacterItems'] = { name = 'Character items', message = 'Please drop the Save Tool on that character\'s items, merged into one deck. Drop the token on the NEXT Tool if no items are owned.', continueOrNext = 'CharacterInfoTile', quantity = 1},
+    ['AvailableStore'] = { name = 'Store', message = 'Please drop the Save Tool on the available items deck. Or on the NEXT Tool if you\'ve managed to buy out the store.', continueOrNext = 'CityEvents', quantity = 1},
+    ['CityEvents'] = { name = 'City Events', message = 'Cannot differentiate cards in current version. Please use the included sheet to mark off any completed events, without looking at incomplete events. ' ..
+        'Then drop the Save Tool on the completed sheet.', continue = 'Map', quantity = 1},
+    ['Map'] = { name = 'Map of Gloomhaven', message = 'Please drop the Save Tool on the map of Gloomhaven.', continue = 'LootIndex', quantity = 1},
+    ['LootIndex'] = { name = 'Treasure Index tile', message = 'Please check off all looted chests on the included Treasure Index tile and drop the Save Tool on it.', continue = 'Done', quantity = 1},
+}
+
+commonRequestDataV3Base = {
+    firstStep = 'CharacterInfoTile',
+    ['CharacterInfoTile'] = { name = 'Character portrait tile', message = 'Please drop the Save Tool on a character portrait tile to be imported. If there are no more, please drop the token on the NEXT Tool',
+        continue = 'CharacterSheet', next = 'AvailableStore', quantity = 0},
+    ['CharacterSheet'] = { name = 'Character sheet', message = 'Please drop the Save Tool on the associated character sheet.', continue = 'AbilityDeckInUse', quantity = 1},
+    ['AbilityDeckInUse'] = { name = 'In-use abilities', message = 'Please drop the Save Tool on that character\'s In-Use ability deck. Skip this step if you are still using any A or B cards with the NEXT Tool. Unused available cards will follow.',
+        continue = 'AbilityDeckUnused', next = 'CharacterItems', quantity = 1},
+    ['AbilityDeckUnused'] = { name = 'Not-in-use abilities', message = 'Please drop the Save Tool on that character\'s Not-In-Use ability deck. This should not include A and B cards. ' ..
+        'Drop the token on the NEXT Tool if level 1 cards are not yet available', continue = 'CharacterItems', quantity = 1},
+    ['CharacterItems'] = { name = 'Character items', message = 'Please drop the Save Tool on that character\'s items, merged into one deck. Drop the token on the NEXT Tool if no items are owned.', continueOrNext = 'CharacterInfoTile', quantity = 1},
+    ['AvailableStore'] = { name = 'Store', message = 'Please drop the Save Tool on the available items deck. Or on the NEXT Tool if you\'ve managed to buy out the store.', continueOrNext = 'CityEvents', quantity = 1},
+    ['CityEvents'] = { name = 'City Events', message = 'Please drop the Save Tool on the included sheet, once you have checked completed events.', continueOrNext = 'Map', quantity = 1},
+    ['Map'] = { name = 'Map of Gloomhaven', message = 'Please drop the Save Tool on the map of Gloomhaven.', continue = 'PlayerCount', quantity = 1},
+    ['PlayerCount'] = { name = 'Player Count Tracker', message = 'Please drop the Save Tool on the Player Count Tracker.', continue = 'ScenarioLevel', quantity = 1 },
+    ['ScenarioLevel'] = { name = 'Scenario Level Tracker', message = 'Please drop the Save Tool on the Scenario Level Tracker.', continue = 'LootIndex', quantity = 1 },
+    ['LootIndex'] = { name = 'Treasure Index tile', message = 'Please check off all looted chests on the included Treasure Index tile and drop the Save Tool on it.', continue = 'Done', quantity = 1},
+}
+
+requestData = {
+    [1] = commonRequestDataV1Base,
+    [2] = commonRequestDataV1Base,
+    [3] = commonRequestDataV3Base,
+    [3.1] = commonRequestDataV3Base
+}
+
+validTypeDataV3Base = {
+    ['CharacterInfoTile'] = {type = {'Tile'}, name = {'Hatchet', 'Demolitionist', 'Voidwarden', 'Red Guard', 'Brute', 'Cragheart', 'Mindthief', 'Scoundrel', 'Spellweaver', 'Tinkerer',
+        'Sunkeeper', 'Nightshroud', 'Sawbones', 'Elementalist', 'Berserker', 'Summoner', 'Beast Tyrant', 'Quartermaster', 'Doomstalker', 'Plagueherald', 'Soothsinger', 'Diviner'}, expectedShort = '[Class Name]'},
+    ['CharacterSheet'] = {type = {'Tile'}, nameFunction = 'checkCharacterSheet', expectedNameFunction = 'formatExpectedSheetName'},
+    ['AbilityDeckInUse'] = {type = {'Deck'}, min = 6, max = 12},
+    ['AbilityDeckUnused'] = {type = {'Deck'}, max = 11},
+    ['CharacterItems'] = {type = {'Deck', 'Card'}, max = 52},
+    ['AvailableStore'] = {type = {'Deck', 'Card'}, max = 52},
+    ['CityEvents'] = {type = {'Tile'}, name = {'Completed City Events'}},
+    ['Map'] = {type = {'Tile'}, name = {'Map of Gloomhaven'}},
+    ['PlayerCount'] = {type = {'Tile'}, name = {'Player Count'}},
+    ['ScenarioLevel'] = {type = {'Tile'}, name = {'Scenario Level'}},
+    ['LootIndex'] = {type = {'Tile'}, name = {'Treasure Index'}}
+}
+
+validTypeData = {
+    -- version dependent rules
+    [1] = {
+        ['CharacterInfoTile'] = {type = {'Tile'}, name = {'Hatchet', 'Demolitionist', 'Voidwarden', 'Red Guard'}, expectedShort = '[Class Name]'},
+        ['CharacterSheet'] = {type = {'Tile'}, name = {'Character Sheet'}},
+        ['AbilityDeckInUse'] = {type = {'Deck'}, min = 6, max = 40}, -- contentProperty = nil
+        ['AbilityDeckUnused'] = {type = {'Deck'}, max = 11}, -- swapped out cards from 3 X cards + 8 level up. A and B no longer valid options
+        ['CharacterItems'] = {type = {'Deck', 'Card'}, max = 52 }, -- no particular properties to rely on. Bad item will require players to find items manually.
+        ['AvailableStore'] = {type = {'Deck', 'Card'}, max = 52 }, -- no particular properties
+        ['CityEvents'] = {type = {'Tile'}, name = {'Completed City Events'}},
+        ['Map'] = { type = {'Tile'}, name = {'Map of Gloomhaven'}},
+        ['LootIndex'] = { type = {'Tile'}, name = {'Treasure Index'}}
+    },
+    [2] = {
+        ['CharacterInfoTile'] = {type = {'Tile'}, name = {'Hatchet', 'Demolitionist', 'Voidwarden', 'Red Guard', 'Brute', 'Cragheart', 'Mindthief', 'Scoundrel', 'Spellweaver', 'Tinkerer'}, expectedShort = '[Class Name]'},
+        ['CharacterSheet'] = {type = {'Tile'}, name = {'Character Sheet'}},
+        ['AbilityDeckInUse'] = {type = {'Deck'}, min = 6, max = 40},
+        ['AbilityDeckUnused'] = {type = {'Deck'}, max = 11},
+        ['CharacterItems'] = {type = {'Deck', 'Card'}, max = 52},
+        ['AvailableStore'] = {type = {'Deck', 'Card'}, max = 52},
+        ['CityEvents'] = {type = {'Tile'}, name = {'Completed City Events'}},
+        ['Map'] = {type = {'Tile'}, name = {'Map of Gloomhaven'}},
+        ['LootIndex'] = {type = {'Tile'}, name = {'Treasure Index'}}
+    },
+    [3] = validTypeDataV3Base,
+    [3.1] = validTypeDataV3Base
+}
+
+namesV1 = {
+    ['Hatchet'] = {
+        [''] = 'One-Two Punch (66)',
+        ['Disorienting Barraage (51)'] = 'Disorienting Barrage (51)',
+        ['Ripped from the flesh (20)'] = 'Ripped from the Flesh (20)',
+        ['Shapened Blades (44)'] = 'Sharpened Blades (44)'
+    },
+    ['Demolitionist'] = {
+        ['Wholesome Destruction (34)'] = 'Wholesale Destruction (34)'
+    },
+    ['Voidwarden'] = {
+        ['Wicked Search (68)'] = 'Wicked Scratch (68)',
+        ['Wicked scratch (68)'] = 'Wicked Scratch (68)',
+        ['Savage Instincts (51)'] = 'Savage Instinct (51)',
+        ['Svage Instinct (51)'] = 'Savage Instinct (51)',
+        ['Eye of tthe Void (19)'] = 'Eye of the Void (19)'
+    },
+    ['Red Guard'] = {
+        ['Binding Sickle (87)'] = 'Blinding Sickle (87)',
+        ['Twirling Slabs (38)'] = 'Twirling Stabs (38)',
+        ['Healing Hands (32)'] = 'Healing Sands (32)'
+    },
+    ['items'] = {
+        ['Fateful Compass'] = 'Fateful Compass'
+    }
+}
+
+-- Not sure how relevant a mapping for each source version is, but it may be useful
+nameMapping = {
+    [1] = namesV1,
+    [2] = namesV1,
+    [3] = namesV1,
+    [3.1] = namesV1
+}
+
+allowedUninteractableNames = {'Map of Gloomhaven'}
+
+function getVersionCustom()
+    -- version 1 and 2 can be differentiated by presence of Gloomhaven character boxes
+    local bruteTuckBoxGUID = '7dfec2'
+    if getObjectFromGUID(bruteTuckBoxGUID) ~= nil then
+        return 2
+    else
+        return 1
+    end
+end

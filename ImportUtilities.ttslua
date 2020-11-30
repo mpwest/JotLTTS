@@ -1,0 +1,223 @@
+function getCharacterTuckbox(className)
+    return getObjectFromGUID(getCharacterTuckboxGUID(className))
+end
+
+-- player mat
+function setupPlayerMat(number)
+    if number <= 5 then
+        local setupPlayer = getObjectFromGUID(addPlayerMatGuids[number])
+        if  setupPlayer ~= nil then
+            setupPlayer.call('setupPlayerMat')
+        end
+    end
+end
+
+function getPlayerMat(number)
+    return getObjectFromGUID(playerMatGUIDs[number])
+end
+
+-- position calculations
+function positionCalc(itemType, base, condense)
+    local offset
+    if condense then
+        offset = condensedSpacing[itemType]
+    else
+        if itemType == 'init' then
+            return getInitiativeTrackerPosition()
+        else
+            offset = regularSpacing[itemType]
+        end
+    end
+    return vector(base.x + offset.x, offset.absoluteY or (base.y + offset.y), base.z + offset.z)
+end
+
+function getInitiativeTrackerPosition()
+    local initiativeTracker = getObjectFromGUID(Global.call('getInitiativeTracker'))
+    if initiativeTracker ~= nil then
+        local trackerPosition = initiativeTracker.call('getNextEmptyPosition')
+        -- cannot pass reference obtained from another object
+        if trackerPosition ~= nil then
+            return vector(trackerPosition.x, trackerPosition.y, trackerPosition.z)
+        end
+    end
+    return vector(34.00, 2.5, 0.53)
+end
+
+function getPositionOrigin(number, playerMat)
+    if playerMat ~= nil then
+        return playerMat.getPosition() -- Group A
+    elseif number <= 8 then
+        return vector(67.38 + 17.29 * (number - 6), 1, -37) -- Group B; right of player 5, 3 characters, roughly aligned with primary player mat
+    elseif number <= 11 then
+        return vector(67.38 + 17.29 * (number - 9), 1, -65) -- Group C; right of player 5, 3 characters, roughly aligned with secondary player mat
+    elseif number <= 19 then
+        return vector(-20.06 + 17.29 * (number - 12), 1, -101) -- Group D; below Groups A and C, 8 characters, column aligned with above
+    elseif number <= 24 then
+        return vector(-20.06 - 17.29 * (number - 19), 1, -101) -- Group E; starts to the left of Group D, moving further left, 5 characters
+    elseif number <= 29 then
+        return vector(-20.06 - 17.29 * (number - 24), 1, -65) -- Group F; starts left of secondary player mat, row aligned with Group C
+    elseif number <= 33 then
+        return vector(-20.06 - 17.29 * (number - 28), 1, -37) -- Group G; skip extra space, for L2P guide, row aligned with Group B
+    elseif number <= 46 then
+        return vector(-106.51 + 17.29 * (number - 34), 1, 57.3) -- Group H; long row across top, 13 characters
+    elseif number <= 59 then
+        return vector(-106.51 + 17.29 * (number - 47), 1, 81.3) -- Group I; long row across top, 13 characters
+    elseif number <= 72 then
+        return vector(-106.51 + 17.29 * (number - 60), 1, 105.3) -- Group J; long row across top, 13 characters
+    elseif number == 73 then
+        broadcastToAll('Really? 73+ characters? It\'s going in the middle now. Things could break.', {1,1,1,1})
+        return vector(0,1,0)
+    else
+        return vector(0,1,0)
+    end
+end
+
+-- card/deck movement
+
+function moveLastCard(deckPosition, expectedCardName, movePosition, cardRotation)
+    local items = Physics.cast({
+       origin = deckPosition,
+       direction = {0, -1, 0},
+       type = 3,
+       size = {1,1,1},
+       max_distance = 5,
+       debug = false
+    })
+    for _, obj in pairs(items) do
+        local item = obj.hit_object
+        if item.getName() == expectedCardName then
+            item.setPosition(movePosition)
+            if cardRotation ~= nil then
+                item.setRotation(cardRotation)
+            end
+        end
+
+    end
+end
+
+function removeCard(deck, cardName, cardPosition, cardRotation)
+    if deck ~= nil then
+        for _, card in pairs(deck.getObjects()) do
+            if card.name == cardName then
+                deck.takeObject({position = cardPosition, rotation = cardRotation, guid = card.guid, smooth = false})
+                return true
+            end
+        end
+        return false
+    end
+    return false
+end
+
+function addCard(destinationDeck, sourceDeck, cardName, destinationPosition)
+    for _, card in pairs(sourceDeck.getObjects()) do
+        if card.name == cardName then
+            if destinationDeck then
+                destinationDeck.putObject(sourceDeck.takeObject({guid = card.guid}))
+            else
+                sourceDeck.takeObject({guid = card.guid, position = destinationPosition})
+            end
+            return
+        end
+    end
+end
+
+-- inverse of removeCard essentially, for searching for an item from multiple decks
+-- vs searching for what to do with a card from multiple possible lists
+function checkAndMoveCard(deck, card, searchList, movePosition, last)
+    for index, matchName in ipairs(searchList) do
+        if card.name == matchName then
+            if last then
+                Wait.frames(function() moveLastCardByGuid(deck, card.guid, movePosition) end, 2)
+            else
+                deck.takeObject({position = movePosition, guid = card.guid})
+            end
+            return true
+        end
+    end
+    return false
+end
+
+function moveLastCardByGuid(deck, guid, movePosition)
+    local card = getObjectFromGUID(guid)
+    if card ~= nil then
+        card.setPosition(movePosition)
+    else
+        deck.takeObject({position = movePosition, guid = guid})
+    end
+end
+
+-- logic functions class differences
+
+function checkJotlClass(class)
+    for _, jotlClass in pairs(jotlClasses) do
+        if class == jotlClass then
+            return true
+        end
+    end
+    return false
+end
+
+function hasSummons(class)
+    for _, className in pairs(classHasSummons) do
+        if className == class then
+            return true
+        end
+    end
+    return false
+end
+
+-- character sheet/perk logic
+
+function loadCharacterSheet(sheet, characterSheetSave)
+    -- todo Update character sheets with correctly capitalized function name
+    Wait.time(function() sheet.clearButtons() end, 1.5)
+    Wait.time(function() sheet.clearInputs() end, 1.5)
+    Wait.time(function() sheet.call('onLoad', JSON.encode_pretty(characterSheetSave)) end, 2)
+end
+
+function calculatePerkChanges(characterSheetSave, class)
+    local modifierDeckChanges = {}
+    -- calculate perk cards
+    for i = 1, 15 do
+        if characterSheetSave['perk' .. i] and perkInfo[class] ~= nil and perkInfo[class][i] ~= nil then
+            for _, perk in pairs(perkInfo[class][i]) do
+                table.insert(modifierDeckChanges, perk)
+            end
+        end
+    end
+    return modifierDeckChanges
+end
+
+function updateCharacterSheetSave(characterSheetSave, sourceVersion)
+    if characterSheetSave == nil then return {} end
+    if sourceVersion <= 2 then
+        for buttonName, buttonValue in pairs(characterSheetSave['buttons'] or {}) do
+            if buttonValue == 'u{2717}' then
+                characterSheetSave[buttonName] = true
+            elseif buttonValue == '' then
+                characterSheetSave[buttonName] = nil
+            end
+        end
+        characterSheetSave['xp'] = tonumber(characterSheetSave['buttons']['xp'])
+        characterSheetSave['gold'] = tonumber(characterSheetSave['buttons']['gold'])
+        characterSheetSave['buttons'] = nil
+        for inputName, inputValue in pairs(characterSheetSave['inputs']) do
+            characterSheetSave[inputName] = inputValue
+        end
+        characterSheetSave['inputs'] = nil
+    end
+    return characterSheetSave
+end
+
+function log(message)
+    if debug then
+        print(message)
+    end
+end
+
+-- logging
+function logCharacter(action, class, characterNumber, items)
+    if debug then
+        print((action or 'Get') .. ' ' .. (class or '[unknown class]') .. ' (' .. (characterNumber or 'x') .. ') ' .. (items or ''))
+    end
+end

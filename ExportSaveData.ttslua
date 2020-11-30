@@ -1,0 +1,238 @@
+#include DataExportInfo
+#include ExportTypes
+
+maxSourceVersion = 3.1
+green = color(76/255, 177/255, 71/255, 1)
+blue = color(31/255, 136/255, 255/255, 1)
+
+wait = true
+
+saveState = {}
+
+function onLoad(save_state)
+    if save_state ~= nil then
+        saveState = JSON.decode(save_state)
+    end
+    if saveState == nil then saveState = {} end
+
+    if saveState['complete'] ~= nil and saveState['complete'] then
+        self.setColorTint(green)
+        tryPushSaveData()
+    else
+        local version = getVersion()
+        if saveState['sourceVersion'] == nil or version == saveState['sourceVersion'] then
+            broadcastToAll('Exporting data from version ' .. version or '(unknown)')
+            requestSaveData(version)
+        else
+            broadcastToAll('This Save Tool has begun exporting data from a different version of this mod. Please spawn a new instance of the Save Tool from the target version and choosing \'Expand\'.', 'Red')
+        end
+    end
+    wait = false
+end
+
+function getVersion()
+    if Global.getVar('getVersion') then
+        return Global.call('getVersion')
+    end
+    return getVersionCustom()
+end
+
+function tryPushSaveData()
+    if Global.getVar('importPriorVersion') then
+        broadcastToAll('Import from version ' .. saveState['sourceVersion'], 'White')
+        saveState['toolVersion'] = maxSourceVersion
+        if Global.call('importPriorVersion', JSON.encode(saveState)) then
+            selfDestruct()
+        end
+    end
+end
+
+function selfDestruct()
+    flashSuccess(green)
+    Wait.time(function() self.destruct() end, 1.25)
+end
+
+function requestSaveData(version)
+    local next = saveState['next'] or requestData[version].firstStep
+    local request = requestData[version][next]
+
+    broadcastToAll(request.name, 'Blue')
+    print(request.message)
+end
+
+function onCollisionEnter(collision_info)
+    if wait then return end
+
+    if saveState['complete'] then
+        return
+    end
+
+    local version = saveState['sourceVersion'] or getVersion()
+    local next = saveState['next'] or requestData[version].firstStep
+    local request = requestData[version][next]
+    local target = collision_info['collision_object']
+
+    if target.interactable == false and not allowImportUninteractable(target.getName()) then-- presumably the ground/background items, ignore collision
+        return
+    end
+
+    if target.getName() == 'NEXT Tool' and target.getGMNotes() == 'Continue export data process' then
+        setWait()
+        saveState['next'] = request.next or request.continueOrNext or saveState['next']
+        requestSaveData(version)
+        return
+    end
+
+    if checkValidTarget(target, version, next) then
+        setWait()
+        if saveState['sourceVersion'] == nil then
+            saveState['sourceVersion'] = version
+        end
+        self.call('export' .. next, {target = target, version = version})
+        saveState['next'] = request.continue or request.continueOrNext
+        if saveState['next'] == 'Done' then
+            complete()
+        else
+            flashSuccess(blue)
+            requestSaveData(version)
+        end
+    end
+
+    save()
+end
+
+function setWait()
+    wait = true
+    Wait.time(function() wait = false end, 1)
+end
+
+function allowImportUninteractable(name)
+    for _, allowedName in pairs(allowedUninteractableNames) do
+        if name == allowedName then
+            return true
+        end
+    end
+    return false
+end
+
+function checkValidTarget(target, version,  next)
+    local type = target.tag
+    if not checkType(type, validTypeData[version][next].type) then return false end
+    if not checkName(target, validTypeData[version][next].name, validTypeData[version][next].expectedShort) then return false end
+    if not checkNameFunction(target, validTypeData[version][next].nameFunction, validTypeData[version][next].expectedNameFunction) then return false end
+    if not checkMinMax(target, validTypeData[version][next].min, validTypeData[version][next].max) then return false end
+
+    return true
+end
+
+function checkType(type, possibleTypes)
+    for _, typeOption in pairs(possibleTypes) do
+        if type == typeOption  then
+            return true
+        end
+    end
+    return false
+end
+
+function checkName(target, expectedNames, expectedShort)
+    local possibleNames = ''
+    local foundName = false
+    if expectedNames then
+        for _, matchName in pairs(expectedNames) do
+            if target.getName() == matchName then
+                return true
+            else
+                possibleNames = possibleNames .. ' '.. matchName
+            end
+        end
+        if target.getName() ~= '' then
+            broadcastToAll('Expected an item with name:' .. (expectedShort or possibleNames), 'Red')
+        end
+    else
+        return true
+    end
+end
+
+function checkNameFunction(target, nameFunction, expectedNameFunction)
+    if nameFunction == nil then return true end
+    if self.call(nameFunction, target.getName()) then
+        return true
+    else
+        if expectedNameFunction then
+            local expected = self.call(expectedNameFunction, target.getName())
+        else
+            broadcastToAll('Object does not match expected name', 'Red')
+        end
+        return false
+    end
+end
+
+function checkMinMax(target, min, max)
+    if target.tag ~= 'Deck' and target.tag ~= 'Bag' then
+        if min ~= nil and min > 1 then
+            return false
+        else
+            return true
+        end
+    end
+    local objectType = 'bag'
+    local objectContents = 'objects'
+    if target.tag == 'Deck' then
+        objectType = 'deck'
+        objectContents = 'cards'
+    end
+
+    if min then
+        if #(target.getObjects()) < min then
+            broadcastToAll('Expected a ' .. objectType .. ' with at least ' .. min .. ' ' .. objectContents, 'Red')
+            return false
+        end
+    end
+
+    if max then
+        if #(target.getObjects()) > max then
+            broadcastToAll('Expected a ' .. objectType .. ' with at most ' .. max .. ' ' .. objectContents, 'Red')
+            return false
+        end
+    end
+    return true
+end
+
+function readCardsInDeck(deck, version, deckType)
+    local mapSet = getMapSet(version, deckType)
+
+    local cards = {}
+    for _, card in pairs(deck.getObjects()) do
+        table.insert(cards, (mapSet[card.name] or card.name))
+    end
+    return cards
+end
+
+function readCard(card, version, deckType)
+    local mapSet = getMapSet(version, deckType)
+    return { mapSet[card.name] or card.name }
+end
+
+function getMapSet(version, cardType)
+    if nameMapping[version] ~= nil and nameMapping[version][cardType] ~= nil then
+        return nameMapping[version][cardType]
+    end
+    return {}
+end
+
+function flashSuccess(secondaryColor)
+    Wait.time(function() self.setColorTint(secondaryColor) end, 0.25)
+    Wait.time(function() self.setColorTint('White') end, 0.5)
+    Wait.time(function() self.setColorTint(secondaryColor) end, 0.75)
+    Wait.time(function() self.setColorTint('White') end, 1)
+end
+
+function complete()
+    saveState['complete'] = true
+    self.setColorTint(green)
+    broadcastToAll(completeMessage, 'Green')
+end
+
+function save()
+    self.script_state = JSON.encode(saveState)
+end

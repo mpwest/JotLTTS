@@ -1,0 +1,145 @@
+#include DataImportInfo
+#include ImportCharacter
+#include ImportUtilities
+
+debug = false -- No breakpoints or debugging utilities for tts, unfortunately
+allowImport = true
+version = 3.1
+
+function getVersion()
+    return version
+end
+
+-- Any older source versions must be handled, destination versions can update fully with any future release
+function importPriorVersion(saveInfoJSON)
+    if not allowImport then
+        broadcastToAll('There is currently an import operation being run. Please wait to spawn additional import tokens.', {1,1,1,1})
+        return true
+    end
+    allowImport = false
+
+    local saveInfo = JSON.decode(saveInfoJSON)
+
+    if (saveInfo['toolVersion'] or 0) < version then
+        broadcastToAll('Please use a current version of the Save Tool to import game status.', {1,1,1,1})
+        return
+    end
+
+    if saveInfo['characters'] ~= nil  then
+        log('Import characters')
+        importCharacters(saveInfo['characters'], saveInfo['sourceVersion'])
+    end
+
+    if saveInfo['storeItems'] ~= nil  then
+        log('Import store')
+        addToStore(saveInfo['storeItems'])
+    end
+
+    if saveInfo['cityEvents'] ~= nil  then
+        log('Import city events')
+        moveCompletedEvents(saveInfo['cityEvents'])
+    end
+
+    if saveInfo['map'] ~= nil then
+        log('Import map')
+        updateMap(saveInfo['map'])
+    end
+
+    if saveInfo['playerCount'] ~= nil then
+        log('Import player count')
+        updatePlayerCount(saveInfo['playerCount'])
+    end
+
+    if saveInfo['scenarioLevel'] ~= nil then
+        log('Import player count')
+        updateScenarioLevel(saveInfo['scenarioLevel'])
+    end
+
+    if saveInfo['lootIndex'] ~= nil then
+        log('Import loot index')
+        updateLoot(saveInfo['lootIndex'])
+    end
+    Wait.frames(function() broadcastToAll('Try setting up scenarios 1 and 2 for a tutorial on the new setup process.', {1,1,1,1}) end, 300)
+    Wait.frames(function() allowImport = true end, 60 * (#(saveInfo['characters'] or {}) + 5))
+    return true
+end
+
+function addToStore(itemList)
+    local available =  getObjectFromGUID(getItemDeck('available'))
+    local unavailable = getObjectFromGUID(getItemDeck('unavailable'))
+    local itemsRemaining = 0
+    local unavailablePosition = vector(-26.10, 2.13, -3.99)
+    if unavailable then
+        itemsRemaining = #unavailable.getObjects()
+        local unavailablePosition = unavailable.getPosition()
+    end
+
+    local availablePosition = vector(-26.07, 2.13, -7.47)
+    if available then
+        available.getPosition()
+    end
+
+    for _, item in pairs(itemList) do
+        if itemsRemaining == 1 then
+            Wait.frames(function() moveLastCard(unavailablePosition, item, availablePosition) end, 30)
+        elseif itemsRemaining > 1 then
+            if available then
+                addCard(available, unavailable, item)
+            else
+
+            end
+        end
+        itemsRemaining = itemsRemaining - 1
+    end
+end
+
+function moveCompletedEvents(cityEvents)
+    local eventDeck = getObjectFromGUID(eventDeckGUID)
+    local deckPosition = eventDeck.getPosition()
+    if eventDeck ~= nil then
+        local eventsRemaining = #eventDeck.getObjects()
+        for eventNumber, complete in pairs(cityEvents) do
+            if complete then
+                if eventsRemaining == 1 then -- removed last card
+                    Wait.frames(function() moveLastCard(deckPosition, eventNumber, completedEventLocation) end, 30)
+                else
+                    removeCard(eventDeck, eventNumber, completedEventLocation)
+                end
+                eventsRemaining = eventsRemaining - 1
+            end
+        end
+    end
+end
+
+function updateMap(mapInfo)
+    local map = getObjectFromGUID(getMapTileGUID())
+    local importedAll = true
+    for guid, checked in pairs(mapInfo) do
+        importedAll = map.call('addStickerFromImport', {guid = guid, checked = checked}) and importedAll -- will become false if adding a sticker fails
+    end
+    if not importedAll then
+        broadcastToAll('Some map stickers may not have imported correctly, based on unexpected GUIDs', {1,1,1,1})
+    end
+end
+
+function updatePlayerCount(playerInfo)
+
+    local playerCountTracker = getObjectFromGUID(playerCountTrackerGUID)
+    Wait.time(function() playerCountTracker.clearButtons() end, 1.5)
+    Wait.time(function() playerCountTracker.clearInputs() end, 1.5)
+    Wait.time(function() playerCountTracker.call('onLoad', JSON.encode_pretty(playerInfo)) end, 2)
+end
+
+function updateScenarioLevel(levelInfo)
+    local scenarioLevelTracker = getObjectFromGUID(scenarioLevelTrackerGUID)
+    Wait.time(function() scenarioLevelTracker.clearButtons() end, 1.5)
+    Wait.time(function() scenarioLevelTracker.clearInputs() end, 1.5)
+    Wait.time(function() scenarioLevelTracker.call('onLoad', JSON.encode_pretty(levelInfo)) end, 2)
+end
+
+function updateLoot(lootInfo)
+    local treasureIndex = getObjectFromGUID(getTreasureIndexGUID())
+    if treasureIndex ~= nil then
+        treasureIndex.call('onLoad', JSON.encode({lootedIndex = lootInfo}))
+    end
+end
