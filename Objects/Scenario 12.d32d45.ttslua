@@ -110,6 +110,8 @@ buttonData = {
     [9] = { position = {-0.79, -0.1, -0.97}, nextButtons = {}, action = 'generateWinRewards', hint = 'Click for Scenario Rewards' }
 }
 
+gridData = { scale =  2.74, x = -1.0, y = 0.9 }
+
 function destroyPillarA()
     cleanupButton(2)
     setupRoom(2)

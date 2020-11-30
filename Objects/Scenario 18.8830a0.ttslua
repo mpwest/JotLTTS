@@ -89,3 +89,5 @@ buttonData = {
     [10] = { position = {0.33, 0.1, -0.64}, label = '', message = 'Please move golems to an appropriate position.', nextButtons = { 11 }, action = "setupRoom", hint = 'Setup monsters'},
     [11] = { position = {0.47, 0.1, 0.95}, nextButtons = {}, action = 'generateWinRewards', hint = 'Click for Scenario Rewards' }
 }
+
+gridData = { scale =  2.6, x = 1.1, y = 0.1 }

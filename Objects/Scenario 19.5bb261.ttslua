@@ -161,3 +161,5 @@ buttonData = {
    [8] = {position = {0.46, 0.1, -0.76}, nextButtons = { 9 }, action = 'setupRoom', hint = 'Destroy nest', overrideButtonHeight = hexHeight},
    [9] = { position = {0.43, 0.1, 0.9}, nextButtons = {}, action = 'generateWinRewards', hint = 'Click for Scenario Rewards' }
 }
+
+gridData = { scale =  2.95, x = -0.7, y = 0.9 }

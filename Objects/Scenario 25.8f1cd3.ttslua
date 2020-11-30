@@ -171,3 +171,5 @@ buttonData = {
     -- win
     [18] = { position = {-0.9, 0.1, -0.45}, nextButtons = {}, action = 'generateWinRewards', hint = 'Click for Scenario Rewards' }
 }
+
+gridData = { scale =  2.51, x = 0.1, y = 1.1 }

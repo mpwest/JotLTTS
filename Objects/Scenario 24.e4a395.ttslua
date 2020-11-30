@@ -80,3 +80,5 @@ buttonData = {
     [3] = { position = {-0.01, 0.1, 0.52}, nextButtons = { 4 }, action = 'setupRoom', hint = 'Continue'},
     [4] = { position = {0.34, 0.1, 0.85}, nextButtons = {}, action = 'generateWinRewards', hint = 'Click for Scenario Rewards' }
 }
+
+gridData = { scale =  2.71, x = -0.9, y = -0.3 }

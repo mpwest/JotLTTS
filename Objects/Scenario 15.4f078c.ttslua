@@ -64,6 +64,8 @@ buttonData = {
     [7] = { position = {0.62, 0.1, 0.89}, nextButtons = {}, action = 'generateWinRewards', hint = 'Click to get Scenario Rewards' }
 }
 
+gridData = { scale =  2.59, x = -1.0, y = -0.1 }
+
 function setupAllDRooms()
     setupRoom(3)
 end

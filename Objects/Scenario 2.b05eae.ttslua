@@ -64,3 +64,5 @@ buttonData = {
         message = 'Drop these Reward tokens on your character sheets to transfer rewards.',
         nextButtons = {}, action = "generateWinRewards", hint = "Click for Scenario Rewards" }
 }
+
+gridData = { scale =  2.73, x = 1.0, y = 0.7 }
