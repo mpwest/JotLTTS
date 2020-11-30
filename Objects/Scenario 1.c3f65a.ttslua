@@ -36,3 +36,5 @@ buttonData = {
     [1] = { position = {-0.67, 0.1, -0.91}, label = 'Click the scenario number\nfor automated setup', labelPosition = {-0.67, 0, -1.1},
         message = 'When the scenario is complete, unlock (\'L\'), and delete the scenario sheet.', nextButtons = { }, action = "initializeScenario", hint = 'Setup Scenario'}
 }
+
+gridData = { scale =  2.62, x = -1.7, y = 0.0 }

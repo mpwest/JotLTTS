@@ -53,6 +53,8 @@ buttonData = {
     [2] = { position = {-1.29, 0.1, 0.85}, nextButtons = {}, action = "generateWinRewards", hint = "Click for Scenario Rewards" }
 }
 
+gridData = { scale =  2.82, x = -1.0, y = 0.8 }
+
 function healthTimesCharacterNum()
     local playerCount = saveState['playerCount']
     local scenarioLevel = saveState['scenarioLevel']

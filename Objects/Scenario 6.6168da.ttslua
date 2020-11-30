@@ -103,3 +103,5 @@ buttonData = {
     [9] = { position = {2.14, 0.1, -0.18}, nextButtons = {}, action = 'setupRoom', hint = 'Destroy Growth'},
     [10] = { position = {1.93, 0.1, 0.41}, nextButtons = {}, action = 'setupRoom', hint = 'Destroy Growth'},
 }
+
+gridData = { scale =  2.58, x = 0.6, y = -0.4 }

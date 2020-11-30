@@ -16,6 +16,42 @@ function onLoad(save_state)
     initializeSetupButtons()
 end
 
+function onDrop(player_color)
+    -- Follow the dropped map until it lands.
+    Wait.frames(followLanding, 1)
+
+    -- Set appropriate options for the Grid
+    Grid.type = 2
+    Grid.snapping = 3
+
+    if gridData ~= nil then
+        Grid.sizeX = gridData.scale
+        Grid.sizeY = gridData.scale
+    end
+
+    -- Useful for debugging - show grid lines.
+    --Grid.show_lines = true -- for debugging
+    --self.grid_projection = true
+end
+
+function followLanding()
+    -- keep following the landing until the map is resting
+    if not self.resting then
+        Wait.frames(followLanding, 1)
+    end
+
+    local pos = self.getPosition()
+
+    -- There's some confusion here, as Grid refers to X and Y, but these
+    -- correspond to the X and Z dimensions of objects. Just note that the
+    -- mixing of y & z is intentional.
+    if gridData ~= nil then
+        Grid.offsetX = gridData.x + pos.x
+        Grid.offsetY = gridData.y + pos.z
+    end
+
+end
+
 function initializeScenario()
     local level = Global.call('getScenarioLevel')
     local playerCount = Global.call('getPlayerCount')

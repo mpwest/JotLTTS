@@ -79,6 +79,8 @@ buttonData = {
    [4] = { position = {0, 0.1, -0.39}, nextButtons = {}, action = 'generateWinRewards', hint = 'Click for Scenario Rewards' }
 }
 
+gridData = { scale =  2.98, x = -0.5, y = -0.4 }
+
 function reduceBy4C()
     local playerCount = saveState['playerCount']
     local scenarioLevel = saveState['scenarioLevel']

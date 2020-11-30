@@ -76,6 +76,8 @@ buttonData = {
    [4] = { position = {2.05, 0.1, 0.7}, nextButtons = {}, action = 'generateWinRewards', hint = 'Click for Scenario Rewards' }
 }
 
+gridData = { scale =  2.67, x = -0.1, y = 0.1 }
+
 function fotoHP()
     local playerCount = saveState['playerCount']
     local scenarioLevel = saveState['scenarioLevel']

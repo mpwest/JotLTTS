@@ -69,6 +69,8 @@ buttonData = {
     [4] = { position = {0.36, 0.1, 0.9}, nextButtons = {}, action = 'generateWinRewards', hint = 'Click for Scenario Rewards' }
 }
 
+gridData = { scale =  2.65, x = -1.0, y = 0.0 }
+
 crowdMemberPositions = {
     [1] = { x = -5, z = 11.5 }, [2] = { x = -9, z = 9 }, [3] = { x = -9, z = -2.25 }, [4] = { x = -5, z = -4.6},
      [5] = { x = -5, z = 0.1 }, [6] = { x = -5, z = 7 }, [7] = { x = -9, z = 4.6 }, [8] = { x = -9, z = 2.3 },
