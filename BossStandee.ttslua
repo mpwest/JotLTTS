@@ -1,4 +1,4 @@
-#include SimpleCounter
+#include AdjustableCounter
 #include Figure
 
 min = 0
@@ -19,7 +19,7 @@ function initialize()
         local level = Global.call('getScenarioLevel')
         local playerCount = Global.call('getPlayerCount')
 
-        max = calculateHealth(level, playerCount)
+        max = saveState['max'] or calculateHealth(level, playerCount)
         setCounter(max)
 
         saveState['max'] = max

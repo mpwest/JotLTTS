@@ -1,9 +1,11 @@
 saveState = {}
+option = 'Off'
 
 function onLoad(save_state)
     if save_state ~= '' then
         saveState = JSON.decode(save_state)
     end
+    setFollowOption()
 end
 
 function onCollisionEnter(collision_info)
@@ -17,16 +19,24 @@ end
 function checkAttach(object)
     return object.getVar('jotl_Class') == 'figure'
         and saveState['figureGuid'] == nil
+        and setFollowOption()
         and object.call('registerCondition', self)
 end
 
+function setFollowOption()
+    option = Global.call('checkConditionAttachOption')
+    return option ~= 'Off'
+end
+
 function onPickUp()
+    option = 'Off'
+    saveState['figureGuid'] = nil
+    self.script_state = JSON.encode(saveState)
+    self.registerCollisions()
+
     local figure = getObjectFromGUID(saveState['figureGuid'])
     if figure ~= nil then
-        saveState['figureGuid'] = nil
-        self.script_state = JSON.encode(saveState)
         figure.call('removeCondition', self.getGUID())
-        self.registerCollisions()
     end
 end
 
@@ -39,15 +49,29 @@ end
 function move(params)
     local figure = params.figure
     local baseDistance = params.baseDistance
-    self.setPositionSmooth(calculatePosition(figure, baseDistance), false, true)
-    self.setRotationSmooth(conditionRotation, false, true)
+
+    if(option == 'Top') then
+        self.setPositionSmooth(calculatePosition(figure, baseDistance, false), false, true)
+        self.setRotationSmooth(conditionRotationTop, false, true)
+    elseif(option == 'Iso') then
+        self.setPositionSmooth(calculatePosition(figure, baseDistance, true), false, true)
+        self.setRotationSmooth(conditionRotationIso, false, true)
+    end
 end
 
-function calculatePosition(figure, baseDistance)
+function calculatePosition(figure, baseDistance, iso)
+    local adjustment = conditionDistanceAdjustmentTop
+    local angle = conditionAngleTop
+
+    if iso then
+        adjustment = conditionDistanceAdjustmentIso
+        angle = conditionAngleIso
+    end
+
     local offset = vector(
-        math.cos(math.rad(conditionAngle)) * (baseDistance + conditionDistanceAdjustment),
+        math.cos(math.rad(angle)) * (baseDistance + adjustment),
         0.4,
-        math.sin(math.rad(conditionAngle)) * (baseDistance + conditionDistanceAdjustment)
+        math.sin(math.rad(angle)) * (baseDistance + adjustment)
     )
     return figure.getPosition() + offset
 end

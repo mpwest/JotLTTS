@@ -37,50 +37,6 @@ tempModifierDeck = {
     ['monsterCurse'] = '4c71f2'
 }
 
---[[
-function initializeScenarioData()
-    if saveState['overlayBags'] == nil then
-        saveState['overlayBags'] = overlayBags
-    end
-    if saveState['itemDecks'] == nil then
-        saveState['itemDecks'] = itemDecks
-    end
-    if saveState['scenarioRewards'] == nil then
-        saveState['scenarioRewards'] = scenarioRewards
-    end
-    if saveState['scenarioLevelTrackerGUID'] == nil then
-        saveState['scenarioLevelTrackerGUID'] = scenarioLevelTrackerGUID
-    end
-    if saveState['playerCountTrackerGUID'] == nil then
-        saveState['playerCountTrackerGUID'] = playerCountTrackerGUID
-    end
-    if saveState['treasureIndexGUID'] == nil then
-        saveState['treasureIndexGUID'] = treasureIndexGUID
-    end
-    if saveState['rewardTileBagGUID'] == nil then
-        saveState['rewardTileBagGUID'] = rewardTileBagGUID
-    end
-    if saveState['initiativeTrackerGUID'] == nil then
-        saveState['initiativeTrackerGUID'] = initiativeTrackerGUID
-    end
-    if saveState['mapStickerBagGUID'] == nil then
-        saveState['mapStickerBagGUID'] = mapStickerBagGUID
-    end
-    if saveState['mapTileGUID'] == nil then
-        saveState['mapTileGUID'] = mapTileGUID
-    end
-    if saveState['elementsBagGUID'] == nil then
-        saveState['elementsBagGUID'] = elementsBagGUID
-    end
-    if saveState['elementTrackerGUID'] == nil then
-        saveState['elementTrackerGUID'] = elementTrackerGUID
-    end
-    if saveState['conditionControlGUID'] == nil then
-        saveState['conditionControlGUID'] = conditionControlGUID
-    end
-    save()
-end ]]
-
 function getScenarioLevel()
     local scenarioLevelTracker = getObjectFromGUID(scenarioLevelTrackerGUID)
     return scenarioLevelTracker.call('getLevel')
@@ -149,11 +105,11 @@ function getElementTracker()
     return elementTrackerGUID
 end
 
-function checkAllowConditionAttach()
+function checkConditionAttachOption()
     local conditionControl = getObjectFromGUID(conditionControlGUID)
     if conditionControl then
         return conditionControl.call('isConditionFeatureEnabled')
     else
-        return false
+        return 'Off'
     end
 end

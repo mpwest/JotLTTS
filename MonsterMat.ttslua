@@ -4,19 +4,25 @@ Casts = {
 }
 
 function onLoad(save_state)
-  createButt("draw", -0.3, -0.89, "Default", "Draw a Skill Card")
-  createButt("shuffle", 0.3, -0.89, "Default", "Shuffle the Skill Deck")
-  createButt('placeSleeveClick', 0, 0.955, "Default", "Place Sleeve")
+  createButt('draw', -0.3, -0.89, 'Default', 'Draw a Skill Card')
+  createButt('shuffle', 0.3, -0.89, 'Default', 'Shuffle the Skill Deck')
+  createButt('placeUnder', 0, -0.89, 'Small', 'No enemies present - move cards to bottom of draw pile')
+  createButt('placeSleeveClick', 0, 0.955, 'Default', 'Place Sleeve')
 end
 
 function createButt(name, x, z, type, tooltip)
+  local buttonWidth = 1100
+  if type == 'Small' then
+      buttonWidth = 500
+  end
+
   self.createButton({
      click_function = name,
      function_owner = self,
-     label = "",
+     label = '',
      position = {x, 0.1, z},
      scale = {0.1, 0.1, 0.1},
-     width = 1100,
+     width = buttonWidth,
      height = 450,
      color = {1, 1, 1, 0},
      tooltip = tooltip
@@ -84,6 +90,45 @@ function shuffle()
     end
 end
 
+function placeUnder()
+    local drawObjects = getCards(Casts['AbilityDraw'])
+    local drawDeck
+    for _, obj in pairs(drawObjects) do
+        local hitItem = obj.hit_object
+        if hitItem.tag == 'Deck' or hitItem.tag == 'Card' then
+            drawDeck = hitItem
+            local raisedPosition = drawDeck.getPosition()
+            raisedPosition.y = raisedPosition.y + 3
+            drawDeck.setPosition(raisedPosition)
+            drawDeck.setLock(true)
+        end
+    end
+
+    local discard = getCards(Casts['AbilityDiscard'])
+
+    local drawBottom = self.positionToWorld(Casts['AbilityDraw'])
+
+    if drawDeck ~= nil then
+        drawBottom = drawDeck.getPosition()
+        drawBottom.y = self.getPosition().y + 0.1
+    end
+
+    for _, obj in pairs(discard) do
+        item = obj.hit_object
+        if item.tag == 'Card' or item.tag == 'Deck' then
+            item.setRotation({0,180,180})
+            item.setPositionSmooth(drawBottom, false, true)
+        end
+    end
+    if drawDeck then
+        Wait.frames(function() drawDeck.setLock(false) end, 10)
+    end
+end
+
+function moveCard(card, position)
+
+end
+
 function announceDraw(card)
     broadcastToAll(card.getName(), {31/255, 135/255, 255/255})
 end
@@ -112,7 +157,12 @@ function placeSleeve(flipSleeve)
 end
 
 function cleanup()
-    local objects = getCards(Casts["AbilityDiscard"])
+    deleteAbilityCards(Casts['AbilityDraw'])
+    deleteAbilityCards(Casts['AbilityDiscard'])
+end
+
+function deleteAbilityCards(location)
+    local objects = getCards(location)
     for _, obj in pairs(objects) do
         local item = obj.hit_object
         if (item.tag == 'Deck' or item.tag == 'Card') then

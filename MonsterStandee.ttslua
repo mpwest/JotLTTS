@@ -1,4 +1,4 @@
-#include SimpleCounter
+#include AdjustableCounter
 #include Figure
 
 min = 0
@@ -76,7 +76,7 @@ function initialize()
     saveState['level'] = level
     if saveState['type'] == nil then
         saveState['type'] = 'normal'
-        max = normalHealth[level]
+        max = saveState['max'] or normalHealth[level]
     end
     if saveState['type'] == 'elite' then
         setType(true)

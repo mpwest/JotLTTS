@@ -199,12 +199,12 @@ function add(name, amount, alt_click)
     local oldValue = tonumber(button.label)
     local newValue = oldValue + amount
     self.editButton({index = button.index, label = newValue})
+    saveState[name] = newValue
 
-	if name == "xp" then
+    if name == "xp" then
         checkLevelChange(oldValue, newValue)
-	end
+    end
 
-	saveState[name] = newValue
     save()
 end
 
